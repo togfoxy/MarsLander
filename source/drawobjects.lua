@@ -9,7 +9,22 @@ local function DrawSurface()
 	end
 end
 
+local function DrawObjects()
+-- query garrObjects table and draw them in the world
+
+	for k,_ in pairs(garrObjects) do
+		
+		local xvalue = k
+		local objectvalue = garrObjects[xvalue]
+		
+		if objectvalue == 1 then
+			love.graphics.draw(garrImages[1], xvalue, garrGround[xvalue] - garrImages[1]:getHeight())
+		end
+	end
+end
+
 function drawobjects.DrawWorld()
+-- draw the spaceship and flame and other bits
 
 	love.graphics.setColor(1,1,1,1)
 	for k,v in ipairs(garrLanders) do
@@ -25,6 +40,8 @@ function drawobjects.DrawWorld()
 	
 	-- draw the surface
 	DrawSurface()
+	
+	DrawObjects()
 
 end
 

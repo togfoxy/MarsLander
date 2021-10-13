@@ -16,7 +16,9 @@ gintScreenHeight = 900-- 1080
 garrCurrentScreen = {}	
 
 garrLanders = {}	
-garrGround = {}
+garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
+garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
+garrImages = {}
 
 local function DoThrust(dt)
 
@@ -62,6 +64,12 @@ local function InitialiseGround()
 	for i = 0, gintScreenWidth do
 		garrGround[i] = 600
 	end
+	
+	-- Place a single tower for testing purposes
+	local randomx = love.math.random(100, gintScreenWidth - 100)
+	garrObjects[randomx] = 1	-- 1 = tower
+	
+	
 end
 
 local function CheckForContact(Lander)
@@ -105,6 +113,8 @@ function love.load()
 	--love.keyboard.setKeyRepeat( true )
 	
 	InitialiseGround()
+	
+	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
 	
 	
 end
