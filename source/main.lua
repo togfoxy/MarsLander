@@ -1,4 +1,4 @@
-gstrGameVersion = "0.01"
+gstrGameVersion = "0.02"
 
 inspect = require 'inspect'
 -- https://github.com/kikito/inspect.lua
@@ -11,14 +11,16 @@ dobjs = require "drawobjects"
 fun = require "functions"
 cf = require "commonfunctions"
 
-gintScreenWidth = 1440-- 1920
-gintScreenHeight = 900-- 1080
+gintScreenWidth = 800-- 1920
+gintScreenHeight = 600-- 1080
 garrCurrentScreen = {}	
 
 garrLanders = {}	
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
 garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
 garrImages = {}
+
+gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 
 local function DoThrust(dt)
 
@@ -49,7 +51,7 @@ local function TurnRight(dt)
 end
 
 local function MoveShip(Lander, dt)
-	Lander.x = Lander.x + Lander.vx 
+	Lander.x = Lander.x + Lander.vx
 	Lander.y = Lander.y + Lander.vy
 	
 	-- apply gravity
@@ -62,13 +64,12 @@ local function InitialiseGround()
 -- initialie the ground array to be a flat line
 
 	for i = 0, gintScreenWidth do
-		garrGround[i] = 600
+		garrGround[i] = gintScreenHeight * 0.80
 	end
 	
 	-- Place a single tower for testing purposes
 	local randomx = love.math.random(100, gintScreenWidth - 100)
 	garrObjects[randomx] = 1	-- 1 = tower
-	
 	
 end
 
@@ -76,16 +77,24 @@ local function CheckForContact(Lander)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(Lander.x)
-	local groundYvalue = cf.round(garrGround[LanderXValue],0)
+	local groundYvalue
 	
-	if Lander.y > groundYvalue - 8 then
-		Lander.landed = true
-		Lander.vx = 0
-		Lander.vy = 0
-	else
-		Lander.landed = false
+	Lander.landed = false
+	
+	if garrGround[LanderXValue] ~= nil then
+		groundYvalue = cf.round(garrGround[LanderXValue],0)
+	
+		if Lander.y > groundYvalue - 8 then
+			Lander.landed = true
+			Lander.vx = 0
+			-- Lander.vy = 0
+			
+			if Lander.vy > 0 then Lander.vy = 0 end
+			
+		else
+			Lander.landed = false
+		end
 	end
-
 end
 
 function love.keypressed( key, scancode, isrepeat)
@@ -107,12 +116,15 @@ function love.load()
 
 	fun.AddScreen("World")
 	
-	-- create one lander and add it to the global array
-	table.insert(garrLanders, cobjs.CreateLander())
+
 	
 	--love.keyboard.setKeyRepeat( true )
 	
 	InitialiseGround()
+
+	-- create one lander and add it to the global array
+	-- ** this needs to be called AFTER InitialiseGround()
+	table.insert(garrLanders, cobjs.CreateLander())
 	
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
 	
