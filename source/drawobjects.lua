@@ -4,6 +4,7 @@ local drawobjects = {}
 local function DrawSurface(worldoffset)
 -- draws the terrain as a bunch of lines that are 1 pixel in length	
 
+	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (worldoffset + gintScreenWidth) > #garrGround then
 		fun.GetMoreTerrain()
@@ -17,6 +18,7 @@ end
 local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
+	love.graphics.setColor(1,1,1,1)
 	for k,_ in pairs(garrObjects) do
 		
 		local xvalue = k
@@ -25,14 +27,24 @@ local function DrawObjects(worldoffset)
 		if objectvalue == 1 then
 			love.graphics.draw(garrImages[1], xvalue - worldoffset, garrGround[xvalue] - garrImages[1]:getHeight())
 		end
+		
+		if objectvalue == 2 then
+			if garrGround[xvalue - worldoffset] ~= nil then
+				love.graphics.draw(garrImages[2], xvalue - worldoffset, garrGround[xvalue] - garrImages[2]:getHeight())
+			end
+		end
+		
 	end
 end
 
-function drawobjects.DrawWorld()
--- draw the spaceship and flame and other bits
+local function DrawDebug()
 
-	-- adjust the world so that the lander is centred and the terrain moves under it
-	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
+	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 15)
+	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
+
+end
+
+local function DrawLander(worldoffset)
 
 	-- draw the lander and flame
 	love.graphics.setColor(1,1,1,1)
@@ -46,11 +58,25 @@ function drawobjects.DrawWorld()
 		end		
 	
 	end
-	
+
+end
+
+function drawobjects.DrawWorld()
+-- draw the spaceship and flame and other bits
+
+	-- adjust the world so that the lander is centred and the terrain moves under it
+	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
+
 	-- draw the surface
 	DrawSurface(worldoffset)
 	
 	DrawObjects(worldoffset)
+	
+	DrawLander(worldoffset)
+	
+	if gbolDebug then
+		DrawDebug()
+	end	
 
 end
 

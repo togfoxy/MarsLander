@@ -17,7 +17,9 @@ end
 function functions.GetMoreTerrain()
 -- determines the next bit of terrain and adds that to the terrain table
 
-	for i = #garrGround + 1, #garrGround + 2000 do
+	local groundtablesize = #garrGround
+
+	for i = groundtablesize + 1, groundtablesize + 2000 do
 	
 		local newgroundaltitude = garrGround[i-1] + love.math.random (-5,5)
 		
@@ -26,6 +28,40 @@ function functions.GetMoreTerrain()
 	
 		table.insert(garrGround, newgroundaltitude)
 	end
+	
+	-- reapply bases and smoothing
+	for i = groundtablesize + 1, groundtablesize + 2000 do
+		if garrObjects[i] ~= nil then
+			fun.CreateBase(garrObjects[i],i)
+		end
+	end
+end
+
+function functions.GetLanderMass()
+-- return the mass of all the bits on the lander
+
+	local result = 0
+
+	-- all the masses are stored in this table so add them up
+	for i = 1, #garrLanders[1].mass do
+		result = result + garrLanders[1].mass[i]
+	end
+	
+	-- add the mass of the fuel
+	result = result + garrLanders[1].fuel
+	
+	return result
+end
+
+function functions.CreateBase(intType, intXValue)
+
+	garrObjects[intXValue] = intType
+	
+	-- smooth the terrain around the base
+	for i = 1, 125 do
+		garrGround[intXValue + i] = garrGround[intXValue]
+	end
+
 end
 
 
