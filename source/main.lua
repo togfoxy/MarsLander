@@ -1,4 +1,4 @@
-gstrGameVersion = "0.02"
+gstrGameVersion = "0.04"
 
 inspect = require 'inspect'
 -- https://github.com/kikito/inspect.lua
@@ -6,14 +6,15 @@ inspect = require 'inspect'
 TLfres = require "tlfres"
 -- https://love2d.org/wiki/TLfres
 
-cobjs = require "createobjects"
-dobjs = require "drawobjects"
-fun = require "functions"
-cf = require "commonfunctions"
 
 gintScreenWidth = 800-- 1920
 gintScreenHeight = 600-- 1080
 garrCurrentScreen = {}	
+
+cobjs = require "createobjects"
+dobjs = require "drawobjects"
+fun = require "functions"
+cf = require "commonfunctions"
 
 garrLanders = {}	
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
@@ -47,19 +48,20 @@ end
 
 local function TurnLeft(dt)
 
-	if garrLanders[1].landed == false then
+	--if garrLanders[1].landed == false then
 		garrLanders[1].angle = garrLanders[1].angle - (90 * dt)
 		if garrLanders[1].angle < 0 then garrLanders[1].angle = 360 end
-	end
+	--end
 	
+
 end
 
 local function TurnRight(dt)
 
-	if garrLanders[1].landed == false then
+	--if garrLanders[1].landed == false then
 		garrLanders[1].angle = garrLanders[1].angle + (90 * dt)
 		if garrLanders[1].angle > 360 then garrLanders[1].angle = 0 end
-	end
+	--end
 end
 
 local function MoveShip(Lander, dt)
@@ -153,7 +155,6 @@ function love.draw()
 	TLfres.endRendering({0, 0, 0, 1})
 
 end
-
 
 function love.update(dt)
 
