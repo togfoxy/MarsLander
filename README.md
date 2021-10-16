@@ -3,8 +3,10 @@
 A recreation of the 1979 Atari classic Lunar Lander.
 
 This is a LOVE2D community project with contributions from 
-@togfox
-@DocMcSnappen
+
+* @togfox
+
+* @DocMcSnappen
 
 https://en.wikipedia.org/wiki/Lunar_Lander_(1979_video_game)
 
