@@ -83,11 +83,19 @@ end
 local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
-	love.graphics.setColor(1,1,1,1)
-	for k,_ in pairs(garrObjects) do
+
+	
+	for k,v in pairs(garrObjects) do
+	
+		if v.active then
+			love.graphics.setColor(1,1,1,1)
+		else
+			love.graphics.setColor(1,1,1,0.5)
+		end
+	
 		
-		local xvalue = k
-		local objectvalue = garrObjects[xvalue]
+		local xvalue = v.x
+		local objectvalue = v.objecttype
 		
 		if objectvalue == 1 then
 			love.graphics.draw(garrImages[1], xvalue - worldoffset, garrGround[xvalue] - garrImages[1]:getHeight())
@@ -106,10 +114,9 @@ local function DrawDebug()
 
 	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 15)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
-	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 100,15)
+	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,15)
 
 end
-
 
 local function DrawLander(worldoffset)
 

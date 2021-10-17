@@ -32,4 +32,28 @@ function createobjects.CreateLander()
 
 end
 
+function createobjects.CreateObject(intType, intXValue)
+-- creates a base and appends it to the garrObjects table
+
+	local mybase = {}
+	mybase.x = intXValue			-- where on the map this object is positioned.
+	mybase.objecttype = intType		-- 2 = a fuel base
+	mybase.fuelqty = 0
+	mybase.active = true
+	
+	if intType == 2 then
+		mybase.fuelqty = 15
+		
+		-- smooth the terrain around the base
+		for i = 1, 125 do
+			local myindex = intXValue + i
+			garrGround[myindex] = garrGround[intXValue]
+		end		
+	end
+
+	table.insert(garrObjects, mybase)
+
+end
+
+
 return createobjects

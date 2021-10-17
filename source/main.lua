@@ -9,6 +9,8 @@ TLfres = require "tlfres"
 Slab = require 'Slab.Slab'
 -- https://github.com/coding-jackalope/Slab/wiki
 
+bitser = require 'bitser'
+-- https://github.com/gvx/bitser
 
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
@@ -24,6 +26,7 @@ garrLanders = {}
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
 garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
 garrImages = {}
+garrSound = {}
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
@@ -52,10 +55,12 @@ local function DoThrust(dt)
 		garrLanders[1].vy = garrLanders[1].vy + force_y
 		
 		garrLanders[1].fuel = garrLanders[1].fuel - dt
+		
+
 	else
 		-- no fuel to thrust
 		--! probably need to make a serious alert here
-	
+
 	
 	end
 end
@@ -82,6 +87,9 @@ local function MoveShip(Lander, dt)
 	Lander.x = Lander.x + Lander.vx
 	Lander.y = Lander.y + Lander.vy
 	
+	local leftedge = gintOriginX - (gintScreenWidth / 2)
+	if Lander.x < leftedge then Lander.x = leftedge end
+	
 	-- apply gravity
 	if garrLanders[1].landed == false then
 		Lander.vy = Lander.vy + (0.6 * dt)
@@ -91,23 +99,39 @@ end
 local function InitialiseGround()
 -- initialie the ground array to be a flat line
 
+	-- this creates a big flat space at the start of the game
 	for i = 0, gintScreenWidth do
 		garrGround[i] = gintScreenHeight * 0.80
 	end
 	
+	fun.GetMoreTerrain(gintScreenWidth * 2)
+	
 	-- Place a single tower for testing purposes
 	local randomx = love.math.random(100, gintScreenWidth - 100)
-	garrObjects[randomx] = 1	-- 1 = tower
+	cobjs.CreateObject(1,randomx)
 	
 	-- Place bases
 	local basedistance = cf.round(gintScreenWidth * 1.5,0)
 	for i = 1, 3 do
-		fun.CreateBase(2, basedistance)
+		cobjs.CreateObject(2, basedistance)		-- 2 = fuel base
 		basedistance = cf.round(basedistance * 1.3,0)
 	end
 	
-	-- Place spikes
+	--! Place spikes
 	
+end
+
+local function RefuelLander(objBase)
+-- drain fuel from the base and add it to the lander
+
+	local refuelamt = math.min(objBase.fuelqty, (garrLanders[1].fueltanksize - garrLanders[1].fuel))
+
+	objBase.fuelqty = objBase.fuelqty - refuelamt
+	garrLanders[1].fuel = garrLanders[1].fuel + refuelamt
+	
+	-- disable the base if the tanks are empty
+	if objBase.fuelqty <= 0 then objBase.active = false end
+
 end
 
 local function CheckForContact(Lander)
@@ -128,10 +152,26 @@ local function CheckForContact(Lander)
 			
 			if Lander.vy > 0 then Lander.vy = 0 end
 			
+			-- see if landed near a fuel base
+			local bestdist, bestbase = fun.GetDistanceToClosestBase(2)		-- 2 = type of base = fuel
+			if bestdist <= 125 and bestdist > 0 then
+				RefuelLander(bestbase)				
+			end
+			
 		else
 			Lander.landed = false
 		end
 	end
+end
+
+local function PlaySoundEffects()
+
+	if garrLanders[1].engineOn then
+		garrSound[1]:play()
+	else
+		garrSound[1]:stop()
+	end
+
 end
 
 function love.keypressed( key, scancode, isrepeat)
@@ -167,6 +207,10 @@ function love.load()
 	garrImages[2] = love.graphics.newImage("/Assets/gastank.png")
 	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
 	
+	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
+	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
+	garrSound[3] = love.audio.newSource("Assets/Galactic-Pole-Position.mp3", "stream")
+	garrSound[3]:setVolume(0.25)
 	
 	Slab.Initialize(args)
 	
@@ -200,21 +244,33 @@ end
 
 function love.update(dt)
 
-	Slab.Update(dt)		--! should this be called only when the main menu is current?
+	garrSound[3]:play()
 
-	if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
-		DoThrust(dt)
-	end
-
-	if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-		TurnLeft(dt)
-	end
-	if love.keyboard.isDown("right") or love.keyboard.isDown("d")then
-		TurnRight(dt)
+	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
+	
+	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" then
+		Slab.Update(dt)		--! should this be called only when the main menu is current?
 	end
 	
-	MoveShip(garrLanders[1], dt)
-	CheckForContact(garrLanders[1])
+	if strCurrentScreen == "World" then
+
+		if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
+			DoThrust(dt)
+		end
+
+		if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
+			TurnLeft(dt)
+		end
+		if love.keyboard.isDown("right") or love.keyboard.isDown("d")then
+			TurnRight(dt)
+		end
+		
+		MoveShip(garrLanders[1], dt)
+		
+		PlaySoundEffects()
+		
+		CheckForContact(garrLanders[1])
+	end
 
 
 end

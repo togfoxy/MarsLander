@@ -14,6 +14,14 @@ function functions.RemoveScreen()
 	end
 end
 
+function functions.SwapScreen(newscreen)
+-- swaps screens so that the old screen is removed from the stack
+-- this adds the new screen then removes the 2nd last screen.
+
+    fun.AddScreen(newscreen)
+    table.remove(garrCurrentScreen, #garrCurrentScreen - 1)
+end
+
 function functions.GetMoreTerrain(intAmountToCreate)
 -- determines the next bit of terrain and adds that to the terrain table
 -- will create intAmountToCreate number of ground items/elements/pixels
@@ -54,14 +62,50 @@ function functions.GetLanderMass()
 	return result
 end
 
-function functions.CreateBase(intType, intXValue)
+function functions.SaveGame()
+-- uses the globals because too hard to pass params
 
-	garrObjects[intXValue] = intType
+--! for some reason bitser throws runtime error when serialising true/false values.
+
+    local savefile
+    local contents
+    local success, message
+    local savedir = love.filesystem.getSource()
+    
+    savefile = savedir .. "/" .. "landers.dat"
+    serialisedString = bitser.dumps(garrLanders)
+    success, message = nativefs.write(savefile, serialisedString )
+    
+    savefile = savedir .. "/" .. "ground.dat"
+    serialisedString = bitser.dumps(garrGround)
+    success, message = nativefs.write(savefile, serialisedString )
+    
+    savefile = savedir .. "/" .. "objects.dat"
+    serialisedString = bitser.dumps(garrObjects)    -- 
+    success, message = nativefs.write(savefile, serialisedString )   
+    
+end
+
+
+function functions.GetDistanceToClosestBase(intBaseType)
+-- returns two values: the distance to the closest base, and the object/table item for that base
+-- if there are no bases (impossible) then the distance value returned will be -1
+-- note: if distance is a negative value then the Lander has not yet passed the base
+
+	local closestdistance = -1
+	local closestbase = {}
 	
-	-- smooth the terrain around the base
-	for i = 1, 125 do
-		garrGround[intXValue + i] = garrGround[intXValue]
+	for k,v in pairs(garrObjects) do
+		if v.objecttype == intBaseType then
+			local dist = math.abs(garrLanders[1].x - v.x)
+			if closestdistance < 0 or dist <= closestdistance then
+				closestdistance = dist
+				closestbase = v
+			end
+		end
 	end
+
+	return garrLanders[1].x - closestbase.x, closestbase
 
 end
 

@@ -30,6 +30,8 @@ function menus.DrawMainMenu()
 		-- end
 		-- Slab.NewLine()
 
+		
+		--! this is functionally ready but there is a problem with BITSER that needs to be fixed.
 		-- if Slab.Button("Save game",{W=155}) then
 			-- fun.SaveGame()      --! need some sort of feedback here
 		-- end
@@ -94,6 +96,12 @@ function menus.DrawCredits()
 		Slab.Text("inspect", {URL="https://github.com/kikito/inspect.lua",Color={1,1,1}, IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
 		Slab.Text("freesound.org", {URL="https://freesound.org/",Color={1,1,1}, IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
  		Slab.Text("Kenney.nl", {URL="https://kenney.nl", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
+		Slab.Text("bitser", {URL="https://github.com/gvx/bitser", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
+		
+		
+		Slab.Text("Galactic Pole Position by Eric Matyas. ", {URL="www.soundimage.org", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
+				
+
 		--Slab.Text("Dark Fantasy Studio", {URL="http://darkfantasystudio.com/", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
 		
 		Slab.NewLine()
