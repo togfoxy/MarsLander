@@ -72,7 +72,7 @@ local function DrawSurface(worldoffset)
 	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (worldoffset + gintScreenWidth) > #garrGround then
-		fun.GetMoreTerrain()
+		fun.GetMoreTerrain(gintScreenWidth * 2)
 	end
 	
 	for i = 1, #garrGround - 1 do
@@ -106,6 +106,7 @@ local function DrawDebug()
 
 	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 15)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
+	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 100,15)
 
 end
 
@@ -125,12 +126,22 @@ local function DrawLander(worldoffset)
 	end
 end
 
+local function DrawWallPaper()
+	love.graphics.setColor(1,1,1,0.25)
+	love.graphics.draw(garrImages[3],0,0)
+end
+
+
+
 function drawobjects.DrawWorld()
 -- draw the spaceship and flame and other bits
 
 	-- adjust the world so that the lander is centred and the terrain moves under it
 	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
 
+	
+	DrawWallPaper()
+	
 	-- draw the surface
 	DrawSurface(worldoffset)
 	

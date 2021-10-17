@@ -14,12 +14,13 @@ function functions.RemoveScreen()
 	end
 end
 
-function functions.GetMoreTerrain()
+function functions.GetMoreTerrain(intAmountToCreate)
 -- determines the next bit of terrain and adds that to the terrain table
+-- will create intAmountToCreate number of ground items/elements/pixels
 
 	local groundtablesize = #garrGround
 
-	for i = groundtablesize + 1, groundtablesize + 2000 do
+	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
 	
 		local newgroundaltitude = garrGround[i-1] + love.math.random (-5,5)
 		
@@ -29,8 +30,8 @@ function functions.GetMoreTerrain()
 		table.insert(garrGround, newgroundaltitude)
 	end
 	
-	-- reapply bases and smoothing
-	for i = groundtablesize + 1, groundtablesize + 2000 do
+	-- reapply smoothing around the base
+	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
 		if garrObjects[i] ~= nil then
 			fun.CreateBase(garrObjects[i],i)
 		end

@@ -6,6 +6,9 @@ inspect = require 'inspect'
 TLfres = require "tlfres"
 -- https://love2d.org/wiki/TLfres
 
+Slab = require 'Slab.Slab'
+-- https://github.com/coding-jackalope/Slab/wiki
+
 
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
@@ -15,7 +18,7 @@ cobjs = require "createobjects"
 dobjs = require "drawobjects"
 fun = require "functions"
 cf = require "commonfunctions"
-menu = require "menus"
+menus = require "menus"
 
 garrLanders = {}	
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
@@ -151,7 +154,8 @@ function love.load()
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
-	fun.AddScreen("World")
+	fun.AddScreen("MainMenu")
+	-- fun.AddScreen("World")
 	
 	InitialiseGround()
 
@@ -172,8 +176,16 @@ function love.draw()
 
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
 	
-	dobjs.DrawWorld()
+	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	
+	if strCurrentScreen == "MainMenu" then
+		menus.DrawMainMenu()
+	end
+	
+	if strCurrentScreen == "World" then
+		dobjs.DrawWorld()
+	end
+
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 	
 	TLfres.endRendering({0, 0, 0, 1})
