@@ -185,6 +185,12 @@ function love.draw()
 	if strCurrentScreen == "World" then
 		dobjs.DrawWorld()
 	end
+	
+	if strCurrentScreen == "Credits" then
+		menus.DrawCredits()
+	end	
+	
+	
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 	
