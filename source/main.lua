@@ -1,4 +1,4 @@
-gstrGameVersion = "0.04"
+gstrGameVersion = "0.05"
 
 inspect = require 'inspect'
 -- https://github.com/kikito/inspect.lua
@@ -11,6 +11,9 @@ Slab = require 'Slab.Slab'
 
 bitser = require 'bitser'
 -- https://github.com/gvx/bitser
+
+nativefs = require("nativefs")
+-- https://github.com/megagrump/nativefs
 
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
@@ -96,30 +99,7 @@ local function MoveShip(Lander, dt)
 	end
 end
 
-local function InitialiseGround()
--- initialie the ground array to be a flat line
 
-	-- this creates a big flat space at the start of the game
-	for i = 0, gintScreenWidth do
-		garrGround[i] = gintScreenHeight * 0.80
-	end
-	
-	fun.GetMoreTerrain(gintScreenWidth * 2)
-	
-	-- Place a single tower for testing purposes
-	local randomx = love.math.random(100, gintScreenWidth - 100)
-	cobjs.CreateObject(1,randomx)
-	
-	-- Place bases
-	local basedistance = cf.round(gintScreenWidth * 1.5,0)
-	for i = 1, 3 do
-		cobjs.CreateObject(2, basedistance)		-- 2 = fuel base
-		basedistance = cf.round(basedistance * 1.3,0)
-	end
-	
-	--! Place spikes
-	
-end
 
 local function RefuelLander(objBase)
 -- drain fuel from the base and add it to the lander
@@ -197,15 +177,20 @@ function love.load()
 	fun.AddScreen("MainMenu")
 	-- fun.AddScreen("World")
 	
-	InitialiseGround()
+	fun.InitialiseGround()
 
 	-- create one lander and add it to the global array
 	-- ** this needs to be called AFTER InitialiseGround()
 	table.insert(garrLanders, cobjs.CreateLander())
 	
+	-- capture the 'normal' mass of the lander into a global variable
+	gintDefaultMass = fun.GetLanderMass()
+	
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
 	garrImages[2] = love.graphics.newImage("/Assets/gastank.png")
 	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
+	garrImages[4] = love.graphics.newImage("/Assets/engine.png")
+	garrImages[5] = love.graphics.newImage("/Assets/ship.png")
 	
 	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
 	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")

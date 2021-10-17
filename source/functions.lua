@@ -87,6 +87,29 @@ function functions.SaveGame()
 end
 
 
+function functions.LoadGame()
+    
+    local savedir = love.filesystem.getSource()
+    love.filesystem.setIdentity( savedir )
+    
+    local savefile
+    local contents
+
+    savefile = savedir .. "/" .. "landers.dat"
+    contents, _ = nativefs.read( savefile) 
+    garrLanders = bitser.loads(contents)    
+
+    savefile = savedir .. "/" .. "ground.dat"
+    contents, _ = nativefs.read( savefile) 
+    garrGround = bitser.loads(contents)   
+   
+    savefile = savedir .. "/" .. "objects.dat"
+    contents, _ = nativefs.read(savefile) 
+    garrObjects = bitser.loads(contents)  
+    
+  
+end
+
 function functions.GetDistanceToClosestBase(intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
 -- if there are no bases (impossible) then the distance value returned will be -1
@@ -106,6 +129,49 @@ function functions.GetDistanceToClosestBase(intBaseType)
 	end
 
 	return garrLanders[1].x - closestbase.x, closestbase
+
+end
+
+function functions.InitialiseGround()
+-- initialise the ground array to be a flat line
+-- add bases to garrObjects
+
+	-- this creates a big flat space at the start of the game
+	for i = 0, (gintScreenWidth * 0.90) do
+		garrGround[i] = gintScreenHeight * 0.80
+	end
+	
+	fun.GetMoreTerrain(gintScreenWidth * 2)
+	
+	-- Place a single tower for testing purposes
+	local randomx = love.math.random(100, gintScreenWidth - 100)
+	cobjs.CreateObject(1,randomx)
+	
+	-- Place bases
+	local basedistance = cf.round(gintScreenWidth * 1.5,0)
+	for i = 1, 10 do
+		cobjs.CreateObject(2, basedistance)		-- 2 = fuel base
+		basedistance = cf.round(basedistance * 1.3,0)
+		if basedistance > #garrGround then fun.GetMoreTerrain(basedistance * 2) end
+	end
+	
+	--! Place spikes
+	
+end
+
+
+function functions.ResetGame()
+
+	garrGround = {}
+	garrObjects = {}
+	fun.InitialiseGround()
+
+	garrLanders = {}
+	table.insert(garrLanders, cobjs.CreateLander())
+	
+
+
+
 
 end
 
