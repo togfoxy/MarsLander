@@ -7,14 +7,15 @@ TLfres = require "tlfres"
 -- https://love2d.org/wiki/TLfres
 
 
-gintScreenWidth = 800-- 1920
-gintScreenHeight = 600-- 1080
+gintScreenWidth = 1024-- 1920
+gintScreenHeight = 768-- 1080
 garrCurrentScreen = {}	
 
 cobjs = require "createobjects"
 dobjs = require "drawobjects"
 fun = require "functions"
 cf = require "commonfunctions"
+menu = require "menus"
 
 garrLanders = {}	
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
@@ -22,6 +23,10 @@ garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[
 garrImages = {}
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
+gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
+garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
+
+
 
 gbolDebug = true
 
@@ -33,6 +38,12 @@ local function DoThrust(dt)
 		local angle_radian = math.rad(garrLanders[1].angle)
 		local force_x = math.cos(angle_radian) * dt
 		local force_y = math.sin(angle_radian) * dt
+		
+		-- adjust the thrust based on ship mass
+		local massratio = gintDefaultMass / fun.GetLanderMass()	-- less mass = higher ratio = more thrust = less fuel needed to move
+		if gbolDebug then garrMassRatio = massratio end			-- for debugging only
+		force_x = force_x * massratio
+		force_y = force_y * massratio
 
 		garrLanders[1].vx = garrLanders[1].vx + force_x
 		garrLanders[1].vy = garrLanders[1].vy + force_y
@@ -86,8 +97,13 @@ local function InitialiseGround()
 	garrObjects[randomx] = 1	-- 1 = tower
 	
 	-- Place bases
-	fun.CreateBase(2,1000)	-- 2 = type and 1000 = x value
-	fun.CreateBase(2, 2250)
+	local basedistance = cf.round(gintScreenWidth * 1.5,0)
+	for i = 1, 3 do
+		fun.CreateBase(2, basedistance)
+		basedistance = cf.round(basedistance * 1.3,0)
+	end
+	
+	-- Place spikes
 	
 end
 
@@ -123,6 +139,9 @@ end
 
 function love.load()
 
+	-- this line doesn't work for some reason. Perhaps love.load is the wrong place for it.
+	--gintScreenWidth, gintScreenHeight = love.graphics.getDimensions()
+
     if love.filesystem.isFused( ) then
         void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
         gbolDebug = false
@@ -141,8 +160,11 @@ function love.load()
 	table.insert(garrLanders, cobjs.CreateLander())
 	
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
-	garrImages[2] = love.graphics.newImage("/Assets/spacebase.png")
+	garrImages[2] = love.graphics.newImage("/Assets/gastank.png")
+	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
 	
+	
+	Slab.Initialize(args)
 	
 end
 
@@ -152,20 +174,24 @@ function love.draw()
 	
 	dobjs.DrawWorld()
 	
+	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
+	
 	TLfres.endRendering({0, 0, 0, 1})
 
 end
 
 function love.update(dt)
 
-	if love.keyboard.isDown("up") then
+	Slab.Update(dt)		--! should this be called only when the main menu is current?
+
+	if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
 		DoThrust(dt)
 	end
 
-	if love.keyboard.isDown("left") then
+	if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
 		TurnLeft(dt)
 	end
-	if love.keyboard.isDown("right") then
+	if love.keyboard.isDown("right") or love.keyboard.isDown("d")then
 		TurnRight(dt)
 	end
 	
