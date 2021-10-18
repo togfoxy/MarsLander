@@ -15,6 +15,9 @@ bitser = require 'bitser'
 nativefs = require("nativefs")
 -- https://github.com/megagrump/nativefs
 
+anim8 = require 'anim8'
+-- https://github.com/kikito/anim8
+
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
 garrCurrentScreen = {}	
@@ -29,6 +32,7 @@ garrLanders = {}
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
 garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
 garrImages = {}
+garrSprites = {}	-- spritesheets
 garrSound = {}
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
@@ -99,12 +103,11 @@ local function MoveShip(Lander, dt)
 	end
 end
 
-
-
-local function RefuelLander(objBase)
+local function RefuelLander(objBase, dt)
 -- drain fuel from the base and add it to the lander
+-- objBase is an object/table item from garrObjects
 
-	local refuelamt = math.min(objBase.fuelqty, (garrLanders[1].fueltanksize - garrLanders[1].fuel))
+	local refuelamt = math.min(objBase.fuelqty, (garrLanders[1].fueltanksize - garrLanders[1].fuel), dt)
 
 	objBase.fuelqty = objBase.fuelqty - refuelamt
 	garrLanders[1].fuel = garrLanders[1].fuel + refuelamt
@@ -114,7 +117,21 @@ local function RefuelLander(objBase)
 
 end
 
-local function CheckForContact(Lander)
+local function PayLander(objBase, fltDist)
+-- pay some wealth based on distance to the base
+-- objBase is an object/table item from garrObjects
+-- fltDist is the distance from the base
+
+	local dist = math.abs(fltDist)
+	if objBase.paid == false then
+		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + (100 - dist),0)
+		garrSound[4]:play()
+		objBase.paid = true
+	end
+
+end
+
+local function CheckForContact(Lander,dt)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(Lander.x)
@@ -133,9 +150,14 @@ local function CheckForContact(Lander)
 			if Lander.vy > 0 then Lander.vy = 0 end
 			
 			-- see if landed near a fuel base
+			-- bestdist could be a negative number meaning not yet past the base (but maybe really close to it)
 			local bestdist, bestbase = fun.GetDistanceToClosestBase(2)		-- 2 = type of base = fuel
-			if bestdist <= 125 and bestdist > 0 then
-				RefuelLander(bestbase)				
+
+			-- bestbase is an object/table item
+			if bestdist >= -80 and bestdist <= 40 then
+				RefuelLander(bestbase,dt)
+				PayLander(bestbase, bestdist)
+
 			end
 			
 		else
@@ -186,16 +208,27 @@ function love.load()
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = fun.GetLanderMass()
 	
+	-- stills/images
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
 	garrImages[2] = love.graphics.newImage("/Assets/gastank.png")
 	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
 	garrImages[4] = love.graphics.newImage("/Assets/engine.png")
 	garrImages[5] = love.graphics.newImage("/Assets/ship.png")
 	
+	-- spritesheets and animations
+	garrSprites[1] = love.graphics.newImage("assets/landinglights.png")
+	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
+	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
+	
+	
 	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
 	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
 	garrSound[3] = love.audio.newSource("Assets/Galactic-Pole-Position.mp3", "stream")
 	garrSound[3]:setVolume(0.25)
+	garrSound[4] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
+	
+	-- fonts
+	font20 = love.graphics.newFont(20) -- the number denotes the font size
 	
 	Slab.Initialize(args)
 	
@@ -254,7 +287,9 @@ function love.update(dt)
 		
 		PlaySoundEffects()
 		
-		CheckForContact(garrLanders[1])
+		CheckForContact(garrLanders[1], dt)
+		
+		gLandingLightsAnimation:update(dt)
 	end
 
 

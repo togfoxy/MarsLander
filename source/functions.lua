@@ -39,11 +39,11 @@ function functions.GetMoreTerrain(intAmountToCreate)
 	end
 	
 	-- reapply smoothing around the base
-	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
-		if garrObjects[i] ~= nil then
-			fun.CreateBase(garrObjects[i],i)
-		end
-	end
+	-- for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
+		-- if garrObjects[i] ~= nil then
+			-- fun.CreateBase(garrObjects[i],i)
+		-- end
+	-- end
 end
 
 function functions.GetLanderMass()
@@ -86,7 +86,6 @@ function functions.SaveGame()
     
 end
 
-
 function functions.LoadGame()
     
     local savedir = love.filesystem.getSource()
@@ -115,20 +114,26 @@ function functions.GetDistanceToClosestBase(intBaseType)
 -- if there are no bases (impossible) then the distance value returned will be -1
 -- note: if distance is a negative value then the Lander has not yet passed the base
 
-	local closestdistance = -1
+	local closestdistance = 0
 	local closestbase = {}
+	local absdist
+	local dist
 	
 	for k,v in pairs(garrObjects) do
 		if v.objecttype == intBaseType then
-			local dist = math.abs(garrLanders[1].x - v.x)
-			if closestdistance < 0 or dist <= closestdistance then
-				closestdistance = dist
+			absdist = math.abs(garrLanders[1].x - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
+			dist = (garrLanders[1].x - (v.x + 85))						-- same but without the math.abs
+			if closestdistance == 0 or absdist <= closestdistance then
+				closestdistance = absdist
 				closestbase = v
 			end
 		end
 	end
+	
+	-- now we have the closest base, work out the distance to the landing pad for that base
+	local realdist = garrLanders[1].x - (closestbase.x + 85)			-- the + bit is an offset to calculate the landing pad and not the image
 
-	return garrLanders[1].x - closestbase.x, closestbase
+	return  realdist, closestbase
 
 end
 

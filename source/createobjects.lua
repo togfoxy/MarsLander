@@ -14,6 +14,7 @@ function createobjects.CreateLander()
 	Lander.vy = 0
 	Lander.engineOn = false
 	Lander.landed = false
+	Lander.wealth = 0
 	Lander.mass = {}
 	table.insert(Lander.mass, 100)	-- base mass of lander
 
@@ -36,6 +37,7 @@ function createobjects.CreateObject(intType, intXValue)
 	mybase.objecttype = intType		-- 2 = a fuel base
 	mybase.fuelqty = 0
 	mybase.active = true
+	mybase.paid = false				-- set true when lander lands and pays player. Ensures bases only pay once
 	
 	if intType == 2 then
 		mybase.fuelqty = 15

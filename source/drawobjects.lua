@@ -53,12 +53,22 @@ local function DrawOffscreenIndicator(worldoffset)
 
 end
 
+local function DrawWealth()
+
+	love.graphics.setNewFont(20)
+	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 15)
+
+
+end
+
 function HUD.draw(worldoffset)
     
 	DrawFuelIndicator()
     
     -- offscreen indicator
 	DrawOffscreenIndicator(worldoffset)
+	
+	DrawWealth()
 	
 end
 
@@ -110,16 +120,21 @@ local function DrawObjects(worldoffset)
 			end
 			if objectvalue == 2 then
 				if garrGround[xvalue - worldoffset] ~= nil then
-					love.graphics.draw(garrImages[2], xvalue - worldoffset, garrGround[xvalue] - garrImages[2]:getHeight())
+				
+					local drawingx = xvalue - worldoffset
+					local drawingy = garrGround[xvalue] - garrImages[2]:getHeight()
+				
+					love.graphics.draw(garrImages[2], drawingx, drawingy)
+					gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ), drawingy + garrImages[2]:getHeight())		-- the -10 bit is a small adjustment as the png file is not quite right
 				end
 			end
 		end
-		
 	end
 end
 
 local function DrawDebug()
 
+	love.graphics.setNewFont(14)
 	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 15)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,15)
@@ -145,8 +160,6 @@ local function DrawWallPaper()
 	love.graphics.setColor(1,1,1,0.25)
 	love.graphics.draw(garrImages[3],0,0)
 end
-
-
 
 function drawobjects.DrawWorld()
 -- draw the spaceship and flame and other bits

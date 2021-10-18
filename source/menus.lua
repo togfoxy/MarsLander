@@ -3,7 +3,7 @@ local menus = {}
 
 function menus.DrawMainMenu()
     local intSlabWidth = 205	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 325 	-- the height of the main menu slab
+	local intSlabHeight = 350 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
