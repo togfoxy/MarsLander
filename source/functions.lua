@@ -137,6 +137,17 @@ function functions.GetDistanceToClosestBase(intBaseType)
 
 end
 
+function functions.IsOnLandingPad(intBaseType)
+-- returns a true / false value
+
+	local mydist, _ = fun.GetDistanceToClosestBase(intBaseType)
+	if mydist >= -80 and mydist <= 40 then
+		return true
+	else
+		return false
+	end
+end
+
 function functions.InitialiseGround()
 -- initialise the ground array to be a flat line
 -- add bases to garrObjects
@@ -164,7 +175,6 @@ function functions.InitialiseGround()
 	
 end
 
-
 function functions.ResetGame()
 
 	garrGround = {}
@@ -180,5 +190,37 @@ function functions.ResetGame()
 
 end
 
+function functions.LanderHasEfficentThrusters()
+-- return TRUE if the lander has fuel efficien thrusters
+
+	for i = 1, #garrLanders[1].modules do
+		if garrLanders[1].modules[i] == enum.moduleNamesThrusters then
+			return true
+		end
+	end
+	return false
+end
+
+function functions.LanderHasRangefinder()
+-- return TRUE if the lander has a rangefinder
+
+	for i = 1, #garrLanders[1].modules do
+		if garrLanders[1].modules[i] == enum.moduleNamesRangeFinder then
+			return true
+		end
+	end
+	return false
+end
+
 
 return functions
+
+
+
+
+
+
+
+
+
+

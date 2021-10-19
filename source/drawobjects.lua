@@ -46,7 +46,7 @@ local function DrawOffscreenIndicator(worldoffset)
         love.graphics.circle("line", x, y, garrImages[5]:getHeight() + 5)
         love.graphics.polygon("fill", x, garrLanders[1].y, x - 10, indicatorY - 5, x + 10, indicatorY - 5)
         if garrLanders[1].engineOn then
-            love.graphics.draw(garrLanders[1].imgEngine, x, y, math.rad(garrLanders[1].angle), magnifier, magnifier, garrLanders[1].imgEngine:getWidth()/2, garrLanders[1].imgEngine:getHeight()/2)
+            love.graphics.draw(garrImages[4], x, y, math.rad(garrLanders[1].angle), magnifier, magnifier, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
         end
     end
     love.graphics.setLineWidth(lineThickness) -- restore line thickness
@@ -57,7 +57,27 @@ local function DrawWealth()
 
 	love.graphics.setNewFont(20)
 	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 15)
+end
 
+local function DrawNearestBase()
+-- determine distance to nearest base and draw indicator
+
+	if fun.LanderHasRangefinder() then
+
+		local mydist, _ = fun.GetDistanceToClosestBase(enum.basetypeFuel)
+		mydist = cf.round(mydist,0)
+		
+		-- don't draw if close to base
+		if math.abs(mydist) > 100 then
+		
+			if mydist <= 0 then
+				-- closest base is to the right (forward)
+				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
+			else
+				love.graphics.print("<-- " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
+			end
+		end
+	end
 
 end
 
@@ -69,6 +89,8 @@ function HUD.draw(worldoffset)
 	DrawOffscreenIndicator(worldoffset)
 	
 	DrawWealth()
+	
+	DrawNearestBase()
 	
 end
 
@@ -145,20 +167,40 @@ local function DrawLander(worldoffset)
 
 	-- draw the lander and flame
 	for k,v in ipairs(garrLanders) do
+	
+		local drawingx = v.x - worldoffset
+		local drawingy = v.y
 		
-		love.graphics.draw(garrImages[5], v.x - worldoffset,v.y, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
+		love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
 
 		if v.engineOn == true then
-			love.graphics.draw(garrImages[4], v.x - worldoffset, v.y, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+			love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
 			v.engineOn = false
-		end			
-	
+		end		
 	end
 end
 
 local function DrawWallPaper()
 	love.graphics.setColor(1,1,1,0.25)
 	love.graphics.draw(garrImages[3],0,0)
+end
+
+local function DrawShopMenu()
+-- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
+
+	if fun.IsOnLandingPad(2) then			-- 2 = base type (fuel)
+
+		love.graphics.setNewFont(14)
+		
+		local strText = "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
+		strText = strText .. "2. Buy a larger fuel tanks         ($100)" .. "\n"
+		strText = strText .. "3. Buy a rangefinder               ($100)" .. "\n"
+		
+		local drawingx = (gintScreenWidth / 2 ) - 125		-- try to get centre of screen
+		local drawingy = gintScreenHeight * 0.33
+		love.graphics.print(strText, drawingx, drawingy)
+
+	end
 end
 
 function drawobjects.DrawWorld()
@@ -181,6 +223,10 @@ function drawobjects.DrawWorld()
 	
 	-- draw the lander
     DrawLander(worldoffset)
+	
+	if garrLanders[1].landed then
+		DrawShopMenu()
+	end
     
     
 	if gbolDebug then
@@ -188,5 +234,9 @@ function drawobjects.DrawWorld()
 	end	
 
 end
+
+
+
+
 
 return drawobjects

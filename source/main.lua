@@ -1,4 +1,4 @@
-gstrGameVersion = "0.05"
+gstrGameVersion = "0.06"
 
 inspect = require 'inspect'
 -- https://github.com/kikito/inspect.lua
@@ -27,6 +27,7 @@ dobjs = require "drawobjects"
 fun = require "functions"
 cf = require "commonfunctions"
 menus = require "menus"
+enum = require "enum"
 
 garrLanders = {}	
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
@@ -34,18 +35,18 @@ garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[
 garrImages = {}
 garrSprites = {}	-- spritesheets
 garrSound = {}
+garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
-garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
 
-
+gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 
 gbolDebug = true
 
 local function DoThrust(dt)
 
-	if garrLanders[1].fuel - dt >= 0 then
+	if garrLanders[1].fuel - dt >= 0 or (fun.LanderHasEfficentThrusters() and garrLanders[1].fuel - (dt * 0.80) >= 0) then
 
 		garrLanders[1].engineOn = true
 		local angle_radian = math.rad(garrLanders[1].angle)
@@ -60,15 +61,15 @@ local function DoThrust(dt)
 
 		garrLanders[1].vx = garrLanders[1].vx + force_x
 		garrLanders[1].vy = garrLanders[1].vy + force_y
-		
-		garrLanders[1].fuel = garrLanders[1].fuel - dt
-		
 
+		if fun.LanderHasEfficentThrusters() then
+			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 0.80)		-- efficient thrusters use 80% fuel compared to normal thrusters
+		else
+			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 1)
+		end
 	else
 		-- no fuel to thrust
 		--! probably need to make a serious alert here
-
-	
 	end
 end
 
@@ -91,6 +92,9 @@ local function TurnRight(dt)
 end
 
 local function MoveShip(Lander, dt)
+
+	local myalt = Lander.y		-- need to capture vertical movement here and check it later on
+
 	Lander.x = Lander.x + Lander.vx
 	Lander.y = Lander.y + Lander.vy
 	
@@ -98,9 +102,10 @@ local function MoveShip(Lander, dt)
 	if Lander.x < leftedge then Lander.x = leftedge end
 	
 	-- apply gravity
-	if garrLanders[1].landed == false then
+	if Lander.landed == false then
 		Lander.vy = Lander.vy + (0.6 * dt)
 	end
+	
 end
 
 local function RefuelLander(objBase, dt)
@@ -117,7 +122,7 @@ local function RefuelLander(objBase, dt)
 
 end
 
-local function PayLander(objBase, fltDist)
+local function PayLanderFromBase(objBase, fltDist)
 -- pay some wealth based on distance to the base
 -- objBase is an object/table item from garrObjects
 -- fltDist is the distance from the base
@@ -126,8 +131,18 @@ local function PayLander(objBase, fltDist)
 	if objBase.paid == false then
 		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + (100 - dist),0)
 		garrSound[4]:play()
-		objBase.paid = true
 	end
+
+end
+
+local function PayLanderForControl(objBase, fltDist)
+
+	if objBase.paid == false then
+		-- pay for a good vertical speed
+		garrLanders[1].wealth = garrLanders[1].wealth + ((1 - gfltLandervy) * 100)
+--print(((1 - gfltLandervy) * 100))
+	end
+
 
 end
 
@@ -144,21 +159,21 @@ local function CheckForContact(Lander,dt)
 	
 		if Lander.y > groundYvalue - 8 then
 			Lander.landed = true
-			Lander.vx = 0
-			-- Lander.vy = 0
-			
-			if Lander.vy > 0 then Lander.vy = 0 end
-			
+	
 			-- see if landed near a fuel base
 			-- bestdist could be a negative number meaning not yet past the base (but maybe really close to it)
 			local bestdist, bestbase = fun.GetDistanceToClosestBase(2)		-- 2 = type of base = fuel
 
 			-- bestbase is an object/table item
+			-- add wealth based on alignment to centre of landing pad
 			if bestdist >= -80 and bestdist <= 40 then
 				RefuelLander(bestbase,dt)
-				PayLander(bestbase, bestdist)
-
+				PayLanderFromBase(bestbase, bestdist)
+				bestbase.paid = true
 			end
+	
+			Lander.vx = 0
+			if Lander.vy > 0 then Lander.vy = 0 end			
 			
 		else
 			Lander.landed = false
@@ -176,9 +191,85 @@ local function PlaySoundEffects()
 
 end
 
+local function PurchaseThrusters()
+-- add fuel efficient thrusters to the lander
+
+	if garrLanders[1].wealth >= enum.moduleCostsThrusters then
+		for i = 1, #garrLanders[1].modules do
+			if garrLanders[1].modules[i] == enum.moduleNamesThrusters then
+				-- this module is already purchased. Abort
+				--! make a 'wrong' sound		
+				return
+			end
+		end
+		-- can purchase thrusters
+		
+		table.insert(garrLanders[1].modules, enum.moduleNamesThrusters)
+		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsThrusters
+
+
+	end
+end
+
+local function PurchaseLargeTank()
+-- add a larger tank to carry more fuelqty
+
+	if garrLanders[1].wealth >= enum.moduleCostsLargeTank then
+		for i = 1, #garrLanders[1].modules do
+			if garrLanders[1].modules[i] == enum.moduleNamesLargeTank then
+				-- this module is already purchased. Abort.
+				--! make a 'wrong' sound		
+				return
+			end
+		end
+		-- can purchase item
+		
+		table.insert(garrLanders[1].modules, enum.moduleNamesLargeTank)
+		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsLargeTank
+		
+		garrLanders[1].fueltanksize = 32		-- an increase from the default (25)
+	end
+
+end
+
+local function PurchaseRangeFinder()
+-- the rangefinder points to the nearest base
+
+	if garrLanders[1].wealth >= enum.moduleCostsRangeFinder then
+		for i = 1, #garrLanders[1].modules do
+			if garrLanders[1].modules[i] == enum.moduleNamesRangeFinder then
+				-- this module is already purchased. Abort.
+				--! make a 'wrong' sound		
+				return
+			end
+		end
+		-- can purchase item
+		
+		table.insert(garrLanders[1].modules, enum.moduleNamesRangeFinder)
+		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsRangeFinder
+
+	end
+
+end
+
+
 function love.keypressed( key, scancode, isrepeat)
 	if key == "escape" then
 		fun.RemoveScreen()
+	end
+	
+	if fun.IsOnLandingPad(2) then
+		if key == "1" then			-- 2 = base type (fuel) then
+			PurchaseThrusters()
+		end
+	
+		if key == "2" then			-- 2 = base type (fuel) then
+			PurchaseLargeTank()
+		end	
+		
+		if key == "3" then			-- 2 = base type (fuel) then
+			PurchaseRangeFinder()
+		end			
 	end
 end
 
@@ -216,7 +307,7 @@ function love.load()
 	garrImages[5] = love.graphics.newImage("/Assets/ship.png")
 	
 	-- spritesheets and animations
-	garrSprites[1] = love.graphics.newImage("assets/landinglights.png")
+	garrSprites[1] = love.graphics.newImage("Assets/landinglights.png")
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 	
@@ -262,7 +353,10 @@ end
 
 function love.update(dt)
 
-	garrSound[3]:play()
+	if love.filesystem.isFused( ) then
+		-- not played when in 'dev' mode to save my sanity
+		garrSound[3]:play()
+	end
 
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	

@@ -13,8 +13,13 @@ function createobjects.CreateLander()
 	Lander.vx = 0
 	Lander.vy = 0
 	Lander.engineOn = false
-	Lander.landed = false
+	Lander.landed = false			-- true = on the ground
+	Lander.airborne = false			-- true = on the ground FOR THE FIRST TIME
 	Lander.wealth = 0
+	Lander.bolGameOver = false
+	
+	
+	-- mass	
 	Lander.mass = {}
 	table.insert(Lander.mass, 100)	-- base mass of lander
 
@@ -22,7 +27,9 @@ function createobjects.CreateLander()
 	Lander.fuel = Lander.fueltanksize	-- start with a full tank
 	table.insert(Lander.mass, 20)	-- this is the mass of an empty tank
 	
-	Lander.bolGameOver = false
+	-- modules
+	Lander.modules = {}		-- this will be strings/names of modules
+	
 	
 	return Lander
 
