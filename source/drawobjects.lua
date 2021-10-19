@@ -193,8 +193,8 @@ local function DrawShopMenu()
 		love.graphics.setNewFont(14)
 		
 		local strText = "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
-		strText = strText .. "2. Buy a larger fuel tanks         ($100)" .. "\n"
-		strText = strText .. "3. Buy a rangefinder               ($100)" .. "\n"
+		strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
+		strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
 		
 		local drawingx = (gintScreenWidth / 2 ) - 125		-- try to get centre of screen
 		local drawingy = gintScreenHeight * 0.33
@@ -234,8 +234,6 @@ function drawobjects.DrawWorld()
 	end	
 
 end
-
-
 
 
 

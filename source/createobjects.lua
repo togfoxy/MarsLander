@@ -26,10 +26,10 @@ function createobjects.CreateLander()
 	Lander.fueltanksize = 25		-- volume in arbitrary units
 	Lander.fuel = Lander.fueltanksize	-- start with a full tank
 	table.insert(Lander.mass, 20)	-- this is the mass of an empty tank
+	table.insert(Lander.mass, 0)	-- this is the mass of the rangefinder (not yet purchased)
 	
 	-- modules
 	Lander.modules = {}		-- this will be strings/names of modules
-	
 	
 	return Lander
 

@@ -41,6 +41,7 @@ gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world 
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
+gfltLandervx = 0
 
 gbolDebug = true
 
@@ -106,6 +107,11 @@ local function MoveShip(Lander, dt)
 		Lander.vy = Lander.vy + (0.6 * dt)
 	end
 	
+	if Lander.airborne then
+		gfltLandervy = Lander.vy		-- used to determine speed right before touchdown
+		gfltLandervx = Lander.vx
+	end
+	
 end
 
 local function RefuelLander(objBase, dt)
@@ -135,15 +141,16 @@ local function PayLanderFromBase(objBase, fltDist)
 
 end
 
-local function PayLanderForControl(objBase, fltDist)
+local function PayLanderForControl(objBase)
 
 	if objBase.paid == false then
 		-- pay for a good vertical speed
-		garrLanders[1].wealth = garrLanders[1].wealth + ((1 - gfltLandervy) * 100)
---print(((1 - gfltLandervy) * 100))
+		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + ((1 - gfltLandervy) * 100),0)
+		
+		-- pay for a good horizontal speed
+		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + (0.60 - gfltLandervx * 100),0)
+		
 	end
-
-
 end
 
 local function CheckForContact(Lander,dt)
@@ -169,14 +176,21 @@ local function CheckForContact(Lander,dt)
 			if bestdist >= -80 and bestdist <= 40 then
 				RefuelLander(bestbase,dt)
 				PayLanderFromBase(bestbase, bestdist)
+				if Lander.airborne then
+					Lander.airborne = false
+					PayLanderForControl(bestbase)
+				end				
 				bestbase.paid = true
 			end
-	
+
 			Lander.vx = 0
 			if Lander.vy > 0 then Lander.vy = 0 end			
 			
 		else
 			Lander.landed = false
+			if Lander.airborne == false then
+				Lander.airborne = true
+			end
 		end
 	end
 end
@@ -206,7 +220,8 @@ local function PurchaseThrusters()
 		
 		table.insert(garrLanders[1].modules, enum.moduleNamesThrusters)
 		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsThrusters
-
+		
+		garrLanders[1].mass[1] = 115
 
 	end
 end
@@ -228,6 +243,8 @@ local function PurchaseLargeTank()
 		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsLargeTank
 		
 		garrLanders[1].fueltanksize = 32		-- an increase from the default (25)
+		garrLanders[1].mass[2] = 23
+		
 	end
 
 end
@@ -248,10 +265,10 @@ local function PurchaseRangeFinder()
 		table.insert(garrLanders[1].modules, enum.moduleNamesRangeFinder)
 		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsRangeFinder
 
+		garrLanders[1].mass[3] = 2	-- this is the mass of the rangefinder
 	end
 
 end
-
 
 function love.keypressed( key, scancode, isrepeat)
 	if key == "escape" then
