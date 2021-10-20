@@ -64,7 +64,7 @@ local function DrawNearestBase()
 
 	if fun.LanderHasRangefinder() then
 
-		local mydist, _ = fun.GetDistanceToClosestBase(enum.basetypeFuel)
+		local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
 		
 		-- don't draw if close to base
@@ -104,7 +104,7 @@ local function DrawSurface(worldoffset)
 	end
 	
 	for i = 1, #garrGround - 1 do
-		if i < worldoffset - gintScreenWidth or i > worldoffset + gintScreenWidth then
+		if i < worldoffset - (gintScreenWidth) or i > worldoffset + (gintScreenWidth) then
 			-- don't draw. Do nothing
 		else
 			love.graphics.line(i - worldoffset, garrGround[i], i + 1 - worldoffset, garrGround[i+1])
@@ -126,30 +126,60 @@ local function DrawObjects(worldoffset)
 		local objectvalue = v.objecttype
 		
 		-- check if on-screen
-		if xvalue < worldoffset - gintScreenWidth or xvalue > worldoffset + gintScreenWidth then
+		if xvalue < worldoffset - 100 or xvalue > worldoffset + (gintScreenWidth) then
 			-- don't draw. Do nothing
 		else
-			-- set colour based on ACTIVE status
-			if v.active then
-				love.graphics.setColor(1,1,1,1)
-			else
-				love.graphics.setColor(1,1,1,0.5)
-			end
-			
+
 			-- draw image based on object type
 			if objectvalue == 1 then
 				love.graphics.draw(garrImages[1], xvalue - worldoffset, garrGround[xvalue] - garrImages[1]:getHeight())
 			end
 			if objectvalue == 2 then
-				if garrGround[xvalue - worldoffset] ~= nil then
+				local drawingx = xvalue - worldoffset
+				local drawingy = garrGround[xvalue] - garrImages[2]:getHeight()
+
+				-- draw gas tank
+				-- draw the 'fuel level' before drawing the tank over it
+				-- draw the whole gauge red then overlay the right amount of green
+				love.graphics.setColor(1,0,0,1)
+				love.graphics.rectangle("fill", drawingx + 40,drawingy + 84,5,40)
 				
-					local drawingx = xvalue - worldoffset
-					local drawingy = garrGround[xvalue] - garrImages[2]:getHeight()
-				
+				-- draw green gauge
+				local gaugeheight = v.fuelqty / enum.baseMaxFuel * 36		-- pixel art gauge is 36 pixels high
+				local gaugebottom = 120
+				love.graphics.setColor(0,1,0,1)
+				love.graphics.rectangle("fill", drawingx + 40, drawingy + gaugebottom - gaugeheight, 5, gaugeheight)
+
+				-- set colour based on ACTIVE status
+				love.graphics.setColor(1,1,1,1)
+				if v.active then
 					love.graphics.draw(garrImages[2], drawingx, drawingy)
-					gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ), drawingy + garrImages[2]:getHeight())		-- the -10 bit is a small adjustment as the png file is not quite right
+				else
+					love.graphics.draw(garrImages[6], drawingx, drawingy)
 				end
+
+				-- draw landing lights
+				-- the image is white so the colour can be controlled here at runtime
+				if v.paid then
+					love.graphics.setColor(1,0,0,1)
+				else
+					love.graphics.setColor(0,1,0,1)
+				end
+				gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ), drawingy + garrImages[2]:getHeight())		-- the -10 bit is a small adjustment as the png file is not quite right
 			end
+			if objectvalue == enum.basetypeBuilding1 then
+				local drawingx = xvalue - worldoffset
+				local drawingy = garrGround[xvalue] - garrImages[7]:getHeight()			
+				love.graphics.setColor(1,1,1,1)
+				love.graphics.draw(garrImages[7], drawingx, drawingy)
+			end
+			if objectvalue == enum.basetypeBuilding2 then
+				local drawingx = xvalue - worldoffset
+				local drawingy = garrGround[xvalue] - garrImages[8]:getHeight()			
+				love.graphics.setColor(1,1,1,1)
+				love.graphics.draw(garrImages[8], drawingx, drawingy)
+			end
+			
 		end
 	end
 end
@@ -192,9 +222,18 @@ local function DrawShopMenu()
 
 		love.graphics.setNewFont(14)
 		
-		local strText = "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
-		strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
-		strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
+		local strText = ""
+
+
+		if not fun.LanderHasEfficentThrusters() then
+			strText = strText .. "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
+		end
+		if not fun.LanderHasLargeTanks() then
+			strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
+		end
+		if not fun.LanderHasRangefinder() then
+			strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
+		end
 		
 		local drawingx = (gintScreenWidth / 2 ) - 125		-- try to get centre of screen
 		local drawingy = gintScreenHeight * 0.33

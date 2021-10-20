@@ -1,4 +1,4 @@
-gstrGameVersion = "0.06"
+gstrGameVersion = "0.07"
 
 inspect = require 'inspect'
 -- https://github.com/kikito/inspect.lua
@@ -169,7 +169,7 @@ local function CheckForContact(Lander,dt)
 	
 			-- see if landed near a fuel base
 			-- bestdist could be a negative number meaning not yet past the base (but maybe really close to it)
-			local bestdist, bestbase = fun.GetDistanceToClosestBase(2)		-- 2 = type of base = fuel
+			local bestdist, bestbase = fun.GetDistanceToClosestBase(garrLanders[1].x, 2)		-- 2 = type of base = fuel
 
 			-- bestbase is an object/table item
 			-- add wealth based on alignment to centre of landing pad
@@ -318,13 +318,16 @@ function love.load()
 	
 	-- stills/images
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
-	garrImages[2] = love.graphics.newImage("/Assets/gastank.png")
+	garrImages[2] = love.graphics.newImage("/Assets/gastank1.png")
 	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
 	garrImages[4] = love.graphics.newImage("/Assets/engine.png")
 	garrImages[5] = love.graphics.newImage("/Assets/ship.png")
+	garrImages[6] = love.graphics.newImage("/Assets/gastank1off.png")
+	garrImages[7] = love.graphics.newImage("/Assets/building1.png")
+	garrImages[8] = love.graphics.newImage("/Assets/building2.png")
 	
 	-- spritesheets and animations
-	garrSprites[1] = love.graphics.newImage("Assets/landinglights.png")
+	garrSprites[1] = love.graphics.newImage("Assets/landinglightsnew.png")
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 	

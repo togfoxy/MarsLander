@@ -38,12 +38,6 @@ function functions.GetMoreTerrain(intAmountToCreate)
 		table.insert(garrGround, newgroundaltitude)
 	end
 	
-	-- reapply smoothing around the base
-	-- for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
-		-- if garrObjects[i] ~= nil then
-			-- fun.CreateBase(garrObjects[i],i)
-		-- end
-	-- end
 end
 
 function functions.GetLanderMass()
@@ -109,7 +103,7 @@ function functions.LoadGame()
   
 end
 
-function functions.GetDistanceToClosestBase(intBaseType)
+function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
 -- if there are no bases (impossible) then the distance value returned will be -1
 -- note: if distance is a negative value then the Lander has not yet passed the base
@@ -121,8 +115,8 @@ function functions.GetDistanceToClosestBase(intBaseType)
 	
 	for k,v in pairs(garrObjects) do
 		if v.objecttype == intBaseType then
-			absdist = math.abs(garrLanders[1].x - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
-			dist = (garrLanders[1].x - (v.x + 85))						-- same but without the math.abs
+			absdist = math.abs(xvalue - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
+			dist = (xvalue - (v.x + 85))						-- same but without the math.abs
 			if closestdistance == 0 or absdist <= closestdistance then
 				closestdistance = absdist
 				closestbase = v
@@ -131,7 +125,7 @@ function functions.GetDistanceToClosestBase(intBaseType)
 	end
 	
 	-- now we have the closest base, work out the distance to the landing pad for that base
-	local realdist = garrLanders[1].x - (closestbase.x + 85)			-- the + bit is an offset to calculate the landing pad and not the image
+	local realdist = xvalue - (closestbase.x + 85)			-- the + bit is an offset to calculate the landing pad and not the image
 
 	return  realdist, closestbase
 
@@ -140,7 +134,7 @@ end
 function functions.IsOnLandingPad(intBaseType)
 -- returns a true / false value
 
-	local mydist, _ = fun.GetDistanceToClosestBase(intBaseType)
+	local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, intBaseType)
 	if mydist >= -80 and mydist <= 40 then
 		return true
 	else
@@ -158,17 +152,45 @@ function functions.InitialiseGround()
 	end
 	
 	fun.GetMoreTerrain(gintScreenWidth * 2)
-	
-	-- Place a single tower for testing purposes
-	local randomx = love.math.random(100, gintScreenWidth - 100)
-	cobjs.CreateObject(1,randomx)
-	
+
 	-- Place bases
 	local basedistance = cf.round(gintScreenWidth * 1.5,0)
-	for i = 1, 10 do
-		cobjs.CreateObject(2, basedistance)		-- 2 = fuel base
+	for i = 1, 20 do
+		cobjs.CreateObject(enum.basetypeFuel, basedistance)		-- 2 = fuel base
 		basedistance = cf.round(basedistance * 1.3,0)
 		if basedistance > #garrGround then fun.GetMoreTerrain(basedistance * 2) end
+	end
+	
+	-- place random buildings
+	for i = 1, 50 do
+		local bolPlacementOkay = false
+		local rndnum
+		repeat
+			rndnum = love.math.random(1, #garrGround)
+			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
+			if disttobase <= 250 and disttobase >= -250 then
+				-- too close to fuel base
+			else
+				bolPlacementOkay = true
+			end
+		until bolPlacementOkay
+		cobjs.CreateObject(enum.basetypeBuilding1, rndnum)
+	end
+	
+	-- place random buildings
+	for i = 1, 50 do
+		local bolPlacementOkay = false
+		local rndnum
+		repeat
+			rndnum = love.math.random(1, #garrGround)
+			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
+			if disttobase <= 250 and disttobase >= -250 then
+				-- too close to fuel base
+			else
+				bolPlacementOkay = true
+			end
+		until bolPlacementOkay
+		cobjs.CreateObject(enum.basetypeBuilding2, rndnum)
 	end
 	
 	--! Place spikes
@@ -195,6 +217,17 @@ function functions.LanderHasEfficentThrusters()
 
 	for i = 1, #garrLanders[1].modules do
 		if garrLanders[1].modules[i] == enum.moduleNamesThrusters then
+			return true
+		end
+	end
+	return false
+end
+
+function functions.LanderHasLargeTanks()
+-- return TRUE if the lander has large tanks
+
+	for i = 1, #garrLanders[1].modules do
+		if garrLanders[1].modules[i] == enum.moduleNamesLargeTank then
 			return true
 		end
 	end
