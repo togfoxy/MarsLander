@@ -1,4 +1,4 @@
-gstrGameVersion = "0.07"
+gstrGameVersion = "0.08"
 
 inspect = require 'inspect'
 -- https://github.com/kikito/inspect.lua
@@ -18,6 +18,11 @@ nativefs = require("nativefs")
 anim8 = require 'anim8'
 -- https://github.com/kikito/anim8
 
+-- socket it native to LOVE2D
+socket = require "socket"
+-- https://love2d.org/wiki/Tutorial:Networking_with_UDP
+-- http://w3.impa.br/~diego/software/luasocket/reference.html
+
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
 garrCurrentScreen = {}	
@@ -28,6 +33,7 @@ fun = require "functions"
 cf = require "commonfunctions"
 menus = require "menus"
 enum = require "enum"
+ss = require "socketstuff"
 
 garrLanders = {}	
 garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
@@ -42,6 +48,21 @@ gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
+
+-- socket stuff
+udpclient = nil
+udphost = nil
+garrHostCommRecv = {}            -- the socket messages that the host receives
+garrHostCommSend = {}            -- records actions and events the other peers need to know about
+garrClientCommSend = {}
+garrClientCommRecv = {}
+garrClientNodeList = {}            -- when playing 'host', the host needs to know its clients end point
+garrClientNodeList.ip = nil
+garrClientNodeList.port = nil
+
+gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
+gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
 
 gbolDebug = true
 
@@ -205,6 +226,18 @@ local function PlaySoundEffects()
 
 end
 
+local function RecalcDefaultMass()
+-- need to recalc the default mass
+-- usually called after buying a module
+		local result = 0
+		-- all the masses are stored in this table so add them up
+		for i = 1, #garrLanders[1].mass do
+			result = result + garrLanders[1].mass[i]
+		end
+		return (result + garrLanders[1].fueltanksize)		-- mass of all the components + mass of fuel if the tank was full (i.e. fueltanksize)
+
+end
+
 local function PurchaseThrusters()
 -- add fuel efficient thrusters to the lander
 
@@ -222,7 +255,9 @@ local function PurchaseThrusters()
 		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsThrusters
 		
 		garrLanders[1].mass[1] = 115
-
+		
+		-- need to recalc the default mass
+		gintDefaultMass = RecalcDefaultMass()
 	end
 end
 
@@ -245,6 +280,8 @@ local function PurchaseLargeTank()
 		garrLanders[1].fueltanksize = 32		-- an increase from the default (25)
 		garrLanders[1].mass[2] = 23
 		
+		-- need to recalc the default mass
+		gintDefaultMass = RecalcDefaultMass()
 	end
 
 end
@@ -266,8 +303,58 @@ local function PurchaseRangeFinder()
 		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsRangeFinder
 
 		garrLanders[1].mass[3] = 2	-- this is the mass of the rangefinder
+
+		-- need to recalc the default mass
+		gintDefaultMass = RecalcDefaultMass()		
+		
 	end
 
+end
+
+local function HandleSockets()
+	
+	-- add lander info to the outgoing queue
+	local msg = {}
+	msg.x = garrLanders[1].x
+	msg.y = garrLanders[1].y
+	msg.angle = garrLanders[1].angle
+	-- ** msg is set here and sent below
+	
+	if gbolIsAHost then
+		ss.HostListenPort()
+		
+		-- get just one item from the queue and process it
+		local incoming = ss.GetItemInHostQueue()		-- could be nil
+		if incoming ~= nil then
+
+			garrLanders[2] = {}
+			garrLanders[2].x = incoming.x
+			garrLanders[2].y = incoming.y
+			garrLanders[2].angle = incoming.angle
+		end
+	
+		ss.AddItemToHostOutgoingQueue(msg)
+		ss.SendToClients()
+		msg = {}
+	end
+	
+	if gbolIsAClient then
+		ss.ClientListenPort()
+		
+		-- get just one item from the queue and process it
+		local incoming = ss.GetItemInClientQueue()		-- could be nil
+		if incoming ~= nil then
+			garrLanders[2] = {}
+			garrLanders[2].x = incoming.x
+			garrLanders[2].y = incoming.y
+			garrLanders[2].angle = incoming.angle
+		end
+
+		ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
+		ss.SendToHost()
+		msg = {}
+	end
+		
 end
 
 function love.keypressed( key, scancode, isrepeat)
@@ -340,7 +427,7 @@ function love.load()
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
-	
+
 	Slab.Initialize(args)
 	
 end
@@ -404,6 +491,8 @@ function love.update(dt)
 		CheckForContact(garrLanders[1], dt)
 		
 		gLandingLightsAnimation:update(dt)
+		
+		HandleSockets()
 	end
 
 

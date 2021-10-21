@@ -92,6 +92,11 @@ function HUD.draw(worldoffset)
 	
 	DrawNearestBase()
 	
+	if gbolIsAHost then
+		love.graphics.setColor(1,1,1,0.50)
+		love.graphics.setNewFont(12)
+		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 15)
+	end
 end
 
 local function DrawSurface(worldoffset)
@@ -184,12 +189,14 @@ local function DrawObjects(worldoffset)
 	end
 end
 
-local function DrawDebug()
+local function DrawDebug(worldoffset)
 
 	love.graphics.setNewFont(14)
 	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 15)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,15)
+	
+	-- love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
 end
 
@@ -201,12 +208,20 @@ local function DrawLander(worldoffset)
 		local drawingx = v.x - worldoffset
 		local drawingy = v.y
 		
+		if k == 1 then
+			love.graphics.setColor(1,1,1,1)
+		else
+			love.graphics.setColor(1,1,1,0.5)
+		end
+		
 		love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
 
 		if v.engineOn == true then
 			love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
 			v.engineOn = false
-		end		
+		end	
+		love.graphics.setColor(1,1,1,1)
+
 	end
 end
 
@@ -269,7 +284,7 @@ function drawobjects.DrawWorld()
     
     
 	if gbolDebug then
-		DrawDebug()
+		DrawDebug(worldoffset)
 	end	
 
 end
@@ -277,3 +292,14 @@ end
 
 
 return drawobjects
+
+
+
+
+
+
+
+
+
+
+

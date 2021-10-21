@@ -3,7 +3,7 @@ local menus = {}
 
 function menus.DrawMainMenu()
     local intSlabWidth = 205	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 350 	-- the height of the main menu slab
+	local intSlabHeight = 400 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -31,12 +31,44 @@ function menus.DrawMainMenu()
 		end
 		Slab.NewLine()
 
-		
-		--! this is functionally ready but there is a problem with BITSER that needs to be fixed.
 		if Slab.Button("Save game",{W=155}) then
 			fun.SaveGame()      --! need some sort of feedback here
 		end
 		Slab.NewLine()
+		
+		if not gbolIsAClient and not gbolIsAHost then
+			if Slab.Button("Host game",{W=155}) then
+				ss.StartHosting(gintServerPort)
+				gbolIsAClient = false
+				gbolIsAHost = true
+				fun.AddScreen("World")
+			end
+			Slab.NewLine()
+		end
+		
+		if gbolIsAHost then
+			Slab.Text("Hosting on port: " .. gintServerPort)
+			Slab.NewLine()
+		end
+		
+		if not gbolIsAHost then
+			Slab.Text("Join on port:" )
+			if Slab.Input('HostEndPoint',{ReturnOnText=true,W=100,Text = ConnectedToPort}) then
+				ConnectedToPort = Slab.GetInputText()
+			end
+			
+			if Slab.Button("Join game",{W=155}) then
+				gbolIsAHost = false
+				gbolIsAClient = true
+
+				ss.ConnectToHost(_, ConnectedToPort)
+				
+				ss.AddItemToClientOutgoingQueue(message)
+				fun.AddScreen("World")
+
+			end
+			Slab.NewLine()		
+		end
 
 		if Slab.Button("Credits",{W=155}) then
 			fun.AddScreen("Credits")		--!
