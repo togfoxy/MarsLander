@@ -3,7 +3,7 @@ local menus = {}
 
 function menus.DrawMainMenu()
     local intSlabWidth = 205	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 400 	-- the height of the main menu slab
+	local intSlabHeight = 450 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -83,10 +83,10 @@ function menus.DrawMainMenu()
 
 		-- ** Increase window height if adding new things ** --
 
-		-- add some white space for presentation
-		Slab.NewLine()
-		if Slab.Button("Hidden",{Invisible=true}) then
-		end
+		-- -- add some white space for presentation
+		-- Slab.NewLine()
+		-- if Slab.Button("Hidden",{Invisible=true}) then
+		-- end
 
 	Slab.EndLayout()
 	Slab.EndWindow()

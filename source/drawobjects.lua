@@ -105,7 +105,7 @@ local function DrawSurface(worldoffset)
 	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (worldoffset + gintScreenWidth) > #garrGround then
-		fun.GetMoreTerrain(gintScreenWidth * 2)
+		fun.GetTerrainNoise(gintScreenWidth * 2)
 	end
 	
 	for i = 1, #garrGround - 1 do
@@ -204,24 +204,28 @@ local function DrawLander(worldoffset)
 
 	-- draw the lander and flame
 	for k,v in ipairs(garrLanders) do
-	
+
 		local drawingx = v.x - worldoffset
 		local drawingy = v.y
 		
-		if k == 1 then
-			love.graphics.setColor(1,1,1,1)
+		if drawingx < -200 or drawingx > (gintScreenWidth * 1.1) then
+			-- off screen. do nothing
 		else
-			love.graphics.setColor(1,1,1,0.5)
-		end
 		
-		love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
+			if k == 1 then
+				love.graphics.setColor(1,1,1,1)
+			else
+				love.graphics.setColor(1,1,1,0.5)
+			end
+			
+			love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
 
-		if v.engineOn == true then
-			love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-			v.engineOn = false
-		end	
-		love.graphics.setColor(1,1,1,1)
-
+			if v.engineOn == true then
+				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+				v.engineOn = false
+			end	
+			love.graphics.setColor(1,1,1,1)
+		end
 	end
 end
 

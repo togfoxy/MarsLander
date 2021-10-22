@@ -1,3 +1,51 @@
+--[[
+Socketstuff module by togfox October 2021. MIT license applies
+
+Usage:
+create three global variables in main.lua that will persistent and used for the life of the session:
+
+gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gbolIsAClient = false            					-- defaults to NOT a client until the player chooses to connect to a host
+gbolIsAHost = false                					-- defaults to NOT a host until the player chooses to be a host
+
+Put the following code into love.update so that the host can do host things:
+
+	if gbolIsAHost then
+		ss.HostListenPort()
+		
+		-- get just one item from the queue and process it
+		local incoming = ss.GetItemInHostQueue()		-- could be nil
+		if incoming ~= nil then
+			print(inspect(incoming))
+		end
+	
+		msg = whatever		-- string, number or table.
+		ss.AddItemToHostOutgoingQueue(msg)
+		ss.SendToClients()
+		msg = {}
+	end
+
+Put the following code into love.update so that clients can do client things:
+
+	if gbolIsAClient then
+		ss.ClientListenPort()
+		
+		-- get just one item from the queue and process it
+		local incoming = ss.GetItemInClientQueue()		-- could be nil
+		if incoming ~= nil then
+			print(inspect(msg))
+		end
+
+		msg = whatever 		-- string, number or table.
+		ss.AddItemToClientOutgoingQueue(msg)	-- 
+		ss.SendToHost()
+		msg = {}
+	end
+	
+]]
+
+
+
 local socketstuff = {}
 
 local arrHostIncomingQueue = {}
@@ -5,6 +53,9 @@ local arrClientIncomingQueue = {}
 local arrHostOutgoingQueue = {}
 local arrClientOutgoingQueue = {}
 local arrClientNodes = {}
+
+udpclient = nil
+udphost = nil
 
 local function DedupClientList(listofclients)
 -- dedupes the listofclients so that IP's and ports are recorded just once
@@ -22,6 +73,7 @@ local function DedupClientList(listofclients)
 end
 
 function socketstuff.HostListenPort()
+-- listens for a message and adds it to the queue
     local data, ip, port = udphost:receivefrom()
     if data then
 		local unpackeddata = bitser.loads(data)
@@ -45,7 +97,6 @@ function socketstuff.ClientListenPort()
     end
 
 end
-
 
 function socketstuff.GetItemInHostQueue()
 -- returns the first/oldest item in the message queue
@@ -93,10 +144,10 @@ function socketstuff.SendToHost()
 -- send the whole outgoing queue to the host
 
 	while #arrClientOutgoingQueue > 0 do
-	
--- print("Client sending value: ", arrClientOutgoingQueue[1])
-		local serialdata = bitser.dumps(arrClientOutgoingQueue[1])
-		udpclient:send(serialdata)
+		if arrClientOutgoingQueue[1] ~= nil then
+			local serialdata = bitser.dumps(arrClientOutgoingQueue[1])
+			udpclient:send(serialdata)
+		end
 		table.remove(arrClientOutgoingQueue,1)
 	end
 end
@@ -104,9 +155,12 @@ end
 function socketstuff.SendToClients()
 -- sends the whole outgoing queue to all of the clients
 	while #arrHostOutgoingQueue > 0 do
-		local serialdata = bitser.dumps(arrHostOutgoingQueue[1])
-		for k,v in pairs(arrClientNodes) do
-			udphost:sendto(serialdata, v.ip, v.port)		--! see if "send" will work and will be faster
+	
+		if arrHostOutgoingQueue[1] ~= nil then
+			local serialdata = bitser.dumps(arrHostOutgoingQueue[1])
+			for k,v in pairs(arrClientNodes) do
+				udphost:sendto(serialdata, v.ip, v.port)		--! see if "send" will work and will be faster
+			end
 		end
 		table.remove(arrHostOutgoingQueue,1)
 	end

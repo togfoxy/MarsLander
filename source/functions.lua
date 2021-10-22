@@ -22,22 +22,33 @@ function functions.SwapScreen(newscreen)
     table.remove(garrCurrentScreen, #garrCurrentScreen - 1)
 end
 
-function functions.GetMoreTerrain(intAmountToCreate)
--- determines the next bit of terrain and adds that to the terrain table
--- will create intAmountToCreate number of ground items/elements/pixels
+function functions.GetTerrainNoise(intAmountToCreate)
+-- gets a predictable terrain value (deterministic) base on x
 
 	local groundtablesize = #garrGround
-
+	
+	local gameID = math.pi
+	
+	local terrainmaxheight = (gintScreenHeight * 0.90)
+	local terrainminheight = (gintScreenHeight * 0.65)
+	local terrainstep = (terrainmaxheight - terrainminheight) / 10
+	local terrainoctaves = 1
+	
+	repeat
+		terrainoctaves = terrainoctaves + 1
+	until 2 ^ terrainoctaves >= terrainstep
+	
 	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
 	
-		local newgroundaltitude = garrGround[i-1] + love.math.random (-5,5)
-		
-		if newgroundaltitude > (gintScreenHeight * 0.90) then newgroundaltitude = (gintScreenHeight * 0.90) end
-		if newgroundaltitude < (gintScreenHeight * 0.65) then newgroundaltitude = (gintScreenHeight * 0.65) end
-	
+		local newgroundaltitude
+		for oct = 1, terrainoctaves do
+			newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
+		end
+		if newgroundaltitude < terrainminheight then newgroundaltitude = terrainminheight end
+		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
+
 		table.insert(garrGround, newgroundaltitude)
 	end
-	
 end
 
 function functions.GetLanderMass()
@@ -151,14 +162,14 @@ function functions.InitialiseGround()
 		garrGround[i] = gintScreenHeight * 0.80
 	end
 	
-	fun.GetMoreTerrain(gintScreenWidth * 2)
+	fun.GetTerrainNoise(gintScreenWidth * 2)
 
 	-- Place bases
 	local basedistance = cf.round(gintScreenWidth * 1.5,0)
 	for i = 1, 20 do
 		cobjs.CreateObject(enum.basetypeFuel, basedistance)		-- 2 = fuel base
 		basedistance = cf.round(basedistance * 1.3,0)
-		if basedistance > #garrGround then fun.GetMoreTerrain(basedistance * 2) end
+		if basedistance > #garrGround then fun.GetTerrainNoise(basedistance * 2) end
 	end
 	
 	-- place random buildings
@@ -194,6 +205,8 @@ function functions.InitialiseGround()
 	end
 	
 	--! Place spikes
+	
+print(#garrGround)
 	
 end
 

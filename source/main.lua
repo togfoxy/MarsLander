@@ -50,16 +50,6 @@ gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
 
 -- socket stuff
-udpclient = nil
-udphost = nil
-garrHostCommRecv = {}            -- the socket messages that the host receives
-garrHostCommSend = {}            -- records actions and events the other peers need to know about
-garrClientCommSend = {}
-garrClientCommRecv = {}
-garrClientNodeList = {}            -- when playing 'host', the host needs to know its clients end point
-garrClientNodeList.ip = nil
-garrClientNodeList.port = nil
-
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
@@ -324,15 +314,17 @@ local function HandleSockets()
 		ss.HostListenPort()
 		
 		-- get just one item from the queue and process it
-		local incoming = ss.GetItemInHostQueue()		-- could be nil
-		if incoming ~= nil then
+		repeat
+			local incoming = ss.GetItemInHostQueue()		-- could be nil
+			if incoming ~= nil then
 
-			garrLanders[2] = {}
-			garrLanders[2].x = incoming.x
-			garrLanders[2].y = incoming.y
-			garrLanders[2].angle = incoming.angle
-		end
-	
+				garrLanders[2] = {}
+				garrLanders[2].x = incoming.x
+				garrLanders[2].y = incoming.y
+				garrLanders[2].angle = incoming.angle
+			end	
+		until incoming == nil
+			
 		ss.AddItemToHostOutgoingQueue(msg)
 		ss.SendToClients()
 		msg = {}
@@ -342,13 +334,15 @@ local function HandleSockets()
 		ss.ClientListenPort()
 		
 		-- get just one item from the queue and process it
-		local incoming = ss.GetItemInClientQueue()		-- could be nil
-		if incoming ~= nil then
-			garrLanders[2] = {}
-			garrLanders[2].x = incoming.x
-			garrLanders[2].y = incoming.y
-			garrLanders[2].angle = incoming.angle
-		end
+		repeat
+			local incoming = ss.GetItemInClientQueue()		-- could be nil
+			if incoming ~= nil then
+				garrLanders[2] = {}
+				garrLanders[2].x = incoming.x
+				garrLanders[2].y = incoming.y
+				garrLanders[2].angle = incoming.angle
+			end
+		until incoming == nil
 
 		ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
 		ss.SendToHost()
