@@ -1,21 +1,21 @@
 gstrGameVersion = "0.08"
 
-inspect = require 'inspect'
+inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
 
-TLfres = require "tlfres"
+TLfres = require "lib.tlfres"
 -- https://love2d.org/wiki/TLfres
 
-Slab = require 'Slab.Slab'
+Slab = require 'lib.Slab.Slab'
 -- https://github.com/coding-jackalope/Slab/wiki
 
-bitser = require 'bitser'
+bitser = require 'lib.bitser'
 -- https://github.com/gvx/bitser
 
-nativefs = require("nativefs")
+nativefs = require("lib.nativefs")
 -- https://github.com/megagrump/nativefs
 
-anim8 = require 'anim8'
+anim8 = require 'lib.anim8'
 -- https://github.com/kikito/anim8
 
 -- socket it native to LOVE2D
@@ -30,7 +30,7 @@ garrCurrentScreen = {}
 cobjs = require "createobjects"
 dobjs = require "drawobjects"
 fun = require "functions"
-cf = require "commonfunctions"
+cf = require "lib.commonfunctions"
 menus = require "menus"
 enum = require "enum"
 ss = require "socketstuff"
