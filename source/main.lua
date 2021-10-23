@@ -422,6 +422,7 @@ function love.load()
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
 
+	Slab.SetINIStatePath(nil)
 	Slab.Initialize(args)
 	
 end
