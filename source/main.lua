@@ -28,6 +28,7 @@ lovelyToasts = require("lib.lovelyToasts")
 
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
+
 garrCurrentScreen = {}	
 
 cobjs = require "createobjects"
@@ -415,9 +416,6 @@ end
 
 function love.load()
 
-	-- this line doesn't work for some reason. Perhaps love.load is the wrong place for it.
-	--gintScreenWidth, gintScreenHeight = love.graphics.getDimensions()
-
     if love.filesystem.isFused( ) then
         void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
         gbolDebug = false
@@ -542,7 +540,6 @@ function love.update(dt)
 	end
 	
 	lovelyToasts.update(dt)
-
 
 end
 
