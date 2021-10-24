@@ -70,7 +70,7 @@ end
 function functions.SaveGame()
 -- uses the globals because too hard to pass params
 
---! for some reason bitser throws runtime error when serialising true/false values.
+--! for some reason bitser throws runtime error when serialising true / false values.
 
     local savefile
     local contents
@@ -206,7 +206,6 @@ function functions.InitialiseGround()
 	
 	--! Place spikes
 	
-print(#garrGround)
 	
 end
 
@@ -218,40 +217,13 @@ function functions.ResetGame()
 
 	garrLanders = {}
 	table.insert(garrLanders, cobjs.CreateLander())
-	
 
-
-
-
-end
-
-function functions.LanderHasEfficentThrusters()
--- return TRUE if the lander has fuel efficien thrusters
-
-	for i = 1, #garrLanders[1].modules do
-		if garrLanders[1].modules[i] == enum.moduleNamesThrusters then
-			return true
-		end
 	end
-	return false
-end
 
-function functions.LanderHasLargeTanks()
--- return TRUE if the lander has large tanks
+function functions.LanderHasUpgrade(strModuleName)
 
 	for i = 1, #garrLanders[1].modules do
-		if garrLanders[1].modules[i] == enum.moduleNamesLargeTank then
-			return true
-		end
-	end
-	return false
-end
-
-function functions.LanderHasRangefinder()
--- return TRUE if the lander has a rangefinder
-
-	for i = 1, #garrLanders[1].modules do
-		if garrLanders[1].modules[i] == enum.moduleNamesRangeFinder then
+		if garrLanders[1].modules[i] == strModuleName then
 			return true
 		end
 	end
