@@ -20,6 +20,8 @@ Use left and right arrows to rotate the vessel. Use 'up' arrow to thrust. Land s
 
 (Also works with numpad 4,8,6)
 
+You can now pause the game with 'p'
+
 :)
 
 ## Installation instructions
@@ -28,7 +30,7 @@ Go to the RELEASES page: https://github.com/togfoxy/MarsLander/releases
 
 Expand the ASSETS drop down for the latest release
 
-### Winodows first time install:
+### Windows first time install:
 
 - download the zip file
 - unzip onto your desktop
