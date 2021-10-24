@@ -23,6 +23,9 @@ socket = require "socket"
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
 -- http://w3.impa.br/~diego/software/luasocket/reference.html
 
+lovelyToasts = require("lib.lovelyToasts")
+-- https://github.com/Loucee/Lovely-Toasts
+
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
 garrCurrentScreen = {}	
@@ -462,6 +465,8 @@ function love.load()
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
 
+	lovelyToasts.options.queueEnabled = true
+	
 	Slab.SetINIStatePath(nil)
 	Slab.Initialize(args)
 	
@@ -484,11 +489,10 @@ function love.draw()
 	if strCurrentScreen == "Credits" then
 		menus.DrawCredits()
 	end	
-	
-	
+		
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
-	
+	lovelyToasts.draw()		--* Put this AFTER the slab so that it draws over the slab
 	TLfres.endRendering({0, 0, 0, 1})
 
 end
@@ -536,6 +540,8 @@ function love.update(dt)
 		
 		HandleSockets()
 	end
+	
+	lovelyToasts.update(dt)
 
 
 end
