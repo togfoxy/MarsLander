@@ -7,6 +7,10 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 ## Unreleased
 ### Added
 - You can now pause the game with 'p'
+- Added a lovelyToast to the SAVE button
+- Simple "end game" screen allows a game restart
+- Low fuel audio
+- Added smoke effect 
 
 ## v0.08
 ### Added
