@@ -151,7 +151,8 @@ local function MoveShip(Lander, dt)
 	-- capture a new smoke location every 1 second
 	gfltSmokeTimer = gfltSmokeTimer - dt
 	if gfltSmokeTimer <= 0 then
-		if garrLanders[1].landed == false then
+		if (garrLanders[1].landed == false) and (garrLanders[1].engineOn or garrLanders[1].enginelefton or garrLanders[1].enginerighton) then
+			-- only produce smoke when not landed or any of the engines aren't firing
 	
 			-- local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
 			gfltSmokeTimer = 0.5
