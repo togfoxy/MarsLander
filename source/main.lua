@@ -46,12 +46,15 @@ garrImages = {}
 garrSprites = {}	-- spritesheets
 garrSound = {}
 garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
+garrSmokeSprites = {}		-- used to track and draw smoke animations
+gSmokeAnimation = {}		-- smoke can move at different pace/speed
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
+gfltSmokeTimer = 1			-- track how often to capture smoke trail
 
 -- socket stuff
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
@@ -129,8 +132,6 @@ end
 
 local function MoveShip(Lander, dt)
 
-	local myalt = Lander.y		-- need to capture vertical movement here and check it later on
-
 	Lander.x = Lander.x + Lander.vx
 	Lander.y = Lander.y + Lander.vy
 	
@@ -145,6 +146,27 @@ local function MoveShip(Lander, dt)
 	if Lander.airborne then
 		gfltLandervy = Lander.vy		-- used to determine speed right before touchdown
 		gfltLandervx = Lander.vx
+	end
+	
+	-- capture a new smoke location every 1 second
+	gfltSmokeTimer = gfltSmokeTimer - dt
+	if gfltSmokeTimer <= 0 then
+		if garrLanders[1].landed == false then
+	
+			-- local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
+			gfltSmokeTimer = 0.5
+			
+			local mysmoke = {}
+			mysmoke.x = Lander.x
+			mysmoke.y = Lander.y
+			mysmoke.dt = 0			-- this timer will count up and determine which sprite to display
+			
+			table.insert(garrSmokeSprites, mysmoke)
+			
+			-- if #garrSmokeSprites > 5 then
+				-- table.remove(garrSmokeSprites,1)
+			-- end
+		end
 	end
 	
 end
@@ -398,6 +420,17 @@ local function HandleSockets()
 		
 end
 
+local function UpdateSmoke(dt)
+-- each entry in the smoke table tracks it's own life (dt) so it knows when to expire
+
+	for k,v in pairs(garrSmokeSprites) do
+		v.dt = v.dt + (dt * 6)
+		if v.dt > 8 then
+			table.remove(garrSmokeSprites,k)
+		end
+	end
+end
+
 function love.keypressed( key, scancode, isrepeat)
 	if key == "escape" then
 		fun.RemoveScreen()
@@ -466,6 +499,8 @@ function love.load()
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 	
+	gSmokeSheet = love.graphics.newImage("Assets/Smoke_Fire.png")
+	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 16, 16)
 	
 	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
 	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
@@ -544,6 +579,8 @@ function love.update(dt)
 		
 		
 		MoveShip(garrLanders[1], dt)
+		
+		UpdateSmoke(dt)
 		
 		PlaySoundEffects()
 		

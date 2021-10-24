@@ -130,7 +130,6 @@ end
 local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
-	
 	for k,v in pairs(garrObjects) do
 	
 		local xvalue = v.x
@@ -202,7 +201,7 @@ local function DrawDebug(worldoffset)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,15)
 	
-	-- love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
+	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
 end
 
@@ -239,8 +238,19 @@ local function DrawLander(worldoffset)
 			if v.enginerighton == true then
 				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle - 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
 				v.enginerighton = false
-			end			
-			
+			end	
+
+			-- draw smoke trail
+			for q,w in pairs(garrSmokeSprites) do
+				local drawingx = w.x - worldoffset
+				local drawingy = w.y
+
+				local intSpriteNum = cf.round(w.dt)
+				if intSpriteNum < 1 then intSpriteNum = 1 end
+				
+				love.graphics.draw(gSmokeSheet,gSmokeImages[intSpriteNum], drawingx - 10, drawingy + 5)
+
+			end
 			
 			love.graphics.setColor(1,1,1,1)
 		end
