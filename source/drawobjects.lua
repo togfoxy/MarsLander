@@ -291,6 +291,14 @@ local function DrawShopMenu()
 	end
 end
 
+function drawobjects.DrawPause()
+	-- Simple text based pause screen
+	love.graphics.setNewFont(18)
+	love.graphics.setColor(1,1,1,1)
+	local strText = "GAME PAUSED: PRESS <ESC> TO RESUME"
+	love.graphics.print(strText, gintScreenWidth / 2 - 200, gintScreenHeight /2)
+end
+
 local function DrawGameOver()
 	
 	love.graphics.setNewFont(16)
@@ -337,8 +345,6 @@ function drawobjects.DrawWorld()
 	end	
 
 end
-
-
 
 return drawobjects
 

@@ -458,6 +458,7 @@ function love.keypressed( key, scancode, isrepeat)
 			fun.ResetGame()
 		end
 	end
+
 end
 
 function love.load()
@@ -537,7 +538,11 @@ function love.draw()
 	if strCurrentScreen == "Credits" then
 		menus.DrawCredits()
 	end	
-		
+	
+	if strCurrentScreen == "Pause" then
+		dobjs.DrawWorld() -- Still draw the world
+		dobjs.DrawPause() -- Display on top of world
+	end
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 	lovelyToasts.draw()		--* Put this AFTER the slab so that it draws over the slab
@@ -563,7 +568,6 @@ function love.update(dt)
 		if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
 			DoThrust(dt)
 		end
-
 		if love.keyboard.isDown("left") or love.keyboard.isDown("a") or love.keyboard.isDown("kp4") then
 			TurnLeft(dt)
 		end
@@ -576,6 +580,9 @@ function love.update(dt)
 		if love.keyboard.isDown("e") or love.keyboard.isDown("kp9") then
 			ThrustRight(dt)
 		end		
+		if love.keyboard.isDown("p") then
+			fun.AddScreen("Pause")
+		end
 		
 		
 		MoveShip(garrLanders[1], dt)
