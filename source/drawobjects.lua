@@ -1,3 +1,9 @@
+--[[
+drawobjects module: put all your screen draws into this module
+
+
+]]
+
 local drawobjects = {}
 -- put all the drawing routines in here
 
@@ -124,7 +130,6 @@ end
 local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
-	
 	for k,v in pairs(garrObjects) do
 	
 		local xvalue = v.x
@@ -196,7 +201,7 @@ local function DrawDebug(worldoffset)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,15)
 	
-	-- love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
+	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
 end
 
@@ -233,8 +238,19 @@ local function DrawLander(worldoffset)
 			if v.enginerighton == true then
 				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle - 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
 				v.enginerighton = false
-			end			
-			
+			end	
+
+			-- draw smoke trail
+			for q,w in pairs(garrSmokeSprites) do
+				local drawingx = w.x - worldoffset
+				local drawingy = w.y
+
+				local intSpriteNum = cf.round(w.dt)
+				if intSpriteNum < 1 then intSpriteNum = 1 end
+				
+				love.graphics.draw(gSmokeSheet,gSmokeImages[intSpriteNum], drawingx - 10, drawingy + 5)
+
+			end
 			
 			love.graphics.setColor(1,1,1,1)
 		end
@@ -249,12 +265,11 @@ end
 local function DrawShopMenu()
 -- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
 
-	if fun.IsOnLandingPad(2) then			-- 2 = base type (fuel)
+	if fun.IsOnLandingPad(enum.basetypeFuel) then			-- 2 = base type (fuel)
 
-		love.graphics.setNewFont(14)
+		love.graphics.setNewFont(16)
 		
 		local strText = ""
-
 
 		if not fun.LanderHasUpgrade(enum.moduleNamesThrusters) then
 			strText = strText .. "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
@@ -274,6 +289,16 @@ local function DrawShopMenu()
 		love.graphics.print(strText, drawingx, drawingy)
 
 	end
+end
+
+local function DrawGameOver()
+	
+	love.graphics.setNewFont(16)
+
+	local strText = "You are out of fuel. Game over. Press R to reset"	
+	local drawingx = (gintScreenWidth / 2 ) - 150		-- try to get centre of screen
+	local drawingy = gintScreenHeight * 0.33
+	love.graphics.print(strText, drawingx, drawingy)
 end
 
 function drawobjects.DrawWorld()
@@ -300,7 +325,12 @@ function drawobjects.DrawWorld()
 	if garrLanders[1].landed then
 		DrawShopMenu()
 	end
-    
+	
+--print(garrLanders[1].fuel, garrLanders[1].landed, fun.IsOnLandingPad(enum.basetypeFuel))
+	
+	if garrLanders[1].bolGameOver then
+		DrawGameOver()
+	end
     
 	if gbolDebug then
 		DrawDebug(worldoffset)

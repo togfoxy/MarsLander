@@ -88,6 +88,8 @@ function functions.SaveGame()
     savefile = savedir .. "/" .. "objects.dat"
     serialisedString = bitser.dumps(garrObjects)    -- 
     success, message = nativefs.write(savefile, serialisedString )   
+	
+	lovelyToasts.show("Game saved",3, "middle")
     
 end
 

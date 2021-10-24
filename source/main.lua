@@ -1,4 +1,4 @@
-gstrGameVersion = "0.08"
+gstrGameVersion = "0.09"
 
 inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
@@ -23,8 +23,12 @@ socket = require "socket"
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
 -- http://w3.impa.br/~diego/software/luasocket/reference.html
 
+lovelyToasts = require("lib.lovelyToasts")
+-- https://github.com/Loucee/Lovely-Toasts
+
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
+
 garrCurrentScreen = {}	
 
 cobjs = require "createobjects"
@@ -42,12 +46,15 @@ garrImages = {}
 garrSprites = {}	-- spritesheets
 garrSound = {}
 garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
+garrSmokeSprites = {}		-- used to track and draw smoke animations
+gSmokeAnimation = {}		-- smoke can move at different pace/speed
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
+gfltSmokeTimer = 1			-- track how often to capture smoke trail
 
 -- socket stuff
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
@@ -125,8 +132,6 @@ end
 
 local function MoveShip(Lander, dt)
 
-	local myalt = Lander.y		-- need to capture vertical movement here and check it later on
-
 	Lander.x = Lander.x + Lander.vx
 	Lander.y = Lander.y + Lander.vy
 	
@@ -141,6 +146,27 @@ local function MoveShip(Lander, dt)
 	if Lander.airborne then
 		gfltLandervy = Lander.vy		-- used to determine speed right before touchdown
 		gfltLandervx = Lander.vx
+	end
+	
+	-- capture a new smoke location every 1 second
+	gfltSmokeTimer = gfltSmokeTimer - dt
+	if gfltSmokeTimer <= 0 then
+		if garrLanders[1].landed == false then
+	
+			-- local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
+			gfltSmokeTimer = 0.5
+			
+			local mysmoke = {}
+			mysmoke.x = Lander.x
+			mysmoke.y = Lander.y
+			mysmoke.dt = 0			-- this timer will count up and determine which sprite to display
+			
+			table.insert(garrSmokeSprites, mysmoke)
+			
+			-- if #garrSmokeSprites > 5 then
+				-- table.remove(garrSmokeSprites,1)
+			-- end
+		end
 	end
 	
 end
@@ -217,6 +243,9 @@ local function CheckForContact(Lander,dt)
 			Lander.vx = 0
 			if Lander.vy > 0 then Lander.vy = 0 end			
 			
+			if garrLanders[1].fuel <= 1 and garrLanders[1].landed == true and fun.IsOnLandingPad(enum.basetypeFuel) == false then
+				garrLanders[1].bolGameOver = true
+			end
 		else
 			Lander.landed = false
 			if Lander.airborne == false then
@@ -227,14 +256,18 @@ local function CheckForContact(Lander,dt)
 end
 
 local function PlaySoundEffects()
---! aweful function name
 
 	if garrLanders[1].engineOn then
 		garrSound[1]:play()
 	else
 		garrSound[1]:stop()
 	end
-
+	
+	local fuelpercent = garrLanders[1].fuel / garrLanders[1].fueltanksize
+	
+	if fuelpercent <= 0.33 then
+		garrSound[5]:play()
+	end
 end
 
 local function RecalcDefaultMass()
@@ -387,6 +420,17 @@ local function HandleSockets()
 		
 end
 
+local function UpdateSmoke(dt)
+-- each entry in the smoke table tracks it's own life (dt) so it knows when to expire
+
+	for k,v in pairs(garrSmokeSprites) do
+		v.dt = v.dt + (dt * 6)
+		if v.dt > 8 then
+			table.remove(garrSmokeSprites,k)
+		end
+	end
+end
+
 function love.keypressed( key, scancode, isrepeat)
 	if key == "escape" then
 		fun.RemoveScreen()
@@ -408,12 +452,15 @@ function love.keypressed( key, scancode, isrepeat)
 			PurchaseSideThrusters()
 		end		
 	end
+	
+	if key == "r" then
+		if garrLanders[1].bolGameOver then
+			fun.ResetGame()
+		end
+	end
 end
 
 function love.load()
-
-	-- this line doesn't work for some reason. Perhaps love.load is the wrong place for it.
-	--gintScreenWidth, gintScreenHeight = love.graphics.getDimensions()
 
     if love.filesystem.isFused( ) then
         void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
@@ -452,16 +499,22 @@ function love.load()
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 	
+	gSmokeSheet = love.graphics.newImage("Assets/Smoke_Fire.png")
+	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 16, 16)
 	
 	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
 	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
 	garrSound[3] = love.audio.newSource("Assets/Galactic-Pole-Position.mp3", "stream")
 	garrSound[3]:setVolume(0.25)
 	garrSound[4] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
+	garrSound[5] = love.audio.newSource("Assets/137920__ionicsmusic__robot-voice-low-fuel1.wav", "static")
+	garrSound[5]:setVolume(0.25)
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
 
+	lovelyToasts.options.queueEnabled = true
+	
 	Slab.SetINIStatePath(nil)
 	Slab.Initialize(args)
 	
@@ -484,11 +537,10 @@ function love.draw()
 	if strCurrentScreen == "Credits" then
 		menus.DrawCredits()
 	end	
-	
-	
+		
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
-	
+	lovelyToasts.draw()		--* Put this AFTER the slab so that it draws over the slab
 	TLfres.endRendering({0, 0, 0, 1})
 
 end
@@ -528,6 +580,8 @@ function love.update(dt)
 		
 		MoveShip(garrLanders[1], dt)
 		
+		UpdateSmoke(dt)
+		
 		PlaySoundEffects()
 		
 		CheckForContact(garrLanders[1], dt)
@@ -536,7 +590,8 @@ function love.update(dt)
 		
 		HandleSockets()
 	end
-
+	
+	lovelyToasts.update(dt)
 
 end
 
