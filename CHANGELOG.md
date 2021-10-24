@@ -4,11 +4,22 @@ All notable changes to this project should be documented in this file.
 
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+
+
+
+
+
+
+
+## v0.08
 ### Added
 - Created a CHANGELOG.md
+- can now purchase sideways thrusters. Use q/e or numpad 7/numpad 9 to use
+- a whole bunch of multiplayer features added (but not yet working)
+
 ### Changed
-- Libraries moved into a lib folder to keep the codebase tidy
+- terrain algorithm has changed to be multiplayer compatible. Will be changed again in future to be less flat
+- fixed a bug with mass not being calculated after a shop purchase
 
 ## v0.07
 ### Added

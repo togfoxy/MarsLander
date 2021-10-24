@@ -13,6 +13,8 @@ function createobjects.CreateLander()
 	Lander.vx = 0
 	Lander.vy = 0
 	Lander.engineOn = false
+	Lander.enginelefton = false
+	Lander.enginerighton = false
 	Lander.landed = false			-- true = on the ground
 	Lander.airborne = false			-- true = on the ground FOR THE FIRST TIME
 	Lander.wealth = 0
