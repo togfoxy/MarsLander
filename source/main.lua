@@ -1,4 +1,4 @@
-gstrGameVersion = "0.08"
+gstrGameVersion = "0.09"
 
 inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
@@ -221,6 +221,9 @@ local function CheckForContact(Lander,dt)
 			Lander.vx = 0
 			if Lander.vy > 0 then Lander.vy = 0 end			
 			
+			if garrLanders[1].fuel <= 1 and garrLanders[1].landed == true and fun.IsOnLandingPad(enum.basetypeFuel) == false then
+				garrLanders[1].bolGameOver = true
+			end
 		else
 			Lander.landed = false
 			if Lander.airborne == false then
@@ -411,6 +414,12 @@ function love.keypressed( key, scancode, isrepeat)
 		if key == "4" then			
 			PurchaseSideThrusters()
 		end		
+	end
+	
+	if key == "r" then
+		if garrLanders[1].bolGameOver then
+			fun.ResetGame()
+		end
 	end
 end
 
