@@ -369,6 +369,7 @@ function love.keypressed( key, scancode, isrepeat)
 			PurchaseRangeFinder()
 		end			
 	end
+
 end
 
 function love.load()
@@ -445,7 +446,10 @@ function love.draw()
 		menus.DrawCredits()
 	end	
 	
-	
+	if strCurrentScreen == "Pause" then
+		dobjs.DrawWorld() -- Still draw the world
+		dobjs.DrawPause() -- Display on top of world
+	end
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 	
@@ -477,6 +481,9 @@ function love.update(dt)
 		end
 		if love.keyboard.isDown("right") or love.keyboard.isDown("d")then
 			TurnRight(dt)
+		end
+		if love.keyboard.isDown("p") then
+			fun.AddScreen("Pause")
 		end
 		
 		MoveShip(garrLanders[1], dt)
