@@ -58,7 +58,7 @@ gbolDebug = true
 
 local function DoThrust(dt)
 
-	if garrLanders[1].fuel - dt >= 0 or (fun.LanderHasEfficentThrusters() and garrLanders[1].fuel - (dt * 0.80) >= 0) then
+	if garrLanders[1].fuel - dt >= 0 or (fun.LanderHasUpgrade(enum.moduleNamesThrusters) and garrLanders[1].fuel - (dt * 0.80) >= 0) then
 
 		garrLanders[1].engineOn = true
 		local angle_radian = math.rad(garrLanders[1].angle)
@@ -74,7 +74,7 @@ local function DoThrust(dt)
 		garrLanders[1].vx = garrLanders[1].vx + force_x
 		garrLanders[1].vy = garrLanders[1].vy + force_y
 
-		if fun.LanderHasEfficentThrusters() then
+		if fun.LanderHasUpgrade(enum.moduleNamesThrusters) then
 			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 0.80)		-- efficient thrusters use 80% fuel compared to normal thrusters
 		else
 			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 1)
@@ -86,21 +86,41 @@ local function DoThrust(dt)
 end
 
 local function TurnLeft(dt)
+-- rotate the lander anti-clockwise
 
-	--if garrLanders[1].landed == false then
-		garrLanders[1].angle = garrLanders[1].angle - (90 * dt)
-		if garrLanders[1].angle < 0 then garrLanders[1].angle = 360 end
-	--end
-	
-
+	garrLanders[1].angle = garrLanders[1].angle - (90 * dt)
+	if garrLanders[1].angle < 0 then garrLanders[1].angle = 360 end
 end
 
 local function TurnRight(dt)
+-- rotate the lander clockwise
 
-	--if garrLanders[1].landed == false then
-		garrLanders[1].angle = garrLanders[1].angle + (90 * dt)
-		if garrLanders[1].angle > 360 then garrLanders[1].angle = 0 end
-	--end
+	garrLanders[1].angle = garrLanders[1].angle + (90 * dt)
+	if garrLanders[1].angle > 360 then garrLanders[1].angle = 0 end
+
+end
+
+local function ThrustLeft(dt)
+
+	if fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+		local force_x = 0.5 * dt		--!
+		garrLanders[1].vx = garrLanders[1].vx - force_x
+		garrLanders[1].enginerighton = true						-- opposite engine is on
+		
+		garrLanders[1].fuel = garrLanders[1].fuel - force_x
+	end
+end
+
+local function ThrustRight(dt)
+
+	if fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+		local force_x = 0.5 * dt		--!
+		garrLanders[1].vx = garrLanders[1].vx + force_x
+		garrLanders[1].enginelefton = true						-- opposite engine is on
+		
+		garrLanders[1].fuel = garrLanders[1].fuel - force_x
+	end
+
 end
 
 local function MoveShip(Lander, dt)
@@ -207,6 +227,7 @@ local function CheckForContact(Lander,dt)
 end
 
 local function PlaySoundEffects()
+--! aweful function name
 
 	if garrLanders[1].engineOn then
 		garrSound[1]:play()
@@ -301,6 +322,21 @@ local function PurchaseRangeFinder()
 
 end
 
+local function PurchaseSideThrusters()
+
+	if garrLanders[1].wealth >= enum.moduleCostSideThrusters then
+		if not fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+			table.insert(garrLanders[1].modules, enum.moduleNamesSideThrusters)
+			garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostSideThrusters
+
+			garrLanders[1].mass[4] = enum.moduleMassSideThrusters	-- this is the mass of the side thrusters
+
+			-- need to recalc the default mass
+			gintDefaultMass = RecalcDefaultMass()	
+		end
+	end
+end
+
 local function HandleSockets()
 	
 	-- add lander info to the outgoing queue
@@ -356,18 +392,21 @@ function love.keypressed( key, scancode, isrepeat)
 		fun.RemoveScreen()
 	end
 	
-	if fun.IsOnLandingPad(2) then
-		if key == "1" then			-- 2 = base type (fuel) then
+	if fun.IsOnLandingPad(2) then	-- 2 = base type (fuel)
+		if key == "1" then			 
 			PurchaseThrusters()
 		end
 	
-		if key == "2" then			-- 2 = base type (fuel) then
+		if key == "2" then			
 			PurchaseLargeTank()
 		end	
 		
-		if key == "3" then			-- 2 = base type (fuel) then
+		if key == "3" then			
 			PurchaseRangeFinder()
 		end			
+		if key == "4" then			
+			PurchaseSideThrusters()
+		end		
 	end
 end
 
@@ -398,6 +437,7 @@ function love.load()
 	gintDefaultMass = fun.GetLanderMass()
 	
 	-- stills/images
+	--! should make these numbers enums one day
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
 	garrImages[2] = love.graphics.newImage("/Assets/gastank1.png")
 	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
@@ -468,16 +508,23 @@ function love.update(dt)
 	
 	if strCurrentScreen == "World" then
 
-		if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
+		if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
 			DoThrust(dt)
 		end
 
-		if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
+		if love.keyboard.isDown("left") or love.keyboard.isDown("a") or love.keyboard.isDown("kp4") then
 			TurnLeft(dt)
 		end
-		if love.keyboard.isDown("right") or love.keyboard.isDown("d")then
+		if love.keyboard.isDown("right") or love.keyboard.isDown("d") or love.keyboard.isDown("kp6") then
 			TurnRight(dt)
 		end
+		if love.keyboard.isDown("q") or love.keyboard.isDown("kp7") then
+			ThrustLeft(dt)
+		end
+		if love.keyboard.isDown("e") or love.keyboard.isDown("kp9") then
+			ThrustRight(dt)
+		end		
+		
 		
 		MoveShip(garrLanders[1], dt)
 		

@@ -62,7 +62,7 @@ end
 local function DrawNearestBase()
 -- determine distance to nearest base and draw indicator
 
-	if fun.LanderHasRangefinder() then
+	if fun.LanderHasUpgrade(enum.moduleNamesRangeFinder) then
 
 		local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
@@ -209,9 +209,10 @@ local function DrawLander(worldoffset)
 		local drawingy = v.y
 		
 		if drawingx < -200 or drawingx > (gintScreenWidth * 1.1) then
-			-- off screen. do nothing
+			-- off screen. do nothing.
 		else
 		
+			-- fade other landers in multiplayer mode
 			if k == 1 then
 				love.graphics.setColor(1,1,1,1)
 			else
@@ -220,10 +221,21 @@ local function DrawLander(worldoffset)
 			
 			love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
 
+			-- draw flames
 			if v.engineOn == true then
 				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
 				v.engineOn = false
 			end	
+			if v.enginelefton == true then
+				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle + 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+				v.enginelefton = false
+			end
+			if v.enginerighton == true then
+				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle - 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+				v.enginerighton = false
+			end			
+			
+			
 			love.graphics.setColor(1,1,1,1)
 		end
 	end
@@ -244,14 +256,17 @@ local function DrawShopMenu()
 		local strText = ""
 
 
-		if not fun.LanderHasEfficentThrusters() then
+		if not fun.LanderHasUpgrade(enum.moduleNamesThrusters) then
 			strText = strText .. "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
 		end
-		if not fun.LanderHasLargeTanks() then
+		if not fun.LanderHasUpgrade(enum.moduleNamesLargeTank) then
 			strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
 		end
-		if not fun.LanderHasRangefinder() then
+		if not fun.LanderHasUpgrade(enum.moduleNamesRangeFinder) then
 			strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
+		end
+		if not fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+			strText = strText .. "4. Buy side-thrusters                 ($" .. enum.moduleCostSideThrusters .. ")" .. "\n"
 		end
 		
 		local drawingx = (gintScreenWidth / 2 ) - 125		-- try to get centre of screen
