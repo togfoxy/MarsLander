@@ -234,14 +234,18 @@ local function CheckForContact(Lander,dt)
 end
 
 local function PlaySoundEffects()
---! aweful function name
 
 	if garrLanders[1].engineOn then
 		garrSound[1]:play()
 	else
 		garrSound[1]:stop()
 	end
-
+	
+	local fuelpercent = garrLanders[1].fuel / garrLanders[1].fueltanksize
+	
+	if fuelpercent <= 0.33 then
+		garrSound[5]:play()
+	end
 end
 
 local function RecalcDefaultMass()
@@ -468,6 +472,8 @@ function love.load()
 	garrSound[3] = love.audio.newSource("Assets/Galactic-Pole-Position.mp3", "stream")
 	garrSound[3]:setVolume(0.25)
 	garrSound[4] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
+	garrSound[5] = love.audio.newSource("Assets/137920__ionicsmusic__robot-voice-low-fuel1.wav", "static")
+	garrSound[5]:setVolume(0.25)
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
