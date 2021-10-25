@@ -501,11 +501,7 @@ function love.load()
 	fun.AddScreen("MainMenu")
 	-- fun.AddScreen("World")
 	
-	fun.InitialiseGround()
-
-	-- create one lander and add it to the global array
-	-- ** this needs to be called AFTER InitialiseGround()
-	table.insert(garrLanders, cobjs.CreateLander())
+	fun.ResetGame()
 	
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = fun.GetLanderMass()
