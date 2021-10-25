@@ -248,6 +248,8 @@ local function DrawLander(worldoffset)
 				local intSpriteNum = cf.round(w.dt)
 				if intSpriteNum < 1 then intSpriteNum = 1 end
 				
+				--! I suspect the smoke sprites need to be redrawn so they are 'off-centre'. This will enable the math.rad used above to work correctly.
+				--! The next line will work for now.
 				love.graphics.draw(gSmokeSheet,gSmokeImages[intSpriteNum], drawingx - 10, drawingy + 5)
 
 			end

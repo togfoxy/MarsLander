@@ -40,21 +40,20 @@ enum = require "enum"
 ss = require "socketstuff"
 
 garrLanders = {}	
-garrGround = {}		-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
-garrObjects = {}	-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
+garrGround = {}				-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
+garrObjects = {}			-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
 garrImages = {}
-garrSprites = {}	-- spritesheets
+garrSprites = {}			-- spritesheets for landing lights
 garrSound = {}
 garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
 garrSmokeSprites = {}		-- used to track and draw smoke animations
-gSmokeAnimation = {}		-- smoke can move at different pace/speed
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
-gfltSmokeTimer = 1			-- track how often to capture smoke trail
+gfltSmokeTimer = enum.constSmokeTimer			-- track how often to capture smoke trail
 
 -- socket stuff
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
@@ -148,14 +147,13 @@ local function MoveShip(Lander, dt)
 		gfltLandervx = Lander.vx
 	end
 	
-	-- capture a new smoke location every 1 second
+	-- capture a new smoke location every x seconds
 	gfltSmokeTimer = gfltSmokeTimer - dt
 	if gfltSmokeTimer <= 0 then
+		-- only produce smoke when not landed or any of the engines aren't firing
 		if (garrLanders[1].landed == false) and (garrLanders[1].engineOn or garrLanders[1].enginelefton or garrLanders[1].enginerighton) then
-			-- only produce smoke when not landed or any of the engines aren't firing
-	
-			-- local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
-			gfltSmokeTimer = 0.5
+			
+			gfltSmokeTimer = enum.constSmokeTimer	-- a new 'puff' is added when this timer expires (and above conditions are met)
 			
 			local mysmoke = {}
 			mysmoke.x = Lander.x
@@ -163,10 +161,6 @@ local function MoveShip(Lander, dt)
 			mysmoke.dt = 0			-- this timer will count up and determine which sprite to display
 			
 			table.insert(garrSmokeSprites, mysmoke)
-			
-			-- if #garrSmokeSprites > 5 then
-				-- table.remove(garrSmokeSprites,1)
-			-- end
 		end
 	end
 	
@@ -425,14 +419,15 @@ local function UpdateSmoke(dt)
 -- each entry in the smoke table tracks it's own life (dt) so it knows when to expire
 
 	for k,v in pairs(garrSmokeSprites) do
-		v.dt = v.dt + (dt * 6)
-		if v.dt > 8 then
+		v.dt = v.dt + (dt * 6)	-- 6 seems to give a good effect
+		if v.dt > 8 then		-- the sprite sheet has 8 images
 			table.remove(garrSmokeSprites,k)
 		end
 	end
 end
 
 function love.keypressed( key, scancode, isrepeat)
+--! don't like how there are keypressed events here as well as in love.update
 	if key == "escape" then
 		fun.RemoveScreen()
 	end
@@ -495,6 +490,8 @@ function love.load()
 	garrImages[6] = love.graphics.newImage("/Assets/gastank1off.png")
 	garrImages[7] = love.graphics.newImage("/Assets/building1.png")
 	garrImages[8] = love.graphics.newImage("/Assets/building2.png")
+	garrImages[9] = love.graphics.newImage("/Assets/apollo-11-clipart-9.png")
+	garrImages[10] = love.graphics.newImage("/Assets/1246701418767105822Soviet_lunar_lander_drawing.svg.hi1.png")
 	
 	-- spritesheets and animations
 	garrSprites[1] = love.graphics.newImage("Assets/landinglightsnew.png")
@@ -527,8 +524,9 @@ function love.draw()
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
 	
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
-	
+
 	if strCurrentScreen == "MainMenu" then
+
 		menus.DrawMainMenu()
 	end
 	
@@ -546,6 +544,7 @@ function love.draw()
 	end
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
+
 	lovelyToasts.draw()		--* Put this AFTER the slab so that it draws over the slab
 	TLfres.endRendering({0, 0, 0, 1})
 
@@ -561,7 +560,7 @@ function love.update(dt)
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" then
-		Slab.Update(dt)		--! should this be called only when the main menu is current?
+		Slab.Update(dt)		
 	end
 	
 	if strCurrentScreen == "World" then
@@ -586,7 +585,7 @@ function love.update(dt)
 		end
 		
 		
-		MoveShip(garrLanders[1], dt)
+		MoveShip(garrLanders[1], dt)		--! some really inconsistent use of parameters here
 		
 		UpdateSmoke(dt)
 		
@@ -599,7 +598,7 @@ function love.update(dt)
 		HandleSockets()
 	end
 	
-	lovelyToasts.update(dt)
+	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 
 end
 

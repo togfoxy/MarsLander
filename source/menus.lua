@@ -2,8 +2,9 @@ local menus = {}
 
 
 function menus.DrawMainMenu()
-    local intSlabWidth = 205	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 450 	-- the height of the main menu slab
+	
+	local intSlabWidth = 650 --205	-- the width of the main menu slab. Change this to change appearance.
+	local intSlabHeight = 425 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -11,8 +12,21 @@ function menus.DrawMainMenu()
 	-- note: Border is the border between the window and the layout
 	Slab.BeginWindow('MainMenu', {Title = "Main menu " .. gstrGameVersion,X=fltSlabWindowX,Y=fltSlabWindowY,W=intSlabWidth,H=intSlabHeight,Border=0,AutoSizeWindow=false, AllowMove=false,AllowResize=false,NoSavedSettings=true})
 
-	Slab.BeginLayout("MMLayout",{AlignX="center"})
-    
+	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 3})
+		
+		Slab.SetLayoutColumn(1)
+		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
+		
+		Slab.SetLayoutColumn(3)
+		--Slab.Image('MyImage1', {Image = garrImages[10], Scale=0.5})
+		
+		Slab.SetLayoutColumn(2)
+		
+		-- -- add some white space for presentation
+		-- Slab.NewLine()
+		-- if Slab.Button("Hidden",{Invisible=true}) then
+		-- end		
+		
 		Slab.NewLine()
 		if Slab.Button("New game",{W=155}) then
 			fun.ResetGame()
@@ -90,18 +104,19 @@ function menus.DrawMainMenu()
 
 	Slab.EndLayout()
 	Slab.EndWindow()
+
 end
 
 function menus.DrawCredits()
 
-    local intSlabWidth = 300	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 625 	-- the height of the main menu slab
+	local intSlabWidth = 300	-- the width of the main menu slab. Change this to change appearance.
+	local intSlabHeight = 700 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
 	Slab.BeginWindow('creditsbox',{Title ='About',BgColor = {0.5,0.5,0.5},AutoSizeWindow = true,NoOutline=true,AllowMove=false,X=fltSlabWindowX,Y=fltSlabWindowY})
+	Slab.BeginLayout('mylayout', {AlignX = 'center',Columns = 2})
 
-	Slab.BeginLayout('mylayout', {AlignX = 'center'})
 		Slab.Text("Mars Lander")
 		Slab.NewLine()
 		Slab.Text("A Love2D community project")
@@ -110,6 +125,7 @@ function menus.DrawCredits()
 		Slab.Text("TOGFox")
 		Slab.Text("Milon")
 		Slab.Text("Gunroar:Cannon()")
+		Slab.Text("Philbywhizz")
 		Slab.NewLine()		
 		
 		Slab.Text("Thanks to beta testers:",{Align = 'center'})

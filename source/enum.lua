@@ -1,5 +1,12 @@
 module(...,package.seeall)
 
+-- Constants --
+constSmokeTimer = 0.5
+
+
+
+-- enumerators -- 
+
 basetypeFuel = 2
 basetypeBuilding1 = 7
 
@@ -14,6 +21,5 @@ moduleNamesThrusters = "Fuel efficient thrusters"
 moduleNamesLargeTank = "Large tank"
 moduleNamesRangeFinder = "Rangefinder"
 moduleNamesSideThrusters = "Side thrusters"
-
 
 moduleMassSideThrusters = 20

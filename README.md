@@ -1,6 +1,6 @@
 # Mars Lander
 
-A recreation of the 1979 Atari classic Lunar Lander.
+A recreation of the 1979 Atari classic Lunar Lander with new game play.
 
 This is a LOVE2D community project with contributions from 
 
@@ -21,6 +21,8 @@ Use left and right arrows to rotate the vessel. Use 'up' arrow to thrust. Land s
 (Also works with numpad 4,8,6)
 
 You can now pause the game with 'p'
+
+If you purchase side thrusters then use q/e or numpad 7/9 to thrust left and right.
 
 :)
 
