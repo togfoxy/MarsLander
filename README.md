@@ -22,6 +22,8 @@ Use left and right arrows to rotate the vessel. Use 'up' arrow to thrust. Land s
 
 You can now pause the game with 'p'
 
+If you purchase side thrusters then use q/e or numpad 7/9 to thrust left and right.
+
 :)
 
 ## Installation instructions
