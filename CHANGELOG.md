@@ -6,15 +6,21 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ## Unreleased
 ### Added
-- You can now pause the game with 'p'
-- Added a lovelyToast to the SAVE button
-- Simple "end game" screen allows a game restart
-- Low fuel audio
-- Added smoke effect 
+- you can now pause the game with 'p'
+- added a lovelyToast to the SAVE button
+- simple "end game" screen allows a game restart
+- low fuel audio
+- added smoke effect 
+- an image to the main menu
+- some commentary to the code to ease understanding and maintenance
+- a CONST section (for constants) to enum.lua
+
+### Changed
+- started replacing constant values with the equivalent CONSTant declared in enum.lua
 
 ## v0.08
 ### Added
-- Created a CHANGELOG.md
+- created a CHANGELOG.md
 - can now purchase sideways thrusters. Use q/e or numpad 7/numpad 9 to use
 - a whole bunch of multiplayer features added (but not yet working)
 
