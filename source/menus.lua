@@ -25,11 +25,14 @@ function menus.DrawMainMenu()
 		-- end		
 		
 		Slab.NewLine()
-		if Slab.Input('Name',{Text=gstrPlayerName,Tooltip="Enter your player name here"}) then
-			gstrPlayerName = Slab.GetInputText()
-			if gstrPlayerName == "" then
-				-- Blank name isn't allowed
-				gstrPlayerName = "Player Name"
+		if Slab.Input('Name',{Text=garrLanders[1].name,Tooltip="Enter your player name here"}) then
+			garrLanders[1].name = Slab.GetInputText()
+			if garrLanders[1].name == "" then
+				-- Blank name isn't allowed, so reset to the default
+				garrLanders[1].name = gstrDefaultPlayerName
+			else
+				-- save the current name in the global variable (Yeah its horrible - FIXME)
+				gstrCurrentPlayerName = garrLanders[1].name
 			end
 		end
 

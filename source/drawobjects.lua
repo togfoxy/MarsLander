@@ -276,7 +276,7 @@ local function DrawLander(worldoffset)
 			-- draw label
 			love.graphics.setNewFont(10)
 			local offsetX, offsetY = 10, 10
-			love.graphics.print(gstrPlayerName, drawingx + offsetX, drawingy - offsetY)
+			love.graphics.print(v.name, drawingx + offsetX, drawingy - offsetY)
 
 			love.graphics.setColor(1,1,1,1)
 		end

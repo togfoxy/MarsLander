@@ -55,7 +55,8 @@ gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
 gfltSmokeTimer = enum.constSmokeTimer			-- track how often to capture smoke trail
 
-gstrPlayerName = 'Player Name'
+gstrDefaultPlayerName = 'Player Name'
+gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
@@ -398,6 +399,7 @@ local function HandleSockets()
 	msg.x = garrLanders[1].x
 	msg.y = garrLanders[1].y
 	msg.angle = garrLanders[1].angle
+	msg.name = garrLanders[1].name
 	-- ** msg is set here and sent below
 	
 	if gbolIsAHost then
@@ -412,6 +414,7 @@ local function HandleSockets()
 				garrLanders[2].x = incoming.x
 				garrLanders[2].y = incoming.y
 				garrLanders[2].angle = incoming.angle
+				garrLanders[2].name = incoming.name
 			end	
 		until incoming == nil
 			
@@ -431,6 +434,7 @@ local function HandleSockets()
 				garrLanders[2].x = incoming.x
 				garrLanders[2].y = incoming.y
 				garrLanders[2].angle = incoming.angle
+				garrLanders[2].name = incoming.name
 			end
 		until incoming == nil
 
