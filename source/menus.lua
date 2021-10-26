@@ -4,7 +4,7 @@ local menus = {}
 function menus.DrawMainMenu()
 	
 	local intSlabWidth = 700 --205	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 425 	-- the height of the main menu slab
+	local intSlabHeight = 475 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -24,6 +24,18 @@ function menus.DrawMainMenu()
 		-- if Slab.Button("Hidden",{Invisible=true}) then
 		-- end		
 		
+		Slab.NewLine()
+		if Slab.Input('Name',{Text=garrLanders[1].name,Tooltip="Enter your player name here"}) then
+			garrLanders[1].name = Slab.GetInputText()
+			if garrLanders[1].name == "" then
+				-- Blank name isn't allowed, so reset to the default
+				garrLanders[1].name = gstrDefaultPlayerName
+			else
+				-- save the current name in the global variable (Yeah its horrible - FIXME)
+				gstrCurrentPlayerName = garrLanders[1].name
+			end
+		end
+
 		Slab.NewLine()
 		if Slab.Button("New game",{W=155}) then
 			fun.ResetGame()

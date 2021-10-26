@@ -16,6 +16,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - a CONST section (for constants) to enum.lua
 - add a HEALTH indicator
 - hard landings will remove HEALTH
+- Add a player name label to the lander (set via the main menu)
 
 ### Changed
 - started replacing constant values with the equivalent CONSTant declared in enum.lua
