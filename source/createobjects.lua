@@ -20,7 +20,7 @@ function createobjects.CreateLander()
 	Lander.wealth = 0
 	Lander.health = 100				-- this is % meaning 100 = no damage
 	Lander.bolGameOver = false
-	
+	Lander.name = gstrCurrentPlayerName	
 	
 	-- mass	
 	Lander.mass = {}
