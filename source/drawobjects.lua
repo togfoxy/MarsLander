@@ -87,9 +87,28 @@ local function DrawNearestBase()
 
 end
 
+local function DrawHealthIndicator()
+-- lander.health reports health from 0 (dead) to 100 (best health)
+
+	local indicatorlength = garrLanders[1].health
+	local drawingx = gintScreenWidth - 30
+	local drawingy = gintScreenHeight * 0.33
+	local width = 10
+	local height = indicatorlength
+	
+	love.graphics.print("Health", drawingx - 20, drawingy)
+	
+	love.graphics.setColor(1,0,0,1)
+	love.graphics.rectangle("fill", drawingx, drawingy + 20,width,height)
+	love.graphics.setColor(1,1,1,1)
+
+end
+
 function HUD.draw(worldoffset)
     
 	DrawFuelIndicator()
+	
+	DrawHealthIndicator()
     
     -- offscreen indicator
 	DrawOffscreenIndicator(worldoffset)
