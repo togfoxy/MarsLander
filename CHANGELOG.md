@@ -4,7 +4,17 @@ All notable changes to this project should be documented in this file.
 
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+UNRELEASED
+### Added
+
+
+
+### Changed
+- smoke spritesheet and code that draws smoke
+
+
+
+## v0.09
 ### Added
 - You can now pause the game with 'p'
 - Added a lovelyToast to the SAVE button
