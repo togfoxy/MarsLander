@@ -527,8 +527,8 @@ function love.load()
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 	
-	gSmokeSheet = love.graphics.newImage("Assets/Smoke_Fire.png")
-	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 16, 16)
+	gSmokeSheet = love.graphics.newImage("Assets/smoke.png")
+	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 30, 30)		-- w/h of each frame
 	
 	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
 	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
