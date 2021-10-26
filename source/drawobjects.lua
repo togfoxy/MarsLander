@@ -90,7 +90,7 @@ end
 local function DrawHealthIndicator()
 -- lander.health reports health from 0 (dead) to 100 (best health)
 
-	local indicatorlength = garrLanders[1].health
+	local indicatorlength = garrLanders[1].health * -1
 	local drawingx = gintScreenWidth - 30
 	local drawingy = gintScreenHeight * 0.33
 	local width = 10
@@ -99,7 +99,7 @@ local function DrawHealthIndicator()
 	love.graphics.print("Health", drawingx - 20, drawingy)
 	
 	love.graphics.setColor(1,0,0,1)
-	love.graphics.rectangle("fill", drawingx, drawingy + 20,width,height)
+	love.graphics.rectangle("fill", drawingx, drawingy + 120,width,height)
 	love.graphics.setColor(1,1,1,1)
 
 end
