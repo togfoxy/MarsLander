@@ -55,7 +55,7 @@ gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
 gfltSmokeTimer = enum.constSmokeTimer			-- track how often to capture smoke trail
 
-gstrPlayerName = 'PlayerName'
+gstrPlayerName = 'Player Name'
 
 -- socket stuff
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
