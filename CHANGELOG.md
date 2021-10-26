@@ -16,6 +16,7 @@ UNRELEASED
 - smoke spritesheet and code that draws smoke
 - adjusted the player label so it does not clash with lander graphic
 - stopped LOW FUEL alert playing when takes are empty
+- the NOISE parameters to make better terrain
 
 ## v0.09
 ### Added
