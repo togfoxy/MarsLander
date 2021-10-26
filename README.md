@@ -1,6 +1,6 @@
 # Mars Lander
 
-A recreation of the 1979 Atari classic Lunar Lander with new game play.
+A re-creation of the 1979 Atari classic Lunar Lander with new game play.
 
 This is a LOVE2D community project with contributions from 
 
