@@ -3,7 +3,7 @@ local menus = {}
 
 function menus.DrawMainMenu()
 	
-	local intSlabWidth = 650 --205	-- the width of the main menu slab. Change this to change appearance.
+	local intSlabWidth = 700 --205	-- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 425 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
@@ -12,13 +12,10 @@ function menus.DrawMainMenu()
 	-- note: Border is the border between the window and the layout
 	Slab.BeginWindow('MainMenu', {Title = "Main menu " .. gstrGameVersion,X=fltSlabWindowX,Y=fltSlabWindowY,W=intSlabWidth,H=intSlabHeight,Border=0,AutoSizeWindow=false, AllowMove=false,AllowResize=false,NoSavedSettings=true})
 
-	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 3})
+	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
 		
 		Slab.SetLayoutColumn(1)
 		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
-		
-		Slab.SetLayoutColumn(3)
-		--Slab.Image('MyImage1', {Image = garrImages[10], Scale=0.5})
 		
 		Slab.SetLayoutColumn(2)
 		
@@ -101,7 +98,7 @@ function menus.DrawMainMenu()
 		-- Slab.NewLine()
 		-- if Slab.Button("Hidden",{Invisible=true}) then
 		-- end
-
+		
 	Slab.EndLayout()
 	Slab.EndWindow()
 

@@ -18,6 +18,7 @@ function createobjects.CreateLander()
 	Lander.landed = false			-- true = on the ground
 	Lander.airborne = false			-- false = on the ground FOR THE FIRST TIME
 	Lander.wealth = 0
+	Lander.health = 100				-- this is % meaning 100 = no damage
 	Lander.bolGameOver = false
 	
 	

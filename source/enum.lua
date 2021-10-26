@@ -2,6 +2,7 @@ module(...,package.seeall)
 
 -- Constants --
 constSmokeTimer = 0.5
+constVYThreshold = 0.60
 
 
 

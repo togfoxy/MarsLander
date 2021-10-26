@@ -205,48 +205,72 @@ local function PayLanderForControl(objBase)
 	end
 end
 
+local function CheckForDamage()
+-- apply damage if vertical speed is too higher
+	
+	if garrLanders[1].vy > enum.constVYThreshold then
+		local excessspeed = garrLanders[1].vy - enum.constVYThreshold
+		garrLanders[1].health = garrLanders[1].health - (excessspeed * 100)
+	
+		if garrLanders[1].health < 0 then garrLanders[1].health = 0 end
+	end
+
+
+
+end
+
 local function CheckForContact(Lander,dt)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(Lander.x)
 	local groundYvalue
-	
-	Lander.landed = false
-	
-	if garrGround[LanderXValue] ~= nil then
-		groundYvalue = cf.round(garrGround[LanderXValue],0)
-	
-		if Lander.y > groundYvalue - 8 then
-			Lander.landed = true
-	
-			-- see if landed near a fuel base
-			-- bestdist could be a negative number meaning not yet past the base (but maybe really close to it)
-			local bestdist, bestbase = fun.GetDistanceToClosestBase(garrLanders[1].x, 2)		-- 2 = type of base = fuel
+	local onbase = fun.IsOnLandingPad(enum.basetypeFuel)
 
-			-- bestbase is an object/table item
-			-- add wealth based on alignment to centre of landing pad
-			if bestdist >= -80 and bestdist <= 40 then
-				RefuelLander(bestbase,dt)
-				PayLanderFromBase(bestbase, bestdist)
-				if Lander.airborne then
-					Lander.airborne = false
-					PayLanderForControl(bestbase)
-				end				
-				bestbase.paid = true
-			end
+	-- see if landed near a fuel base
+	-- bestdist could be a negative number meaning not yet past the base (but maybe really close to it)
+	local bestdist, bestbase = fun.GetDistanceToClosestBase(garrLanders[1].x, 2)		-- 2 = type of base = fuel
+	-- bestbase is an object/table item
+	-- add wealth based on alignment to centre of landing pad
+	if bestdist >= -80 and bestdist <= 40 then
+		onbase = true
+	end
 
-			Lander.vx = 0
-			if Lander.vy > 0 then Lander.vy = 0 end			
+	-- get the height of the terrain under the lander
+	groundYvalue = cf.round(garrGround[LanderXValue],0)
+
+	-- check if lander is at or below the terrain
+	if Lander.y > groundYvalue - 8 then		-- the offset is the size of the lander image
+		Lander.landed = true
+
+		if onbase then
+			RefuelLander(bestbase,dt)
+			PayLanderFromBase(bestbase, bestdist)
 			
-			if garrLanders[1].fuel <= 1 and garrLanders[1].landed == true and fun.IsOnLandingPad(enum.basetypeFuel) == false then
-				garrLanders[1].bolGameOver = true
-			end
-		else
-			Lander.landed = false
-			if Lander.airborne == false then
-				Lander.airborne = true
-			end
+			-- if lander was airborne then track that now it's not.
+			if Lander.airborne then
+				-- this is the first landing on this base so pay wealth based on vertical and horizontal speed
+				PayLanderForControl(bestbase)
+				bestbase.paid = true
+			end				
 		end
+		
+		if Lander.airborne then
+			-- a heavy landing will cause damage
+			CheckForDamage()
+			
+			Lander.airborne = false
+		end
+
+		Lander.vx = 0
+		if Lander.vy > 0 then Lander.vy = 0 end			
+		
+		-- check for game-over conditions
+		if garrLanders[1].fuel <= 1 and garrLanders[1].landed == true and onbase == false then
+			garrLanders[1].bolGameOver = true
+		end
+	else
+		Lander.landed = false
+		Lander.airborne = true
 	end
 end
 
@@ -491,7 +515,6 @@ function love.load()
 	garrImages[7] = love.graphics.newImage("/Assets/building1.png")
 	garrImages[8] = love.graphics.newImage("/Assets/building2.png")
 	garrImages[9] = love.graphics.newImage("/Assets/apollo-11-clipart-9.png")
-	garrImages[10] = love.graphics.newImage("/Assets/1246701418767105822Soviet_lunar_lander_drawing.svg.hi1.png")
 	
 	-- spritesheets and animations
 	garrSprites[1] = love.graphics.newImage("Assets/landinglightsnew.png")
