@@ -626,15 +626,3 @@ function love.update(dt)
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 
 end
-
-
-
-
-
-
-
-
-
-
-
-

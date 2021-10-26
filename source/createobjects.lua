@@ -1,4 +1,3 @@
-
 local createobjects = {}
 
 
@@ -75,23 +74,4 @@ function createobjects.CreateObject(intType, intXValue)
 	
 end
 
-
 return createobjects
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
