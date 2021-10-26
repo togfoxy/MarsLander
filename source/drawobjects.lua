@@ -13,7 +13,7 @@ local HUD = {}
 HUD.font = love.graphics.newFont(20)
 
 -- Fuel indicator elements
-HUD.fuel = {x=20, y=50, w=gintScreenWidth - 40, h=50, cornerSize=15}
+HUD.fuel = {x=20, y=15, w=gintScreenWidth - 40, h=50, cornerSize=15}
 HUD.fuel.mid = HUD.fuel.x + math.floor(HUD.fuel.w / 2)
 HUD.fuel.btm = HUD.fuel.y + HUD.fuel.h
 HUD.fuel.text = {img=love.graphics.newText(HUD.font, "FUEL")}
@@ -62,7 +62,7 @@ end
 local function DrawWealth()
 
 	love.graphics.setNewFont(20)
-	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 15)
+	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 75)
 end
 
 local function DrawNearestBase()
@@ -197,9 +197,9 @@ end
 local function DrawDebug(worldoffset)
 
 	love.graphics.setNewFont(14)
-	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 15)
-	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 30)
-	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,15)
+	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 75)
+	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 90)
+	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)
 	
 	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 

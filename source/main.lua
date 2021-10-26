@@ -491,7 +491,6 @@ function love.load()
 	garrImages[7] = love.graphics.newImage("/Assets/building1.png")
 	garrImages[8] = love.graphics.newImage("/Assets/building2.png")
 	garrImages[9] = love.graphics.newImage("/Assets/apollo-11-clipart-9.png")
-	garrImages[10] = love.graphics.newImage("/Assets/1246701418767105822Soviet_lunar_lander_drawing.svg.hi1.png")
 	
 	-- spritesheets and animations
 	garrSprites[1] = love.graphics.newImage("Assets/landinglightsnew.png")
