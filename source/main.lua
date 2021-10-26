@@ -1,4 +1,4 @@
-gstrGameVersion = "0.09"
+gstrGameVersion = "0.10"
 
 inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
@@ -287,7 +287,8 @@ local function PlaySoundEffects()
 	
 	local fuelpercent = garrLanders[1].fuel / garrLanders[1].fueltanksize
 	
-	if fuelpercent <= 0.33 then
+	-- play alert if fuel is low (but not empty because that's just annoying)
+	if fuelpercent <= 0.33 and fuelpercent > 0.01 then		-- 1% because rounding (fuel is never actually zero)
 		garrSound[5]:play()
 	end
 end
