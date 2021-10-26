@@ -14,9 +14,13 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - an image to the main menu
 - some commentary to the code to ease understanding and maintenance
 - a CONST section (for constants) to enum.lua
+- add a HEALTH indicator
+- hard landings will remove HEALTH
 
 ### Changed
 - started replacing constant values with the equivalent CONSTant declared in enum.lua
+- removed images that aren't used
+- repositioned FUEL indicator and WEALTH counter
 
 ## v0.08
 ### Added
