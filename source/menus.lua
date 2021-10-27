@@ -10,7 +10,19 @@ function menus.DrawMainMenu()
 
 	-- try to centre the Slab window
 	-- note: Border is the border between the window and the layout
-	Slab.BeginWindow('MainMenu', {Title = "Main menu " .. gstrGameVersion,X=fltSlabWindowX,Y=fltSlabWindowY,W=intSlabWidth,H=intSlabHeight,Border=0,AutoSizeWindow=false, AllowMove=false,AllowResize=false,NoSavedSettings=true})
+	local mainMenuOptions = {
+		Title = "Main menu " .. gstrGameVersion,
+		X = fltSlabWindowX,
+		Y = fltSlabWindowY,
+		W = intSlabWidth,
+		H = intSlabHeight,
+		Border = 0,
+		AutoSizeWindow=false,
+		AllowMove=false,
+		AllowResize=false,
+		NoSavedSettings=true
+	}
+	Slab.BeginWindow('MainMenu', mainMenuOptions)
 
 	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
 		
@@ -76,7 +88,7 @@ function menus.DrawMainMenu()
 		
 		if not gbolIsAHost then
 			Slab.Text("Join on port:" )
-			local JoinPortOptions = {
+			local joinPortOptions = {
 				ReturnOnText=true,
 				W=100,
 				Text=ConnectedToPort,
@@ -85,7 +97,7 @@ function menus.DrawMainMenu()
 				MinNumber=6000,
 				MaxNumber=6999
 			}
-			if Slab.Input('HostEndPoint', JoinPortOptions) then
+			if Slab.Input('HostEndPoint', joinPortOptions) then
 				ConnectedToPort = Slab.GetInputText()
 			end
 			
@@ -136,7 +148,16 @@ function menus.DrawCredits()
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
-	Slab.BeginWindow('creditsbox',{Title ='About',BgColor = {0.5,0.5,0.5},AutoSizeWindow = true,NoOutline=true,AllowMove=false,X=fltSlabWindowX,Y=fltSlabWindowY})
+	local creditBoxOptions = {
+		Title ='About',
+		BgColor = {0.5,0.5,0.5},
+		AutoSizeWindow = true,
+		NoOutline = true,
+		AllowMove = false,
+		X = fltSlabWindowX,
+		Y = fltSlabWindowY
+	}
+	Slab.BeginWindow('creditsbox', creditBoxOptions)
 	Slab.BeginLayout('mylayout', {AlignX = 'center',Columns = 2})
 
 		Slab.Text("Mars Lander")
