@@ -76,19 +76,32 @@ function menus.DrawMainMenu()
 		
 		if not gbolIsAHost then
 			Slab.Text("Join on port:" )
-			if Slab.Input('HostEndPoint',{ReturnOnText=true,W=100,Text = ConnectedToPort}) then
+			local JoinPortOptions = 				{
+				ReturnOnText=true,
+				W=100,
+				Text=ConnectedToPort,
+				NumbersOnly=true,
+				NoDrag=true,
+				MinNumber=6000,
+				MaxNumber=6999
+			}
+			if Slab.Input('HostEndPoint', JoinPortOptions) then
 				ConnectedToPort = Slab.GetInputText()
 			end
 			
 			if Slab.Button("Join game",{W=155}) then
-				gbolIsAHost = false
-				gbolIsAClient = true
+				if ConnectedToPort == nil then
+					-- Invalid Port number
+					lovelyToasts.show("Error: You must set a port number", 1.5, "bottom")
+				else
+					gbolIsAHost = false
+					gbolIsAClient = true
 
-				ss.ConnectToHost(_, ConnectedToPort)
-				
-				ss.AddItemToClientOutgoingQueue(message)
-				fun.AddScreen("World")
-
+					ss.ConnectToHost(_, ConnectedToPort)
+					
+					ss.AddItemToClientOutgoingQueue(message)
+					fun.AddScreen("World")
+				end
 			end
 			Slab.NewLine()		
 		end
