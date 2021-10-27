@@ -1,4 +1,4 @@
-gstrGameVersion = "0.09"
+gstrGameVersion = "0.10"
 
 inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
@@ -287,7 +287,8 @@ local function PlaySoundEffects()
 	
 	local fuelpercent = garrLanders[1].fuel / garrLanders[1].fueltanksize
 	
-	if fuelpercent <= 0.33 then
+	-- play alert if fuel is low (but not empty because that's just annoying)
+	if fuelpercent <= 0.33 and fuelpercent > 0.01 then		-- 1% because rounding (fuel is never actually zero)
 		garrSound[5]:play()
 	end
 end
@@ -324,6 +325,9 @@ local function PurchaseThrusters()
 		
 		-- need to recalc the default mass
 		gintDefaultMass = RecalcDefaultMass()
+	else
+		-- play 'failed' sound
+		garrSound[6]:play()
 	end
 end
 
@@ -348,6 +352,9 @@ local function PurchaseLargeTank()
 		
 		-- need to recalc the default mass
 		gintDefaultMass = RecalcDefaultMass()
+	else
+		-- play 'failed' sound
+		garrSound[6]:play()		
 	end
 
 end
@@ -372,7 +379,9 @@ local function PurchaseRangeFinder()
 
 		-- need to recalc the default mass
 		gintDefaultMass = RecalcDefaultMass()		
-		
+	else
+		-- play 'failed' sound
+		garrSound[6]:play()		
 	end
 
 end
@@ -389,6 +398,9 @@ local function PurchaseSideThrusters()
 			-- need to recalc the default mass
 			gintDefaultMass = RecalcDefaultMass()	
 		end
+	else
+		-- play 'failed' sound
+		garrSound[6]:play()		
 	end
 end
 
@@ -533,6 +545,7 @@ function love.load()
 	garrSound[4] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
 	garrSound[5] = love.audio.newSource("Assets/137920__ionicsmusic__robot-voice-low-fuel1.wav", "static")
 	garrSound[5]:setVolume(0.25)
+	garrSound[6] = love.audio.newSource("Assets/483598__raclure__wrong.mp3", "static")
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size

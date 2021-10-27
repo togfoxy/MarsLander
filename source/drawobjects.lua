@@ -13,7 +13,7 @@ local HUD = {}
 HUD.font = love.graphics.newFont(20)
 
 -- Fuel indicator elements
-HUD.fuel = {x=20, y=15, w=gintScreenWidth - 40, h=50, cornerSize=15}
+HUD.fuel = {x=20, y=20, w=gintScreenWidth - 40, h=50, cornerSize=15}
 HUD.fuel.mid = HUD.fuel.x + math.floor(HUD.fuel.w / 2)
 HUD.fuel.btm = HUD.fuel.y + HUD.fuel.h
 HUD.fuel.text = {img=love.graphics.newText(HUD.font, "FUEL")}
@@ -104,11 +104,23 @@ local function DrawHealthIndicator()
 
 end
 
+local function DrawScore()
+-- score is simply the amount of forward distance travelled (lander.x)
+	
+	local score = cf.strFormatThousand(tonumber(cf.round(garrLanders[1].x - gintOriginX,0)))
+	love.graphics.setColor(1,1,1,1)
+	
+	love.graphics.print("score: " .. score, (gintScreenWidth / 2) - 50,75)
+
+end
+
 function HUD.draw(worldoffset)
     
 	DrawFuelIndicator()
 	
 	DrawHealthIndicator()
+	
+	DrawScore()
     
     -- offscreen indicator
 	DrawOffscreenIndicator(worldoffset)
@@ -120,7 +132,7 @@ function HUD.draw(worldoffset)
 	if gbolIsAHost then
 		love.graphics.setColor(1,1,1,0.50)
 		love.graphics.setNewFont(12)
-		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 15)
+		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
 	end
 end
 
@@ -139,7 +151,8 @@ local function DrawSurface(worldoffset)
 		else
 			love.graphics.line(i - worldoffset, garrGround[i], i + 1 - worldoffset, garrGround[i+1])
 			-- draw a vertical line straight down to reflect solid terra firma
-			love.graphics.setColor(115/255,115/255,115/255,1)
+			-- love.graphics.setColor(115/255,115/255,115/255,1)
+			love.graphics.setColor(205/255,92/255,92/255,1)
 			love.graphics.line(i - worldoffset, garrGround[i],i - worldoffset, gintScreenHeight)
 			love.graphics.setColor(1,1,1,1)
 		end
@@ -274,7 +287,7 @@ local function DrawLander(worldoffset)
 			
 			-- draw label
 			love.graphics.setNewFont(10)
-			local offsetX, offsetY = 10, 10
+			local offsetX, offsetY = 14, 10
 			love.graphics.print(v.name, drawingx + offsetX, drawingy - offsetY)
 
 			love.graphics.setColor(1,1,1,1)

@@ -6,11 +6,17 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 UNRELEASED
 ### Added
-- Add a player name label to the lander (set via the main menu)
+- added a player name label to the lander (set via the main menu)
+- added a FAILED audio file
+- FAILED audio file plays when trying to purchase something that can't be afforded
+- added a score
 
 
 ### Changed
 - smoke spritesheet and code that draws smoke
+- adjusted the player label so it does not clash with lander graphic
+- stopped LOW FUEL alert playing when takes are empty
+- the NOISE parameters to make better terrain
 
 ## v0.09
 ### Added
