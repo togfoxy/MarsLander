@@ -3,7 +3,7 @@ module(...,package.seeall)
 -- Constants --
 constSmokeTimer = 0.5
 constVYThreshold = 0.60
-constGravity = 0.3721 -- Gravity of Mars according to Google
+constGravity = 0.6
 
 
 -- enumerators -- 
