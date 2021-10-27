@@ -76,7 +76,7 @@ function menus.DrawMainMenu()
 		
 		if not gbolIsAHost then
 			Slab.Text("Join on port:" )
-			local JoinPortOptions = 				{
+			local JoinPortOptions = {
 				ReturnOnText=true,
 				W=100,
 				Text=ConnectedToPort,
