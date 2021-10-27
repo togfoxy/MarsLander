@@ -142,7 +142,7 @@ local function MoveShip(Lander, dt)
 	
 	-- apply gravity
 	if Lander.landed == false then
-		Lander.vy = Lander.vy + (0.6 * dt)
+		Lander.vy = Lander.vy + (enum.constGravity * dt)
 	end
 	
 	if Lander.airborne then
