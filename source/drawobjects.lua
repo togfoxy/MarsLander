@@ -372,14 +372,3 @@ function drawobjects.DrawWorld()
 end
 
 return drawobjects
-
-
-
-
-
-
-
-
-
-
-

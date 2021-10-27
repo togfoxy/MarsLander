@@ -234,13 +234,3 @@ end
 
 
 return functions
-
-
-
-
-
-
-
-
-
-

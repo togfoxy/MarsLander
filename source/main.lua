@@ -142,7 +142,7 @@ local function MoveShip(Lander, dt)
 	
 	-- apply gravity
 	if Lander.landed == false then
-		Lander.vy = Lander.vy + (0.6 * dt)
+		Lander.vy = Lander.vy + (enum.constGravity * dt)
 	end
 	
 	if Lander.airborne then
@@ -501,11 +501,7 @@ function love.load()
 	fun.AddScreen("MainMenu")
 	-- fun.AddScreen("World")
 	
-	fun.InitialiseGround()
-
-	-- create one lander and add it to the global array
-	-- ** this needs to be called AFTER InitialiseGround()
-	table.insert(garrLanders, cobjs.CreateLander())
+	fun.ResetGame()
 	
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = fun.GetLanderMass()
@@ -630,15 +626,3 @@ function love.update(dt)
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
