@@ -178,6 +178,7 @@ function menus.DrawCredits()
 		Slab.Text("Milon")
 		Slab.Text("Gunroar:Cannon()")
 		Slab.Text("Philbywhizz")
+		Slab.Text("MadByte")
 		Slab.NewLine()		
 		
 		Slab.Text("Thanks to beta testers:",{Align = 'center'})

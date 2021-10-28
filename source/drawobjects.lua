@@ -295,9 +295,22 @@ local function DrawLander(worldoffset)
 	end
 end
 
-local function DrawWallPaper()
+function drawobjects.DrawWallPaper()
+-- scale the wallpaper to be full screen
+
+	-- this is the physical size of the wallpaper
+	local wpwidth = 1600
+	local wpheight = 1200
+	
+	-- this is the size of the window
+	local screenwidth, screenheight = love.graphics.getDimensions( )
+	
+	-- stretch or shrink the image to fit the window
+	local scalex = screenwidth / wpwidth
+	local scaley = screenheight / wpheight
+
 	love.graphics.setColor(1,1,1,0.25)
-	love.graphics.draw(garrImages[3],0,0)
+	love.graphics.draw(garrImages[3],0,0,0,scalex,scaley)
 end
 
 local function DrawShopMenu()
@@ -352,9 +365,8 @@ function drawobjects.DrawWorld()
 
 	-- adjust the world so that the lander is centred and the terrain moves under it
 	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
-
 	
-	DrawWallPaper()
+	--DrawWallPaper()
 	
 	-- draw the surface
 	DrawSurface(worldoffset)
@@ -372,8 +384,6 @@ function drawobjects.DrawWorld()
 		DrawShopMenu()
 	end
 	
---print(garrLanders[1].fuel, garrLanders[1].landed, fun.IsOnLandingPad(enum.basetypeFuel))
-	
 	if garrLanders[1].bolGameOver then
 		DrawGameOver()
 	end
@@ -385,14 +395,3 @@ function drawobjects.DrawWorld()
 end
 
 return drawobjects
-
-
-
-
-
-
-
-
-
-
-
