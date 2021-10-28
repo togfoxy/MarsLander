@@ -119,7 +119,6 @@ function menus.DrawMainMenu()
 					gbolIsAClient = true
 
 					ss.ConnectToHost(ConnectedToIP, ConnectedToPort)		--! Note!!! ss.ConnectToHost does not use the IP address. socketstuff.lua needs to be finished/fixed
-					
 					ss.AddItemToClientOutgoingQueue(message)
 					fun.AddScreen("World")
 				end
