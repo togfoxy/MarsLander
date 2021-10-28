@@ -13,6 +13,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - added an input box for capturing IP address
 - added MadByte to the credits
 - socket logic that won't let the client start the game until the host confirms the connection
+- game settings now persist so they don't need to be retyped (player name, IP, port)
 
 =======
 
@@ -22,6 +23,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - stopped LOW FUEL alert playing when takes are empty
 - the NOISE parameters to make better terrain
 - window now starts full screen
+- window now starts windowed if in non-fused mode
 - added wallpaper to the main menu
 
 =======
