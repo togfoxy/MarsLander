@@ -123,8 +123,8 @@ function menus.DrawMainMenu()
 					msg.name = "ConnectionRequest"
 	
 					ss.AddItemToClientOutgoingQueue(msg)
-					gbolIsConnected = true	--!temporary code
-					fun.AddScreen("World")
+					-- gbolIsConnected = true	--!temporary code
+					-- fun.AddScreen("World")
 				end
 			end
 			Slab.NewLine()		

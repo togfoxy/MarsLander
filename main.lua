@@ -426,9 +426,12 @@ local function HandleSockets()
 			local incoming = ss.GetItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
 				if incoming.name == "ConnectionRequest" then
-					--! do something
+					gbolIsConnected = true
+					msg = {}
+					msg.name = "ConnectionAccepted"
+
 				else
-					garrLanders[2] = {}
+					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
@@ -449,11 +452,18 @@ local function HandleSockets()
 		repeat
 			local incoming = ss.GetItemInClientQueue()		-- could be nil
 			if incoming ~= nil then
-				garrLanders[2] = {}
-				garrLanders[2].x = incoming.x
-				garrLanders[2].y = incoming.y
-				garrLanders[2].angle = incoming.angle
-				garrLanders[2].name = incoming.name
+				if incoming.name == "ConnectionAccepted" then
+					gbolIsConnected = true
+					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
+						fun.AddScreen("World")
+					end
+				else	
+					garrLanders[2] = {}
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end
 			end
 		until incoming == nil
 
@@ -606,6 +616,7 @@ function love.update(dt)
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" then
+		HandleSockets()
 		Slab.Update(dt)		
 	end
 	
