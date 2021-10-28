@@ -12,6 +12,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - added a score
 - added an input box for capturing IP address
 - added MadByte to the credits
+- socket logic that won't let the client start the game until the host confirms the connection
 
 =======
 
