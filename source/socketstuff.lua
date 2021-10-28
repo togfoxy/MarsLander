@@ -75,8 +75,9 @@ end
 function socketstuff.HostListenPort()
 -- listens for a message and adds it to the queue
     local data, ip, port = udphost:receivefrom()
+	local unpackeddata
     if data then
-		local unpackeddata = bitser.loads(data)
+		unpackeddata = bitser.loads(data)
         table.insert(arrHostIncomingQueue,unpackeddata)
     end
     socket.sleep(0.01)    --! will this interfere with the client?
@@ -84,8 +85,16 @@ function socketstuff.HostListenPort()
 	local node = {}
     node.ip = ip
     node.port = port
-    table.insert(arrClientNodes,node)
-	DedupClientList(arrClientNodes)
+	
+	if port == nil or unpackeddata == nil then
+		-- no message, do nothing
+	else
+		if cf.bolTableHasValue (arrClientNodes, node) then
+		else
+			table.insert(arrClientNodes,node)
+			-- DedupClientList(arrClientNodes)
+		end
+	end
 end
 
 function socketstuff.ClientListenPort()

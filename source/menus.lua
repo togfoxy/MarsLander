@@ -89,8 +89,6 @@ function menus.DrawMainMenu()
 				Text=ConnectedToIP,
 				NumbersOnly=false,
 				NoDrag=true,
-				-- MinNumber=6000,
-				-- MaxNumber=6999
 			}			
 			if Slab.Input('HostIP', joinIPOptions) then
 				ConnectedToIP = Slab.GetInputText()
@@ -106,7 +104,7 @@ function menus.DrawMainMenu()
 				MinNumber=6000,
 				MaxNumber=6999
 			}
-			if Slab.Input('HostEndPoint', joinPortOptions) then
+			if Slab.Input('HostPort', joinPortOptions) then
 				ConnectedToPort = Slab.GetInputText()
 			end
 			
@@ -119,7 +117,13 @@ function menus.DrawMainMenu()
 					gbolIsAClient = true
 
 					ss.ConnectToHost(ConnectedToIP, ConnectedToPort)		--! Note!!! ss.ConnectToHost does not use the IP address. socketstuff.lua needs to be finished/fixed
-					ss.AddItemToClientOutgoingQueue(message)
+
+					-- send a test message to the host. The host will return the client's IP and port
+					local msg = {}
+					msg.name = "ConnectionRequest"
+	
+					ss.AddItemToClientOutgoingQueue(msg)
+					gbolIsConnected = true	--!temporary code
 					fun.AddScreen("World")
 				end
 			end
@@ -146,7 +150,7 @@ function menus.DrawMainMenu()
 		
 	Slab.EndLayout()
 	Slab.EndWindow()
-
+	
 end
 
 function menus.DrawCredits()

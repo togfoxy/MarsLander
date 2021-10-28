@@ -59,9 +59,13 @@ gstrDefaultPlayerName = 'Player Name'
 gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
+gstrServerIP = nil					-- server's IP address
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gstrClientIP = nil
+gintClientPoer = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
+gobolIsConnected = false			-- Will become true when received an acknowledgement from the server
 
 gbolDebug = true
 
@@ -421,13 +425,16 @@ local function HandleSockets()
 		repeat
 			local incoming = ss.GetItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
-
-				garrLanders[2] = {}
-				garrLanders[2].x = incoming.x
-				garrLanders[2].y = incoming.y
-				garrLanders[2].angle = incoming.angle
-				garrLanders[2].name = incoming.name
-			end	
+				if incoming.name == "ConnectionRequest" then
+					--! do something
+				else
+					garrLanders[2] = {}
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end	
+			end
 		until incoming == nil
 			
 		ss.AddItemToHostOutgoingQueue(msg)
@@ -505,7 +512,7 @@ function love.load()
         void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
         gbolDebug = false
     else
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=2,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
     end
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
