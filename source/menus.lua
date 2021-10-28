@@ -242,5 +242,25 @@ function menus.DrawCredits()
 	Slab.EndWindow()
 end
 
+function menus.DrawSettingsMenu()
+	local intSlabWidth = 300	-- the width of the settings window slab.
+	local intSlabHeight = 500 	-- the height of the windowslab
+	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
+	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
+
+	local settingsWindowOptions = {
+		Title ='Mars Lander - Game Settings',
+		BgColor = {0.5,0.5,0.5},
+		AutoSizeWindow = true,
+		NoOutline = true,
+		AllowMove = false,
+		X = fltSlabWindowX,
+		Y = fltSlabWindowY
+	}
+	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
+
+	Slab.Text("Settings:",{Align = 'left'})
+	Slab.EndWindow()
+end
 
 return menus

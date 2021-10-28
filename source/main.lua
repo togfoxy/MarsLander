@@ -606,6 +606,10 @@ function love.draw()
 		dobjs.DrawPause() -- Display on top of world
 	end
 
+	if strCurrentScreen == "Settings" then
+		menus.DrawSettingsMenu()
+	end	
+
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 
 	lovelyToasts.draw()		--* Put this AFTER the slab so that it draws over the slab
@@ -622,7 +626,7 @@ function love.update(dt)
 
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	
-	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" then
+	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" or strCurrentScreen == "Settings" then
 		HandleSockets()
 		Slab.Update(dt)		
 	end
@@ -646,6 +650,9 @@ function love.update(dt)
 		end		
 		if love.keyboard.isDown("p") then
 			fun.AddScreen("Pause")
+		end
+		if love.keyboard.isDown("o") then
+			fun.AddScreen("Settings")
 		end
 		
 		
