@@ -26,8 +26,12 @@ socket = require "socket"
 lovelyToasts = require("lib.lovelyToasts")
 -- https://github.com/Loucee/Lovely-Toasts
 
-gintScreenWidth = 1920
-gintScreenHeight = 1080
+-- gintScreenWidth = 1920
+-- gintScreenHeight = 1080
+
+
+gintScreenWidth = 1024-- 1920
+gintScreenHeight = 768-- 1080
 
 garrCurrentScreen = {}	
 
@@ -47,6 +51,7 @@ garrSprites = {}			-- spritesheets for landing lights
 garrSound = {}
 garrMassRatio = 0			-- for debugging only. Records current mass/default mass ratio
 garrSmokeSprites = {}		-- used to track and draw smoke animations
+garrGameSettings = {}		-- track game settings
 
 gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
@@ -62,10 +67,10 @@ gstrCurrentPlayerName = gstrDefaultPlayerName
 gstrServerIP = nil					-- server's IP address
 gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
 gstrClientIP = nil
-gintClientPoer = nil
+gintClientPort = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
-gobolIsConnected = false			-- Will become true when received an acknowledgement from the server
+gbolIsConnected = false			-- Will become true when received an acknowledgement from the server
 
 gbolDebug = true
 
@@ -426,9 +431,12 @@ local function HandleSockets()
 			local incoming = ss.GetItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
 				if incoming.name == "ConnectionRequest" then
-					--! do something
+					gbolIsConnected = true
+					msg = {}
+					msg.name = "ConnectionAccepted"
+
 				else
-					garrLanders[2] = {}
+					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
@@ -445,15 +453,23 @@ local function HandleSockets()
 	if gbolIsAClient then
 		ss.ClientListenPort()
 		
-		-- get just one item from the queue and process it
+		-- get item from the queue and process it
 		repeat
 			local incoming = ss.GetItemInClientQueue()		-- could be nil
 			if incoming ~= nil then
-				garrLanders[2] = {}
-				garrLanders[2].x = incoming.x
-				garrLanders[2].y = incoming.y
-				garrLanders[2].angle = incoming.angle
-				garrLanders[2].name = incoming.name
+				if incoming.name == "ConnectionAccepted" then
+					gbolIsConnected = true
+					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
+						fun.SaveGameSettings()
+						fun.AddScreen("World")
+					end
+				else	
+					garrLanders[2] = {}
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end
 			end
 		until incoming == nil
 
@@ -512,14 +528,15 @@ function love.load()
         void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
         gbolDebug = false
     else
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+		-- gintScreenWidth = 800
+		-- gintScreenHeight = 600
+        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
     end
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
+	fun.LoadGameSettings()
 	fun.AddScreen("MainMenu")
-	-- fun.AddScreen("World")
-	
 	fun.ResetGame()
 	
 	-- capture the 'normal' mass of the lander into a global variable
@@ -606,6 +623,7 @@ function love.update(dt)
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" then
+		HandleSockets()
 		Slab.Update(dt)		
 	end
 	
