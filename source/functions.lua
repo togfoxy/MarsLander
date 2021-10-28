@@ -67,6 +67,36 @@ function functions.GetLanderMass()
 	return result
 end
 
+function functions.SaveGameSettings()
+-- save game settings so they can be autoloaded next session
+	local savefile
+	local serialisedString
+	local success, message
+	local savedir = love.filesystem.getSource()
+	
+    savefile = savedir .. "/" .. "settings.dat"
+    serialisedString = bitser.dumps(garrGameSettings)
+    success, message = nativefs.write(savefile, serialisedString )
+end
+
+function functions.LoadGameSettings()
+
+    local savedir = love.filesystem.getSource()
+    love.filesystem.setIdentity( savedir )
+    
+    local savefile, contents
+
+    savefile = savedir .. "/" .. "settings.dat"
+    contents, _ = nativefs.read(savefile) 
+	local success
+    success, garrGameSettings = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
+	
+	if success == false then
+		garrGameSettings = {}
+	end
+
+end
+
 function functions.SaveGame()
 -- uses the globals because too hard to pass params
 

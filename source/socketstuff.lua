@@ -57,21 +57,6 @@ local arrClientNodes = {}
 udpclient = nil
 udphost = nil
 
-local function DedupClientList(listofclients)
--- dedupes the listofclients so that IP's and ports are recorded just once
-
-	local seen = {}
-	
-	for k,v in pairs(listofclients) do
-		if seen[v.ip] == v.port then
-			-- this is seen
-			table.remove(listofclients,k)
-		else
-			seen[v.ip] = v.port
-		end
-	end
-end
-
 function socketstuff.HostListenPort()
 -- listens for a message and adds it to the queue
     local data, ip, port = udphost:receivefrom()
@@ -92,7 +77,6 @@ function socketstuff.HostListenPort()
 		if cf.bolTableHasValue (arrClientNodes, node) then
 		else
 			table.insert(arrClientNodes,node)
-			-- DedupClientList(arrClientNodes)
 		end
 	end
 end

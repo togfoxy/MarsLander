@@ -22,47 +22,59 @@ function menus.DrawMainMenu()
 		AllowResize=false,
 		NoSavedSettings=true
 	}
+	
 	Slab.BeginWindow('MainMenu', mainMenuOptions)
-
 	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
 		
 		Slab.SetLayoutColumn(1)
 		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
 		
 		Slab.SetLayoutColumn(2)
+
+		PlayerName = garrGameSettings.PlayerName
+		ConnectedToIP = garrGameSettings.PreviousIP
+		ConnectedToPort = garrGameSettings.PreviousPort
 		
+		garrLanders[1].name = PlayerName
+		gstrCurrentPlayerName = PlayerName
+
 		Slab.NewLine()
-		if Slab.Input('Name',{Text=garrLanders[1].name,Tooltip="Enter your player name here"}) then
-			garrLanders[1].name = Slab.GetInputText()
-			if garrLanders[1].name == "" then
+		if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
+			PlayerName = Slab.GetInputText()
+			if PlayerName == "" then
 				-- Blank name isn't allowed, so reset to the default
 				garrLanders[1].name = gstrDefaultPlayerName
 			else
 				-- save the current name in the global variable (Yeah its horrible - FIXME)
-				gstrCurrentPlayerName = garrLanders[1].name
+				garrLanders[1].name = PlayerName
+				gstrCurrentPlayerName = PlayerName
+				garrGameSettings.PlayerName = PlayerName
 			end
 		end
 
 		Slab.NewLine()
 		if Slab.Button("New game",{W=155}) then
 			fun.ResetGame()
+			fun.SaveGameSettings()
 			fun.AddScreen("World")
  		end
 		Slab.NewLine()
  
 		if Slab.Button("Resume game",{W=155}) then
+			fun.SaveGameSettings()
 			fun.AddScreen("World")
 		end
 		Slab.NewLine()        
 
 		if Slab.Button("Load game",{W=155}) then
             fun.LoadGame()
+			fun.SaveGameSettings()
 			fun.AddScreen("World")
 		end
 		Slab.NewLine()
 
 		if Slab.Button("Save game",{W=155}) then
-			fun.SaveGame()      --! need some sort of feedback here
+			fun.SaveGame()
 		end
 		Slab.NewLine()
 		
@@ -71,6 +83,7 @@ function menus.DrawMainMenu()
 				ss.StartHosting(gintServerPort)
 				gbolIsAClient = false
 				gbolIsAHost = true
+				fun.SaveGameSettings()
 				fun.AddScreen("World")
 			end
 			Slab.NewLine()
@@ -92,6 +105,7 @@ function menus.DrawMainMenu()
 			}			
 			if Slab.Input('HostIP', joinIPOptions) then
 				ConnectedToIP = Slab.GetInputText()
+				garrGameSettings.PreviousIP = (ConnectedToIP)
 			end		
 		
 			Slab.Text("Join on port:" )
@@ -106,6 +120,7 @@ function menus.DrawMainMenu()
 			}
 			if Slab.Input('HostPort', joinPortOptions) then
 				ConnectedToPort = Slab.GetInputText()
+				garrGameSettings.PreviousPort = ConnectedToPort
 			end
 			
 			if Slab.Button("Join game",{W=155}) then
@@ -123,8 +138,6 @@ function menus.DrawMainMenu()
 					msg.name = "ConnectionRequest"
 	
 					ss.AddItemToClientOutgoingQueue(msg)
-					gbolIsConnected = true	--!temporary code
-					fun.AddScreen("World")
 				end
 			end
 			Slab.NewLine()		
