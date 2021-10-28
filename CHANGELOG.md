@@ -10,11 +10,21 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - added a FAILED audio file
 - FAILED audio file plays when trying to purchase something that can't be afforded
 - added a score
+- added an input box for capturing IP address
+- added MadByte to the credits
+
+=======
+
 ### Changed
 - smoke spritesheet and code that draws smoke
 - adjusted the player label so it does not clash with lander graphic
 - stopped LOW FUEL alert playing when takes are empty
 - the NOISE parameters to make better terrain
+- window now starts full screen
+- added wallpaper to the main menu
+
+=======
+
 ### Fixed
 - fixed crash when the port number on the main menu was blank. Now only supports numbers
 

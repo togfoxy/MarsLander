@@ -3,8 +3,8 @@ local menus = {}
 
 function menus.DrawMainMenu()
 	
-	local intSlabWidth = 700 --205	-- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 475 	-- the height of the main menu slab
+	local intSlabWidth = 700 -- the width of the main menu slab. Change this to change appearance.
+	local intSlabHeight = 550 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -30,11 +30,6 @@ function menus.DrawMainMenu()
 		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
 		
 		Slab.SetLayoutColumn(2)
-		
-		-- -- add some white space for presentation
-		-- Slab.NewLine()
-		-- if Slab.Button("Hidden",{Invisible=true}) then
-		-- end		
 		
 		Slab.NewLine()
 		if Slab.Input('Name',{Text=garrLanders[1].name,Tooltip="Enter your player name here"}) then
@@ -87,6 +82,20 @@ function menus.DrawMainMenu()
 		end
 		
 		if not gbolIsAHost then
+			Slab.Text("Join on IP:")
+			local joinIPOptions = {
+				ReturnOnText=true,
+				W=100,
+				Text=ConnectedToIP,
+				NumbersOnly=false,
+				NoDrag=true,
+				-- MinNumber=6000,
+				-- MaxNumber=6999
+			}			
+			if Slab.Input('HostIP', joinIPOptions) then
+				ConnectedToIP = Slab.GetInputText()
+			end		
+		
 			Slab.Text("Join on port:" )
 			local joinPortOptions = {
 				ReturnOnText=true,
@@ -102,15 +111,14 @@ function menus.DrawMainMenu()
 			end
 			
 			if Slab.Button("Join game",{W=155}) then
-				if ConnectedToPort == nil then
+				if ConnectedToIP == nil or ConnectedToPort == nil then
 					-- Invalid Port number
-					lovelyToasts.show("Error: You must set a port number", 1.5, "bottom")
+					lovelyToasts.show("Error: You must set an IP and port number", 3, "bottom")
 				else
 					gbolIsAHost = false
 					gbolIsAClient = true
 
-					ss.ConnectToHost(_, ConnectedToPort)
-					
+					ss.ConnectToHost(ConnectedToIP, ConnectedToPort)		--! Note!!! ss.ConnectToHost does not use the IP address. socketstuff.lua needs to be finished/fixed
 					ss.AddItemToClientOutgoingQueue(message)
 					fun.AddScreen("World")
 				end
@@ -169,6 +177,7 @@ function menus.DrawCredits()
 		Slab.Text("Milon")
 		Slab.Text("Gunroar:Cannon()")
 		Slab.Text("Philbywhizz")
+		Slab.Text("MadByte")
 		Slab.NewLine()		
 		
 		Slab.Text("Thanks to beta testers:",{Align = 'center'})

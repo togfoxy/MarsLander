@@ -26,8 +26,8 @@ socket = require "socket"
 lovelyToasts = require("lib.lovelyToasts")
 -- https://github.com/Loucee/Lovely-Toasts
 
-gintScreenWidth = 1024-- 1920
-gintScreenHeight = 768-- 1080
+gintScreenWidth = 1920
+gintScreenHeight = 1080
 
 garrCurrentScreen = {}	
 
@@ -502,10 +502,10 @@ end
 function love.load()
 
     if love.filesystem.isFused( ) then
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
         gbolDebug = false
     else
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=2,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
     end
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
@@ -558,13 +558,14 @@ function love.load()
 end
 
 function love.draw()
+	
+	dobjs.DrawWallPaper()		-- this comes BEFORE the TLfres.beginRendering
 
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
 	
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 
 	if strCurrentScreen == "MainMenu" then
-
 		menus.DrawMainMenu()
 	end
 	
