@@ -14,8 +14,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - added MadByte to the credits
 - socket logic that won't let the client start the game until the host confirms the connection
 - game settings now persist so they don't need to be retyped (player name, IP, port)
-
-=======
+- Added a Settings Menu. Can also be accessed via 'o' while playing the game
 
 ### Changed
 - smoke spritesheet and code that draws smoke
@@ -25,8 +24,6 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - window now starts full screen
 - window now starts windowed if in non-fused mode
 - added wallpaper to the main menu
-
-=======
 
 ### Fixed
 - fixed crash when the port number on the main menu was blank. Now only supports numbers
