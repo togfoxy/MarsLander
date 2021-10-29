@@ -528,16 +528,14 @@ function love.load()
         void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
         gbolDebug = false
     else
-		-- gintScreenWidth = 800
-		-- gintScreenHeight = 600
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+		void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
     end
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
 	fun.LoadGameSettings()
 	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
-
+	
 	fun.AddScreen("MainMenu")
 	fun.ResetGame()
 	

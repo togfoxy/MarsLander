@@ -22,7 +22,7 @@ function menus.DrawMainMenu()
 		AllowResize=false,
 		NoSavedSettings=true
 	}
-	
+
 	Slab.BeginWindow('MainMenu', mainMenuOptions)
 	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
 		
@@ -30,7 +30,7 @@ function menus.DrawMainMenu()
 		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
 		
 		Slab.SetLayoutColumn(2)
-
+		
 		Slab.NewLine()
 		Slab.Text("Name: " .. garrGameSettings.PlayerName)
 
@@ -56,7 +56,7 @@ function menus.DrawMainMenu()
 		Slab.NewLine()
 
 		if Slab.Button("Save game",{W=155}) then
-			fun.SaveGame()
+			fun.SaveGame() 
 		end
 		Slab.NewLine()
 
@@ -125,6 +125,8 @@ function menus.DrawMainMenu()
 					msg.name = "ConnectionRequest"
 	
 					ss.AddItemToClientOutgoingQueue(msg)
+					-- gbolIsConnected = true	--!temporary code
+					-- fun.AddScreen("World")
 				end
 			end
 			Slab.NewLine()		
