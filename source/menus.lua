@@ -31,26 +31,8 @@ function menus.DrawMainMenu()
 		
 		Slab.SetLayoutColumn(2)
 
-		PlayerName = garrGameSettings.PlayerName
-		ConnectedToIP = garrGameSettings.PreviousIP
-		ConnectedToPort = garrGameSettings.PreviousPort
-		
-		garrLanders[1].name = PlayerName
-		gstrCurrentPlayerName = PlayerName
-
 		Slab.NewLine()
-		if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
-			PlayerName = Slab.GetInputText()
-			if PlayerName == "" then
-				-- Blank name isn't allowed, so reset to the default
-				garrLanders[1].name = gstrDefaultPlayerName
-			else
-				-- save the current name in the global variable (Yeah its horrible - FIXME)
-				garrLanders[1].name = PlayerName
-				gstrCurrentPlayerName = PlayerName
-				garrGameSettings.PlayerName = PlayerName
-			end
-		end
+		Slab.Text("Name: " .. garrGameSettings.PlayerName)
 
 		Slab.NewLine()
 		if Slab.Button("New game",{W=155}) then
@@ -78,7 +60,7 @@ function menus.DrawMainMenu()
 		end
 		Slab.NewLine()
 
-		if Slab.Button("Game Settings",{W=155}) then
+		if Slab.Button("Settings",{W=155}) then
 			fun.AddScreen("Settings")
 		end
 		Slab.NewLine()
@@ -248,14 +230,13 @@ function menus.DrawCredits()
 end
 
 function menus.DrawSettingsMenu()
-	local intSlabWidth = 500	-- the width of the settings window slab.
-	local intSlabHeight = 450 	-- the height of the windowslab
+	local intSlabWidth = 400	-- the width of the settings window slab.
+	local intSlabHeight = 250 	-- the height of the windowslab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
 	local settingsWindowOptions = {
 		Title ='Game Settings',
-		BgColor = {0.5,0.5,0.5},
 		X = fltSlabWindowX,
 		Y = fltSlabWindowY,
 		W = intSlabWidth,
@@ -271,7 +252,10 @@ function menus.DrawSettingsMenu()
 		Slab.BeginLayout('layout-settings',{AlignX = "center"})
 
 		Slab.NewLine()
-		Slab.Textf("Player Name:")
+		Slab.Textf("Player Settings:")
+		Slab.NewLine()
+		Slab.Textf("Name:")
+		local PlayerName = garrGameSettings.PlayerName
 		if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
 			PlayerName = Slab.GetInputText()
 			if PlayerName == "" then
@@ -284,7 +268,9 @@ function menus.DrawSettingsMenu()
 				garrGameSettings.PlayerName = PlayerName
 			end
 		end
+		Slab.NewLine()
 		Slab.Separator()
+
 		Slab.NewLine()
 		Slab.Text("Game Settings:")
 		if Slab.CheckBox(garrGameSettings.FullScreen, "Full Screen") then
@@ -292,6 +278,15 @@ function menus.DrawSettingsMenu()
 			love.window.setFullscreen(garrGameSettings.FullScreen)
 			fun.SaveGameSettings()
 		end
+
+		Slab.NewLine()
+		Slab.Separator()
+
+		Slab.NewLine()
+		if Slab.Button("OK") then
+			-- return to the previous game state
+			fun.RemoveScreen()
+		end	
 
 		Slab.EndLayout() -- layout-settings
 	Slab.EndWindow()
