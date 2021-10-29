@@ -94,7 +94,21 @@ function functions.LoadGameSettings()
 	if success == false then
 		garrGameSettings = {}
 	end
-
+	
+	--[[ FIXME:
+	-- This is horrible bugfix and needs refactoring. If a player doesn't have
+	-- a settings.dat already then all the values in garrGameSettings table are 
+	-- nil. This sets some reasonable defaults to stop nil value crashes.
+	]]--
+	if garrGameSettings.PlayerName == nil then
+		garrGameSettings.PlayerName = gstrDefaultPlayerName
+	end
+	if garrGameSettings.PreviousIP == nil then
+		garrGameSettings.PreviousIP = "127.0.0.1"
+	end
+	if garrGameSettings.PreviousPort == nil then
+		garrGameSettings.PreviousPort = "6000"
+	end
 end
 
 function functions.SaveGame()
