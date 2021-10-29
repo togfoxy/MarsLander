@@ -243,23 +243,52 @@ function menus.DrawCredits()
 end
 
 function menus.DrawSettingsMenu()
-	local intSlabWidth = 300	-- the width of the settings window slab.
+	local intSlabWidth = 700	-- the width of the settings window slab.
 	local intSlabHeight = 500 	-- the height of the windowslab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
 	local settingsWindowOptions = {
-		Title ='Mars Lander - Game Settings',
+		Title ='Game Settings',
 		BgColor = {0.5,0.5,0.5},
 		AutoSizeWindow = true,
 		NoOutline = true,
 		AllowMove = false,
 		X = fltSlabWindowX,
-		Y = fltSlabWindowY
-	}
-	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
+		Y = fltSlabWindowY,
+		W = intSlabWidth,
+		H = intSlabHeight,
+		}
 
-	Slab.Text("Settings:",{Align = 'left'})
+	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
+		Slab.BeginLayout('layout-settings',{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
+		Slab.SetLayoutColumn(1)
+			Slab.BeginLayout('layout-name',{Columns=2})
+			Slab.SetLayoutColumn(1)
+				Slab.Text("Player Name:")
+				Slab.SetLayoutColumn(2)
+				if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
+					PlayerName = Slab.GetInputText()
+					if PlayerName == "" then
+						-- Blank name isn't allowed, so reset to the default
+						garrLanders[1].name = gstrDefaultPlayerName
+					else
+						-- save the current name in the global variable (Yeah its horrible - FIXME)
+						garrLanders[1].name = PlayerName
+						gstrCurrentPlayerName = PlayerName
+						garrGameSettings.PlayerName = PlayerName
+					end
+				end
+			Slab.EndLayout() -- layout-name
+		Slab.SetLayoutColumn(2)
+			Slab.BeginLayout('layout-game')
+			if Slab.CheckBox(garrGameSettings.FullScreen, "Full Screen") then
+				garrGameSettings.FullScreen = not garrGameSettings.FullScreen
+				love.window.setFullscreen(garrGameSettings.FullScreen)
+				fun.SaveGameSettings()
+			end
+			Slab.EndLayout()
+		Slab.EndLayout() -- layout-settings
 	Slab.EndWindow()
 end
 

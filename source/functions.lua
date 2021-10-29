@@ -109,6 +109,9 @@ function functions.LoadGameSettings()
 	if garrGameSettings.PreviousPort == nil then
 		garrGameSettings.PreviousPort = "6000"
 	end
+	if garrGameSettings.FullScreen == nil then
+		garrGameSettings.FullScreen = false
+	end
 end
 
 function functions.SaveGame()

@@ -536,6 +536,8 @@ function love.load()
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
 	fun.LoadGameSettings()
+	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
+
 	fun.AddScreen("MainMenu")
 	fun.ResetGame()
 	
