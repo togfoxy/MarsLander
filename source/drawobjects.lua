@@ -68,7 +68,7 @@ end
 local function DrawNearestBase()
 -- determine distance to nearest base and draw indicator
 
-	if fun.LanderHasUpgrade(enum.moduleNamesRangeFinder) then
+	if Lander.hasUpgrade(enum.moduleNamesRangeFinder) then
 
 		local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
@@ -133,29 +133,6 @@ function HUD.draw(worldoffset)
 		love.graphics.setColor(1,1,1,0.50)
 		love.graphics.setNewFont(12)
 		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
-	end
-end
-
-local function DrawSurface(worldoffset)
--- draws the terrain as a bunch of lines that are 1 pixel in length	
-
-	love.graphics.setColor(1,1,1,1)
-	-- ensure we have enough terrain
-	if (worldoffset + gintScreenWidth) > #garrGround then
-		fun.GetTerrainNoise(gintScreenWidth * 2)
-	end
-	
-	for i = 1, #garrGround - 1 do
-		if i < worldoffset - (gintScreenWidth) or i > worldoffset + (gintScreenWidth) then
-			-- don't draw. Do nothing
-		else
-			love.graphics.line(i - worldoffset, garrGround[i], i + 1 - worldoffset, garrGround[i+1])
-			-- draw a vertical line straight down to reflect solid terra firma
-			-- love.graphics.setColor(115/255,115/255,115/255,1)
-			love.graphics.setColor(205/255,92/255,92/255,1)
-			love.graphics.line(i - worldoffset, garrGround[i],i - worldoffset, gintScreenHeight)
-			love.graphics.setColor(1,1,1,1)
-		end
 	end
 end
 
@@ -229,70 +206,12 @@ end
 local function DrawDebug(worldoffset)
 
 	love.graphics.setNewFont(14)
-	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 75)
+	love.graphics.print("Mass = " .. cf.round(Lander.getMass(),2), 5, 75)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 90)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)
 	
 	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
-end
-
-local function DrawLander(worldoffset)
-
-	-- draw the lander and flame
-	for k,v in ipairs(garrLanders) do
-
-		local drawingx = v.x - worldoffset
-		local drawingy = v.y
-		
-		if drawingx < -200 or drawingx > (gintScreenWidth * 1.1) then
-			-- off screen. do nothing.
-		else
-		
-			-- fade other landers in multiplayer mode
-			if k == 1 then
-				love.graphics.setColor(1,1,1,1)
-			else
-				love.graphics.setColor(1,1,1,0.5)
-			end
-			
-			love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
-
-			-- draw flames
-			if v.engineOn == true then
-				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-				v.engineOn = false
-			end	
-			if v.enginelefton == true then
-				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle + 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-				v.enginelefton = false
-			end
-			if v.enginerighton == true then
-				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle - 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-				v.enginerighton = false
-			end	
-
-			-- draw smoke trail
-			for q,w in pairs(garrSmokeSprites) do
-				local drawingx = w.x - worldoffset
-				local drawingy = w.y
-
-				local intSpriteNum = cf.round(w.dt)
-				if intSpriteNum < 1 then intSpriteNum = 1 end
-				
-				-- not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
-				love.graphics.draw(gSmokeSheet,gSmokeImages[intSpriteNum], drawingx, drawingy, math.rad(v.angle + 135))
-
-			end
-			
-			-- draw label
-			love.graphics.setNewFont(10)
-			local offsetX, offsetY = 14, 10
-			love.graphics.print(v.name, drawingx + offsetX, drawingy - offsetY)
-
-			love.graphics.setColor(1,1,1,1)
-		end
-	end
 end
 
 function drawobjects.DrawWallPaper()
@@ -316,22 +235,22 @@ end
 local function DrawShopMenu()
 -- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
 
-	if fun.IsOnLandingPad(enum.basetypeFuel) then			-- 2 = base type (fuel)
+	if Lander.isOnLandingPad(enum.basetypeFuel) then			-- 2 = base type (fuel)
 
 		love.graphics.setNewFont(16)
 		
 		local strText = ""
 
-		if not fun.LanderHasUpgrade(enum.moduleNamesThrusters) then
+		if not Lander.hasUpgrade(enum.moduleNamesThrusters) then
 			strText = strText .. "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
 		end
-		if not fun.LanderHasUpgrade(enum.moduleNamesLargeTank) then
+		if not Lander.hasUpgrade(enum.moduleNamesLargeTank) then
 			strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
 		end
-		if not fun.LanderHasUpgrade(enum.moduleNamesRangeFinder) then
+		if not Lander.hasUpgrade(enum.moduleNamesRangeFinder) then
 			strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
 		end
-		if not fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+		if not Lander.hasUpgrade(enum.moduleNamesSideThrusters) then
 			strText = strText .. "4. Buy side-thrusters                 ($" .. enum.moduleCostSideThrusters .. ")" .. "\n"
 		end
 		
@@ -369,7 +288,7 @@ function drawobjects.DrawWorld()
 	--DrawWallPaper()
 	
 	-- draw the surface
-	DrawSurface(worldoffset)
+	Terrain.draw(worldoffset)	
 	
     -- draw world objects
 	DrawObjects(worldoffset)
@@ -378,7 +297,7 @@ function drawobjects.DrawWorld()
     HUD.draw(worldoffset)
 	
 	-- draw the lander
-    DrawLander(worldoffset)
+    Lander.draw(worldoffset)
 	
 	if garrLanders[1].landed then
 		DrawShopMenu()

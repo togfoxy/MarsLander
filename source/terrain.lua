@@ -78,34 +78,60 @@ function Terrain.initialize()
 end
 
 
+
 function Terrain.getNoise(intAmountToCreate)
-    -- gets a predictable terrain value (deterministic) base on x
-    
-        local groundtablesize = #garrGround
-    
-        local gameID = math.pi
-    
-        local terrainmaxheight = (gintScreenHeight * 0.90)
-        local terrainminheight = (gintScreenHeight * 0.65)
-        local terrainstep = (terrainmaxheight - terrainminheight) / 10
-        local terrainoctaves = 1
-    
-        repeat
-            terrainoctaves = terrainoctaves + 1
-        until 2 ^ terrainoctaves >= terrainstep
-    
-        for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
-    
-            local newgroundaltitude
-            for oct = 1, terrainoctaves do
-                newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
-            end
-            if newgroundaltitude < terrainminheight then newgroundaltitude = terrainminheight end
-            if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
-    
-            table.insert(garrGround, newgroundaltitude)
-        end
-    end
+-- gets a predictable terrain value (deterministic) base on x
+
+	local groundtablesize = #garrGround
+
+	local gameID = math.pi
+
+	local terrainmaxheight = (gintScreenHeight * 0.90)
+	local terrainminheight = (gintScreenHeight * 0.65)
+	local terrainstep = (terrainmaxheight - terrainminheight) / 10
+	local terrainoctaves = 1
+
+	repeat
+		terrainoctaves = terrainoctaves + 1
+	until 2 ^ terrainoctaves >= terrainstep
+
+	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
+
+		local newgroundaltitude
+		for oct = 1, terrainoctaves do
+			newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
+		end
+		if newgroundaltitude < terrainminheight then newgroundaltitude = terrainminheight end
+		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
+
+		table.insert(garrGround, newgroundaltitude)
+	end
+end
 
 
-    return Terrain
+
+function Terrain.draw(worldoffset)
+-- draws the terrain as a bunch of lines that are 1 pixel in length	
+
+	love.graphics.setColor(1,1,1,1)
+	-- ensure we have enough terrain
+	if (worldoffset + gintScreenWidth) > #garrGround then
+		fun.Terrain.getNoise(gintScreenWidth * 2)
+	end
+	
+	for i = 1, #garrGround - 1 do
+		if i < worldoffset - (gintScreenWidth) or i > worldoffset + (gintScreenWidth) then
+			-- don't draw. Do nothing
+		else
+			love.graphics.line(i - worldoffset, garrGround[i], i + 1 - worldoffset, garrGround[i+1])
+			-- draw a vertical line straight down to reflect solid terra firma
+			-- love.graphics.setColor(115/255,115/255,115/255,1)
+			love.graphics.setColor(205/255,92/255,92/255,1)
+			love.graphics.line(i - worldoffset, garrGround[i],i - worldoffset, gintScreenHeight)
+			love.graphics.setColor(1,1,1,1)
+		end
+	end
+end
+
+
+return Terrain

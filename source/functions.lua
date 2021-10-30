@@ -25,23 +25,6 @@ function functions.SwapScreen(newscreen)
 end
 
 
-function functions.GetLanderMass()
--- return the mass of all the bits on the lander
-
-	local result = 0
-
-	-- all the masses are stored in this table so add them up
-	for i = 1, #garrLanders[1].mass do
-		result = result + garrLanders[1].mass[i]
-	end
-	
-	-- add the mass of the fuel
-	result = result + garrLanders[1].fuel
-	
-	return result
-end
-
-
 function functions.SaveGameSettings()
 -- save game settings so they can be autoloaded next session
 	local savefile
@@ -171,38 +154,16 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 end
 
 
-function functions.IsOnLandingPad(intBaseType)
--- returns a true / false value
-
-	local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, intBaseType)
-	if mydist >= -80 and mydist <= 40 then
-		return true
-	else
-		return false
-	end
-end
-
-
 function functions.ResetGame()
 
 	garrGround = {}
 	garrObjects = {}
+
 	Terrain.initialize()
 
 	garrLanders = {}
-	table.insert(garrLanders, cobjs.CreateLander())
+	table.insert(garrLanders, Lander.create())
 
-	end
-
-function functions.LanderHasUpgrade(strModuleName)
-
-	for i = 1, #garrLanders[1].modules do
-		if garrLanders[1].modules[i] == strModuleName then
-			return true
-		end
-	end
-	return false
 end
-
 
 return functions
