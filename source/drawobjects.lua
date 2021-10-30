@@ -71,6 +71,7 @@ local function DrawNearestBase(landerObj)
 	if Lander.hasUpgrade(landerObj, enum.moduleNamesRangeFinder) then
 
 		local mydist, _ = fun.GetDistanceToClosestBase(landerObj.x, enum.basetypeFuel)
+
 		mydist = cf.round(mydist,0)
 		
 		-- don't draw if close to base
@@ -206,6 +207,7 @@ end
 local function DrawDebug(worldoffset)
 
 	love.graphics.setNewFont(14)
+
 	love.graphics.print("Mass = " .. cf.round(Lander.getMass(garrLanders[1]),2), 5, 75)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 90)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)

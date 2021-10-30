@@ -76,8 +76,6 @@ gbolIsConnected = false			-- Will become true when received an acknowledgement f
 
 gbolDebug = true
 
-
-
 function love.keypressed(key, scancode, isrepeat)
 --! don't like how there are keypressed events here as well as in love.update
 	if key == "escape" then
@@ -113,7 +111,7 @@ function love.load()
 	
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = Lander.getMass(garrLanders[1])
-	
+
 	-- stills/images
 	--! should make these numbers enums one day
 	garrImages[1] = love.graphics.newImage("/Assets/tower.png")

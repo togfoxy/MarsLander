@@ -62,11 +62,11 @@ function functions.LoadGameSettings()
 	if garrGameSettings.PlayerName == nil then
 		garrGameSettings.PlayerName = gstrDefaultPlayerName
 	end
-	if garrGameSettings.PreviousIP == nil then
-		garrGameSettings.PreviousIP = "127.0.0.1"
+	if garrGameSettings.HostIP == nil then
+		garrGameSettings.HostIP = "127.0.0.1"
 	end
-	if garrGameSettings.PreviousPort == nil then
-		garrGameSettings.PreviousPort = "6000"
+	if garrGameSettings.HostPort == nil then
+		garrGameSettings.HostPort = "6000"
 	end
 	if garrGameSettings.FullScreen == nil then
 		garrGameSettings.FullScreen = false
