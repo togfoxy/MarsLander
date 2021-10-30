@@ -80,54 +80,47 @@ function menus.DrawMainMenu()
 			Slab.Text("Hosting on port: " .. gintServerPort)
 			Slab.NewLine()
 		end
-		
+
 		if not gbolIsAHost then
 			Slab.Text("Join on IP:")
 			local joinIPOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=ConnectedToIP,
+				Text=garrGameSettings.HostIP,
 				NumbersOnly=false,
 				NoDrag=true,
 			}			
 			if Slab.Input('HostIP', joinIPOptions) then
-				ConnectedToIP = Slab.GetInputText()
-				garrGameSettings.PreviousIP = (ConnectedToIP)
+				garrGameSettings.HostIP = Slab.GetInputText()
 			end		
 		
 			Slab.Text("Join on port:" )
 			local joinPortOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=ConnectedToPort,
+				Text=garrGameSettings.HostPort,
 				NumbersOnly=true,
 				NoDrag=true,
 				MinNumber=6000,
 				MaxNumber=6999
 			}
 			if Slab.Input('HostPort', joinPortOptions) then
-				ConnectedToPort = Slab.GetInputText()
-				garrGameSettings.PreviousPort = ConnectedToPort
+				garrGameSettings.HostPort = Slab.GetInputText() or 6000
 			end
 			
 			if Slab.Button("Join game",{W=155}) then
-				if ConnectedToIP == nil or ConnectedToPort == nil then
-					-- Invalid Port number
-					lovelyToasts.show("Error: You must set an IP and port number", 3, "bottom")
-				else
-					gbolIsAHost = false
-					gbolIsAClient = true
+				gbolIsAHost = false
+				gbolIsAClient = true
 
-					ss.ConnectToHost(ConnectedToIP, ConnectedToPort)		--! Note!!! ss.ConnectToHost does not use the IP address. socketstuff.lua needs to be finished/fixed
+				ss.ConnectToHost(garrGameSettings.HostIP, garrGameSettings.HostPort)		--! Note!!! ss.ConnectToHost does not use the IP address. socketstuff.lua needs to be finished/fixed
 
-					-- send a test message to the host. The host will return the client's IP and port
-					local msg = {}
-					msg.name = "ConnectionRequest"
+				-- send a test message to the host. The host will return the client's IP and port
+				local msg = {}
+				msg.name = "ConnectionRequest"
 	
-					ss.AddItemToClientOutgoingQueue(msg)
-					-- gbolIsConnected = true	--!temporary code
-					-- fun.AddScreen("World")
-				end
+				ss.AddItemToClientOutgoingQueue(msg)
+				-- gbolIsConnected = true	--!temporary code
+				-- fun.AddScreen("World")
 			end
 			Slab.NewLine()		
 		end
