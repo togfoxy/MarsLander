@@ -51,18 +51,18 @@ function functions.GetTerrainNoise(intAmountToCreate)
 	end
 end
 
-function functions.GetLanderMass()
+function functions.GetLanderMass(Lander)
 -- return the mass of all the bits on the lander
 
 	local result = 0
 
 	-- all the masses are stored in this table so add them up
-	for i = 1, #garrLanders[1].mass do
-		result = result + garrLanders[1].mass[i]
+	for i = 1, #Lander.mass do
+		result = result + Lander.mass[i]
 	end
 	
 	-- add the mass of the fuel
-	result = result + garrLanders[1].fuel
+	result = result + Lander.fuel
 	
 	return result
 end
@@ -269,10 +269,10 @@ function functions.ResetGame()
 
 	end
 
-function functions.LanderHasUpgrade(strModuleName)
+function functions.LanderHasUpgrade(Lander, strModuleName)
 
-	for i = 1, #garrLanders[1].modules do
-		if garrLanders[1].modules[i] == strModuleName then
+	for i = 1, #Lander.modules do
+		if Lander.modules[i] == strModuleName then
 			return true
 		end
 	end

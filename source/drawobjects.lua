@@ -65,12 +65,12 @@ local function DrawWealth()
 	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 75)
 end
 
-local function DrawNearestBase()
+local function DrawNearestBase(Lander)
 -- determine distance to nearest base and draw indicator
 
-	if fun.LanderHasUpgrade(enum.moduleNamesRangeFinder) then
+	if fun.LanderHasUpgrade(Lander, enum.moduleNamesRangeFinder) then
 
-		local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, enum.basetypeFuel)
+		local mydist, _ = fun.GetDistanceToClosestBase(Lander.x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
 		
 		-- don't draw if close to base
@@ -127,7 +127,7 @@ function HUD.draw(worldoffset)
 	
 	DrawWealth()
 	
-	DrawNearestBase()
+	DrawNearestBase(garrLanders[1])
 	
 	if gbolIsAHost then
 		love.graphics.setColor(1,1,1,0.50)
@@ -229,7 +229,7 @@ end
 local function DrawDebug(worldoffset)
 
 	love.graphics.setNewFont(14)
-	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(),2), 5, 75)
+	love.graphics.print("Mass = " .. cf.round(fun.GetLanderMass(garrLanders[1]),2), 5, 75)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 90)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)
 	
@@ -322,16 +322,16 @@ local function DrawShopMenu()
 		
 		local strText = ""
 
-		if not fun.LanderHasUpgrade(enum.moduleNamesThrusters) then
+		if not fun.LanderHasUpgrade(garrLanders[1], enum.moduleNamesThrusters) then
 			strText = strText .. "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
 		end
-		if not fun.LanderHasUpgrade(enum.moduleNamesLargeTank) then
+		if not fun.LanderHasUpgrade(garrLanders[1], enum.moduleNamesLargeTank) then
 			strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
 		end
-		if not fun.LanderHasUpgrade(enum.moduleNamesRangeFinder) then
+		if not fun.LanderHasUpgrade(garrLanders[1], enum.moduleNamesRangeFinder) then
 			strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
 		end
-		if not fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+		if not fun.LanderHasUpgrade(garrLanders[1], enum.moduleNamesSideThrusters) then
 			strText = strText .. "4. Buy side-thrusters                 ($" .. enum.moduleCostSideThrusters .. ")" .. "\n"
 		end
 		

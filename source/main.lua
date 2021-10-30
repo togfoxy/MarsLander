@@ -74,28 +74,28 @@ gbolIsConnected = false			-- Will become true when received an acknowledgement f
 
 gbolDebug = true
 
-local function DoThrust(dt)
+local function DoThrust(Lander, dt)
 
-	if garrLanders[1].fuel - dt >= 0 or (fun.LanderHasUpgrade(enum.moduleNamesThrusters) and garrLanders[1].fuel - (dt * 0.80) >= 0) then
+	if Lander.fuel - dt >= 0 or (fun.LanderHasUpgrade(enum.moduleNamesThrusters) and Lander.fuel - (dt * 0.80) >= 0) then
 
-		garrLanders[1].engineOn = true
-		local angle_radian = math.rad(garrLanders[1].angle)
+		Lander.engineOn = true
+		local angle_radian = math.rad(Lander.angle)
 		local force_x = math.cos(angle_radian) * dt
 		local force_y = math.sin(angle_radian) * dt
 		
 		-- adjust the thrust based on ship mass
-		local massratio = gintDefaultMass / fun.GetLanderMass()	-- less mass = higher ratio = more thrust = less fuel needed to move
+		local massratio = gintDefaultMass / fun.GetLanderMass(Lander)	-- less mass = higher ratio = more thrust = less fuel needed to move
 		if gbolDebug then garrMassRatio = massratio end			-- for debugging only
 		force_x = force_x * massratio
 		force_y = force_y * massratio
 
-		garrLanders[1].vx = garrLanders[1].vx + force_x
-		garrLanders[1].vy = garrLanders[1].vy + force_y
+		Lander.vx = Lander.vx + force_x
+		Lander.vy = Lander.vy + force_y
 
-		if fun.LanderHasUpgrade(enum.moduleNamesThrusters) then
-			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 0.80)		-- efficient thrusters use 80% fuel compared to normal thrusters
+		if fun.LanderHasUpgrade(Lander, enum.moduleNamesThrusters) then
+			Lander.fuel = Lander.fuel - (dt * 0.80)		-- efficient thrusters use 80% fuel compared to normal thrusters
 		else
-			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 1)
+			Lander.fuel = Lander.fuel - (dt * 1)
 		end
 	else
 		-- no fuel to thrust
@@ -103,40 +103,40 @@ local function DoThrust(dt)
 	end
 end
 
-local function TurnLeft(dt)
+local function TurnLeft(Lander, dt)
 -- rotate the lander anti-clockwise
 
-	garrLanders[1].angle = garrLanders[1].angle - (90 * dt)
-	if garrLanders[1].angle < 0 then garrLanders[1].angle = 360 end
+	Lander.angle = Lander.angle - (90 * dt)
+	if Lander.angle < 0 then Lander.angle = 360 end
 end
 
-local function TurnRight(dt)
+local function TurnRight(Lander, dt)
 -- rotate the lander clockwise
 
-	garrLanders[1].angle = garrLanders[1].angle + (90 * dt)
-	if garrLanders[1].angle > 360 then garrLanders[1].angle = 0 end
+	Lander.angle = Lander.angle + (90 * dt)
+	if Lander.angle > 360 then Lander.angle = 0 end
 
 end
 
-local function ThrustLeft(dt)
+local function ThrustLeft(Lander, dt)
 
-	if fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+	if fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then		--! need to pass through Lander
 		local force_x = 0.5 * dt		--!
-		garrLanders[1].vx = garrLanders[1].vx - force_x
-		garrLanders[1].enginerighton = true						-- opposite engine is on
+		Lander.vx = Lander.vx - force_x
+		Lander.enginerighton = true						-- opposite engine is on
 		
-		garrLanders[1].fuel = garrLanders[1].fuel - force_x
+		Lander.fuel = Lander.fuel - force_x
 	end
 end
 
-local function ThrustRight(dt)
+local function ThrustRight(Lander, dt)
 
-	if fun.LanderHasUpgrade(enum.moduleNamesSideThrusters) then
+	if fun.LanderHasUpgrade(Lander, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
-		garrLanders[1].vx = garrLanders[1].vx + force_x
-		garrLanders[1].enginelefton = true						-- opposite engine is on
+		Lander.vx = Lander.vx + force_x
+		Lander.enginelefton = true						-- opposite engine is on
 		
-		garrLanders[1].fuel = garrLanders[1].fuel - force_x
+		Lander.fuel = Lander.fuel - force_x
 	end
 
 end
@@ -540,7 +540,7 @@ function love.load()
 	fun.ResetGame()
 	
 	-- capture the 'normal' mass of the lander into a global variable
-	gintDefaultMass = fun.GetLanderMass()
+	gintDefaultMass = fun.GetLanderMass(garrLanders[1])
 	
 	-- stills/images
 	--! should make these numbers enums one day
@@ -634,19 +634,19 @@ function love.update(dt)
 	if strCurrentScreen == "World" then
 
 		if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
-			DoThrust(dt)
+			DoThrust(garrLanders[1], dt)
 		end
 		if love.keyboard.isDown("left") or love.keyboard.isDown("a") or love.keyboard.isDown("kp4") then
-			TurnLeft(dt)
+			TurnLeft(garrLanders[1], dt)
 		end
 		if love.keyboard.isDown("right") or love.keyboard.isDown("d") or love.keyboard.isDown("kp6") then
-			TurnRight(dt)
+			TurnRight(garrLanders[1], dt)
 		end
 		if love.keyboard.isDown("q") or love.keyboard.isDown("kp7") then
-			ThrustLeft(dt)
+			ThrustLeft(garrLanders[1],dt)
 		end
 		if love.keyboard.isDown("e") or love.keyboard.isDown("kp9") then
-			ThrustRight(dt)
+			ThrustRight(garrLanders[1], dt)
 		end		
 		if love.keyboard.isDown("p") then
 			fun.AddScreen("Pause")
@@ -656,7 +656,7 @@ function love.update(dt)
 		end
 		
 		
-		MoveShip(garrLanders[1], dt)		--! some really inconsistent use of parameters here
+		MoveShip(garrLanders[1], dt)
 		
 		UpdateSmoke(dt)
 		
