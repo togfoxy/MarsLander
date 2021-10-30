@@ -112,7 +112,7 @@ function love.load()
 	fun.ResetGame()
 	
 	-- capture the 'normal' mass of the lander into a global variable
-	gintDefaultMass = Lander.getMass()
+	gintDefaultMass = Lander.getMass(garrLanders[1])
 	
 	-- stills/images
 	--! should make these numbers enums one day

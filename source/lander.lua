@@ -13,28 +13,28 @@ local Lander = {}
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
-local function DoThrust(dt)
+local function DoThrust(landerObj, dt)
 
-	if garrLanders[1].fuel - dt >= 0 or (Lander.hasUpgrade(enum.moduleNamesThrusters) and garrLanders[1].fuel - (dt * 0.80) >= 0) then
+	if landerObj.fuel - dt >= 0 or (Lander.hasUpgrade(landerObj, enum.moduleNamesThrusters) and landerObj.fuel - (dt * 0.80) >= 0) then
 
-		garrLanders[1].engineOn = true
-		local angle_radian = math.rad(garrLanders[1].angle)
+		landerObj.engineOn = true
+		local angle_radian = math.rad(landerObj.angle)
 		local force_x = math.cos(angle_radian) * dt
 		local force_y = math.sin(angle_radian) * dt
 		
 		-- adjust the thrust based on ship mass
-		local massratio = gintDefaultMass / Lander.getMass()	-- less mass = higher ratio = more thrust = less fuel needed to move
+		local massratio = gintDefaultMass / Lander.getMass(landerObj)	-- less mass = higher ratio = more thrust = less fuel needed to move
 		if gbolDebug then garrMassRatio = massratio end			-- for debugging only
 		force_x = force_x * massratio
 		force_y = force_y * massratio
 
-		garrLanders[1].vx = garrLanders[1].vx + force_x
-		garrLanders[1].vy = garrLanders[1].vy + force_y
+		landerObj.vx = landerObj.vx + force_x
+		landerObj.vy = landerObj.vy + force_y
 
-		if Lander.hasUpgrade(enum.moduleNamesThrusters) then
-			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 0.80)		-- efficient thrusters use 80% fuel compared to normal thrusters
+		if Lander.hasUpgrade(landerObj, enum.moduleNamesThrusters) then
+			landerObj.fuel = landerObj.fuel - (dt * 0.80)		-- efficient thrusters use 80% fuel compared to normal thrusters
 		else
-			garrLanders[1].fuel = garrLanders[1].fuel - (dt * 1)
+			landerObj.fuel = landerObj.fuel - (dt * 1)
 		end
 	else
 		-- no fuel to thrust
@@ -44,46 +44,46 @@ end
 
 
 
-local function TurnLeft(dt)
+local function TurnLeft(landerObj, dt)
 -- rotate the lander anti-clockwise
 
-	garrLanders[1].angle = garrLanders[1].angle - (90 * dt)
-	if garrLanders[1].angle < 0 then garrLanders[1].angle = 360 end
+	landerObj.angle = landerObj.angle - (90 * dt)
+	if landerObj.angle < 0 then landerObj.angle = 360 end
 end
 
 
 
-local function TurnRight(dt)
+local function TurnRight(landerObj, dt)
 -- rotate the lander clockwise
 
-	garrLanders[1].angle = garrLanders[1].angle + (90 * dt)
-	if garrLanders[1].angle > 360 then garrLanders[1].angle = 0 end
+	landerObj.angle = landerObj.angle + (90 * dt)
+	if landerObj.angle > 360 then landerObj.angle = 0 end
 
 end
 
 
 
-local function ThrustLeft(dt)
+local function ThrustLeft(landerObj, dt)
 
-	if Lander.hasUpgrade(enum.moduleNamesSideThrusters) then
+	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
-		garrLanders[1].vx = garrLanders[1].vx - force_x
-		garrLanders[1].enginerighton = true						-- opposite engine is on
+		landerObj.vx = landerObj.vx - force_x
+		landerObj.enginerighton = true						-- opposite engine is on
 		
-		garrLanders[1].fuel = garrLanders[1].fuel - force_x
+		landerObj.fuel = landerObj.fuel - force_x
 	end
 end
 
 
 
-local function ThrustRight(dt)
+local function ThrustRight(landerObj, dt)
 
-	if Lander.hasUpgrade(enum.moduleNamesSideThrusters) then
+	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
-		garrLanders[1].vx = garrLanders[1].vx + force_x
-		garrLanders[1].enginelefton = true						-- opposite engine is on
+		landerObj.vx = landerObj.vx + force_x
+		landerObj.enginelefton = true						-- opposite engine is on
 		
-		garrLanders[1].fuel = garrLanders[1].fuel - force_x
+		landerObj.fuel = landerObj.fuel - force_x
 	end
 
 end
@@ -129,14 +129,14 @@ end
 
 
 
-local function RefuelLander(objBase, dt)
+local function RefuelLander(landerObj, objBase, dt)
 -- drain fuel from the base and add it to the lander
 -- objBase is an object/table item from garrObjects
 
-	local refuelamt = math.min(objBase.fuelqty, (garrLanders[1].fueltanksize - garrLanders[1].fuel), dt)
+	local refuelamt = math.min(objBase.fuelqty, (landerObj.fueltanksize - landerObj.fuel), dt)
 
 	objBase.fuelqty = objBase.fuelqty - refuelamt
-	garrLanders[1].fuel = garrLanders[1].fuel + refuelamt
+	landerObj.fuel = landerObj.fuel + refuelamt
 	
 	-- disable the base if the tanks are empty
 	if objBase.fuelqty <= 0 then objBase.active = false end
@@ -145,14 +145,14 @@ end
 
 
 
-local function PayLanderFromBase(objBase, fltDist)
+local function PayLanderFromBase(landerObj, objBase, fltDist)
 -- pay some wealth based on distance to the base
 -- objBase is an object/table item from garrObjects
 -- fltDist is the distance from the base
 
 	local dist = math.abs(fltDist)
 	if objBase.paid == false then
-		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + (100 - dist),0)
+		landerObj.wealth = cf.round(landerObj.wealth + (100 - dist),0)
 		garrSound[4]:play()
 	end
 
@@ -160,40 +160,40 @@ end
 
 
 
-local function PayLanderForControl(objBase)
+local function PayLanderForControl(landerObj, objBase)
 
 	if objBase.paid == false then
 		-- pay for a good vertical speed
-		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + ((1 - gfltLandervy) * 100),0)
+		landerObj.wealth = cf.round(landerObj.wealth + ((1 - gfltLandervy) * 100),0)
 		
 		-- pay for a good horizontal speed
-		garrLanders[1].wealth = cf.round(garrLanders[1].wealth + (0.60 - gfltLandervx * 100),0)
+		landerObj.wealth = cf.round(landerObj.wealth + (0.60 - gfltLandervx * 100),0)
 		
 	end
 end
 
 
 
-local function CheckForDamage()
+local function CheckForDamage(landerObj)
 -- apply damage if vertical speed is too higher
 	
-	if garrLanders[1].vy > enum.constVYThreshold then
-		local excessspeed = garrLanders[1].vy - enum.constVYThreshold
-		garrLanders[1].health = garrLanders[1].health - (excessspeed * 100)
+	if landerObj.vy > enum.constVYThreshold then
+		local excessspeed = landerObj.vy - enum.constVYThreshold
+		landerObj.health = landerObj.health - (excessspeed * 100)
 	
-		if garrLanders[1].health < 0 then garrLanders[1].health = 0 end
+		if landerObj.health < 0 then landerObj.health = 0 end
 	end
 
 end
 
 
 
-local function CheckForContact(landerObj,dt)
+local function CheckForContact(landerObj, dt)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(landerObj.x)
 	local groundYvalue
-	local onbase = Lander.isOnLandingPad(enum.basetypeFuel)
+	local onbase = Lander.isOnLandingPad(landerObj, enum.basetypeFuel)
 
 	-- see if landed near a fuel base
 	-- bestdist could be a negative number meaning not yet past the base (but maybe really close to it)
@@ -212,20 +212,20 @@ local function CheckForContact(landerObj,dt)
 		landerObj.landed = true
 
 		if onbase then
-			RefuelLander(bestbase,dt)
-			PayLanderFromBase(bestbase, bestdist)
+			RefuelLander(landerObj, bestbase,dt)
+			PayLanderFromBase(landerObj, bestbase, bestdist)
 			
 			-- if lander was airborne then track that now it's not.
 			if landerObj.airborne then
 				-- this is the first landing on this base so pay wealth based on vertical and horizontal speed
-				PayLanderForControl(bestbase)
+				PayLanderForControl(landerObj, bestbase)
 				bestbase.paid = true
 			end				
 		end
 		
 		if landerObj.airborne then
 			-- a heavy landing will cause damage
-			CheckForDamage()
+			CheckForDamage(landerObj)
 			
 			landerObj.airborne = false
 		end
@@ -245,15 +245,15 @@ end
 
 
 
-local function PlaySoundEffects()
+local function PlaySoundEffects(landerObj)
 
-	if garrLanders[1].engineOn then
+	if landerObj.engineOn then
 		garrSound[1]:play()
 	else
 		garrSound[1]:stop()
 	end
 	
-	local fuelpercent = garrLanders[1].fuel / garrLanders[1].fueltanksize
+	local fuelpercent = landerObj.fuel / landerObj.fueltanksize
 	
 	-- play alert if fuel is low (but not empty because that's just annoying)
 	if fuelpercent <= 0.33 and fuelpercent > 0.01 then		-- 1% because rounding (fuel is never actually zero)
@@ -263,26 +263,26 @@ end
 
 
 
-local function RecalcDefaultMass()
+local function RecalcDefaultMass(landerObj)
 -- need to recalc the default mass
 -- usually called after buying a module
 		local result = 0
 		-- all the masses are stored in this table so add them up
-		for i = 1, #garrLanders[1].mass do
-			result = result + garrLanders[1].mass[i]
+		for i = 1, #landerObj.mass do
+			result = result + landerObj.mass[i]
 		end
-		return (result + garrLanders[1].fueltanksize)		-- mass of all the components + mass of fuel if the tank was full (i.e. fueltanksize)
+		return (result + landerObj.fueltanksize)		-- mass of all the components + mass of fuel if the tank was full (i.e. fueltanksize)
 
 end
 
 
 
-local function PurchaseThrusters()
+local function PurchaseThrusters(landerObj)
 -- add fuel efficient thrusters to the lander
 
-	if garrLanders[1].wealth >= enum.moduleCostsThrusters then
-		for i = 1, #garrLanders[1].modules do
-			if garrLanders[1].modules[i] == enum.moduleNamesThrusters then
+	if landerObj.wealth >= enum.moduleCostsThrusters then
+		for i = 1, #landerObj.modules do
+			if landerObj.modules[i] == enum.moduleNamesThrusters then
 				-- this module is already purchased. Abort
 				--! make a 'wrong' sound		
 				return
@@ -290,13 +290,13 @@ local function PurchaseThrusters()
 		end
 		-- can purchase thrusters
 		
-		table.insert(garrLanders[1].modules, enum.moduleNamesThrusters)
-		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsThrusters
+		table.insert(landerObj.modules, enum.moduleNamesThrusters)
+		landerObj.wealth = landerObj.wealth - enum.moduleCostsThrusters
 		
-		garrLanders[1].mass[1] = 115
+		landerObj.mass[1] = 115
 		
 		-- need to recalc the default mass
-		gintDefaultMass = RecalcDefaultMass()
+		gintDefaultMass = RecalcDefaultMass(landerObj)
 	else
 		-- play 'failed' sound
 		garrSound[6]:play()
@@ -305,12 +305,12 @@ end
 
 
 
-local function PurchaseLargeTank()
+local function PurchaseLargeTank(landerObj)
 -- add a larger tank to carry more fuelqty
 
-	if garrLanders[1].wealth >= enum.moduleCostsLargeTank then
-		for i = 1, #garrLanders[1].modules do
-			if garrLanders[1].modules[i] == enum.moduleNamesLargeTank then
+	if landerObj.wealth >= enum.moduleCostsLargeTank then
+		for i = 1, #landerObj.modules do
+			if landerObj.modules[i] == enum.moduleNamesLargeTank then
 				-- this module is already purchased. Abort.
 				--! make a 'wrong' sound		
 				return
@@ -318,14 +318,14 @@ local function PurchaseLargeTank()
 		end
 		-- can purchase item
 		
-		table.insert(garrLanders[1].modules, enum.moduleNamesLargeTank)
-		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsLargeTank
+		table.insert(landerObj.modules, enum.moduleNamesLargeTank)
+		landerObj.wealth = landerObj.wealth - enum.moduleCostsLargeTank
 		
-		garrLanders[1].fueltanksize = 32		-- an increase from the default (25)
-		garrLanders[1].mass[2] = 23
+		landerObj.fueltanksize = 32		-- an increase from the default (25)
+		landerObj.mass[2] = 23
 		
 		-- need to recalc the default mass
-		gintDefaultMass = RecalcDefaultMass()
+		gintDefaultMass = RecalcDefaultMass(landerObj)
 	else
 		-- play 'failed' sound
 		garrSound[6]:play()		
@@ -335,12 +335,12 @@ end
 
 
 
-local function PurchaseRangeFinder()
+local function PurchaseRangeFinder(landerObj)
 -- the rangefinder points to the nearest base
 
-	if garrLanders[1].wealth >= enum.moduleCostsRangeFinder then
-		for i = 1, #garrLanders[1].modules do
-			if garrLanders[1].modules[i] == enum.moduleNamesRangeFinder then
+	if landerObj.wealth >= enum.moduleCostsRangeFinder then
+		for i = 1, #landerObj.modules do
+			if landerObj.modules[i] == enum.moduleNamesRangeFinder then
 				-- this module is already purchased. Abort.
 				--! make a 'wrong' sound		
 				return
@@ -348,13 +348,13 @@ local function PurchaseRangeFinder()
 		end
 		-- can purchase item
 		
-		table.insert(garrLanders[1].modules, enum.moduleNamesRangeFinder)
-		garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostsRangeFinder
+		table.insert(landerObj.modules, enum.moduleNamesRangeFinder)
+		landerObj.wealth = landerObj.wealth - enum.moduleCostsRangeFinder
 
-		garrLanders[1].mass[3] = 2	-- this is the mass of the rangefinder
+		landerObj.mass[3] = 2	-- this is the mass of the rangefinder
 
 		-- need to recalc the default mass
-		gintDefaultMass = RecalcDefaultMass()		
+		gintDefaultMass = RecalcDefaultMass(landerObj)		
 	else
 		-- play 'failed' sound
 		garrSound[6]:play()		
@@ -364,17 +364,17 @@ end
 
 
 
-local function PurchaseSideThrusters()
+local function PurchaseSideThrusters(landerObj)
 
-	if garrLanders[1].wealth >= enum.moduleCostSideThrusters then
-		if not Lander.hasUpgrade(enum.moduleNamesSideThrusters) then
-			table.insert(garrLanders[1].modules, enum.moduleNamesSideThrusters)
-			garrLanders[1].wealth = garrLanders[1].wealth - enum.moduleCostSideThrusters
+	if landerObj.wealth >= enum.moduleCostSideThrusters then
+		if not Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
+			table.insert(landerObj.modules, enum.moduleNamesSideThrusters)
+			landerObj.wealth = landerObj.wealth - enum.moduleCostSideThrusters
 
-			garrLanders[1].mass[4] = enum.moduleMassSideThrusters	-- this is the mass of the side thrusters
+			landerObj.mass[4] = enum.moduleMassSideThrusters	-- this is the mass of the side thrusters
 
 			-- need to recalc the default mass
-			gintDefaultMass = RecalcDefaultMass()	
+			gintDefaultMass = RecalcDefaultMass(landerObj)	
 		end
 	else
 		-- play 'failed' sound
@@ -404,63 +404,63 @@ end
 function Lander.create()
 -- create a lander and return it to the calling sub
 
-    local newLander = {}
-    newLander.x = gintOriginX
-    newLander.y = 500
-    newLander.y = garrGround[newLander.x] - 8
-    newLander.angle = 270		-- 270 = up
-    newLander.vx = 0
-    newLander.vy = 0
-    newLander.engineOn = false
-    newLander.enginelefton = false
-    newLander.enginerighton = false
-    newLander.landed = false			-- true = on the ground
-    newLander.airborne = false			-- false = on the ground FOR THE FIRST TIME
-    newLander.wealth = 0
-    newLander.health = 100				-- this is % meaning 100 = no damage
-    newLander.bolGameOver = false
-    newLander.name = gstrCurrentPlayerName	
+    local landerObj = {}
+    landerObj.x = gintOriginX
+    landerObj.y = 500
+    landerObj.y = garrGround[landerObj.x] - 8
+    landerObj.angle = 270		-- 270 = up
+    landerObj.vx = 0
+    landerObj.vy = 0
+    landerObj.engineOn = false
+    landerObj.enginelefton = false
+    landerObj.enginerighton = false
+    landerObj.landed = false			-- true = on the ground
+    landerObj.airborne = false			-- false = on the ground FOR THE FIRST TIME
+    landerObj.wealth = 0
+    landerObj.health = 100				-- this is % meaning 100 = no damage
+    landerObj.bolGameOver = false
+    landerObj.name = gstrCurrentPlayerName	
     
     -- mass	
-    newLander.mass = {}
-    table.insert(newLander.mass, 100)	-- base mass of lander
+    landerObj.mass = {}
+    table.insert(landerObj.mass, 100)	-- base mass of lander
 
-    newLander.fueltanksize = 25		-- volume in arbitrary units
-    newLander.fuel = newLander.fueltanksize	-- start with a full tank
-    table.insert(newLander.mass, 20)	-- this is the mass of an empty tank
-    table.insert(newLander.mass, 0)	-- this is the mass of the rangefinder (not yet purchased)
+    landerObj.fueltanksize = 25		-- volume in arbitrary units
+    landerObj.fuel = landerObj.fueltanksize	-- start with a full tank
+    table.insert(landerObj.mass, 20)	-- this is the mass of an empty tank
+    table.insert(landerObj.mass, 0)	-- this is the mass of the rangefinder (not yet purchased)
     
     -- modules
-    newLander.modules = {}		-- this will be strings/names of modules
+    landerObj.modules = {}		-- this will be strings/names of modules
     
-    return newLander
+    return landerObj
 
 end
 
 
 
-function Lander.getMass()
+function Lander.getMass(landerObj)
 -- return the mass of all the bits on the lander
 
     local result = 0
 
     -- all the masses are stored in this table so add them up
-    for i = 1, #garrLanders[1].mass do
-        result = result + garrLanders[1].mass[i]
+    for i = 1, #landerObj.mass do
+        result = result + landerObj.mass[i]
     end
     
     -- add the mass of the fuel
-    result = result + garrLanders[1].fuel
+    result = result + landerObj.fuel
     
     return result
 end
 
 
 
-function Lander.isOnLandingPad(intBaseType)
+function Lander.isOnLandingPad(landerObj, intBaseType)
 -- returns a true / false value
 
-    local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, intBaseType)
+    local mydist, _ = fun.GetDistanceToClosestBase(landerObj.x, intBaseType)
     if mydist >= -80 and mydist <= 40 then
         return true
     else
@@ -470,10 +470,10 @@ end
 
 
 
-function Lander.hasUpgrade(strModuleName)
+function Lander.hasUpgrade(landerObj, strModuleName)
 
-	for i = 1, #garrLanders[1].modules do
-		if garrLanders[1].modules[i] == strModuleName then
+	for i = 1, #landerObj.modules do
+		if landerObj.modules[i] == strModuleName then
 			return true
 		end
 	end
@@ -484,19 +484,19 @@ end
 
 function Lander.update(dt)
     if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
-        DoThrust(dt)
+        DoThrust(garrLanders[1], dt)
     end
     if love.keyboard.isDown("left") or love.keyboard.isDown("a") or love.keyboard.isDown("kp4") then
-        TurnLeft(dt)
+        TurnLeft(garrLanders[1], dt)
     end
     if love.keyboard.isDown("right") or love.keyboard.isDown("d") or love.keyboard.isDown("kp6") then
-        TurnRight(dt)
+        TurnRight(garrLanders[1], dt)
     end
     if love.keyboard.isDown("q") or love.keyboard.isDown("kp7") then
-        ThrustLeft(dt)
+        ThrustLeft(garrLanders[1], dt)
     end
     if love.keyboard.isDown("e") or love.keyboard.isDown("kp9") then
-        ThrustRight(dt)
+        ThrustRight(garrLanders[1], dt)
     end		
     if love.keyboard.isDown("p") then
         fun.AddScreen("Pause")
@@ -509,7 +509,7 @@ function Lander.update(dt)
     
     UpdateSmoke(dt)
     
-    PlaySoundEffects()
+    PlaySoundEffects(garrLanders[1])
     
     CheckForContact(garrLanders[1], dt)
 end
@@ -577,21 +577,21 @@ end
 
 
 function Lander.keypressed(key, scancode, isrepeat)
-	if Lander.isOnLandingPad(2) then	-- 2 = base type (fuel)
+	if Lander.isOnLandingPad(garrLanders[1], 2) then	-- 2 = base type (fuel)
 		if key == "1" then			 
-			PurchaseThrusters()
+			PurchaseThrusters(garrLanders[1])
 		end
 	
 		if key == "2" then			
-			PurchaseLargeTank()
+			PurchaseLargeTank(garrLanders[1])
 		end	
 		
 		if key == "3" then			
-			PurchaseRangeFinder()
+			PurchaseRangeFinder(garrLanders[1])
 		end
 
 		if key == "4" then			
-			PurchaseSideThrusters()
+			PurchaseSideThrusters(garrLanders[1])
 		end		
 	end
 end
