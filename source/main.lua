@@ -42,6 +42,7 @@ cf = require "lib.commonfunctions"
 menus = require "menus"
 enum = require "enum"
 ss = require "socketstuff"
+ai = require "ai"
 
 garrLanders = {}	
 garrGround = {}				-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
