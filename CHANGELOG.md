@@ -25,6 +25,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - window now starts windowed if in non-fused mode
 - added wallpaper to the main menu
 - added parameters to some functions to remove reliance on globals
+- re-organized lander and terrain functionality into separate files
 
 ### Fixed
 - fixed crash when the port number on the main menu was blank. Now only supports numbers
