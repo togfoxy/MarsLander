@@ -112,6 +112,7 @@ local function DrawScore()
 	love.graphics.setColor(1,1,1,1)
 	
 	love.graphics.print("score: " .. score, (gintScreenWidth / 2) - 50,75)
+	love.graphics.print("High Score: " .. garrGameSettings.HighScore, (gintScreenWidth / 2) - 75, 90)
 
 end
 

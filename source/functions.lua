@@ -71,6 +71,9 @@ function functions.LoadGameSettings()
 	if garrGameSettings.FullScreen == nil then
 		garrGameSettings.FullScreen = false
 	end
+	if garrGameSettings.HighScore == nil then
+		garrGameSettings.HighScore = 0
+	end
 end
 
 

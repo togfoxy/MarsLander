@@ -419,6 +419,7 @@ function Lander.create()
     landerObj.wealth = 0
     landerObj.health = 100				-- this is % meaning 100 = no damage
     landerObj.bolGameOver = false
+	landerObj.score = landerObj.x - gintOriginX
     landerObj.name = gstrCurrentPlayerName	
     
     -- mass	
