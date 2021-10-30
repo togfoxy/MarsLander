@@ -102,10 +102,10 @@ end
 
 
 function functions.LoadGame()
-    
+
     local savedir = love.filesystem.getSource()
     love.filesystem.setIdentity( savedir )
-    
+
     local savefile
     local contents
 
@@ -116,12 +116,11 @@ function functions.LoadGame()
     savefile = savedir .. "/" .. "ground.dat"
     contents, _ = nativefs.read( savefile) 
     garrGround = bitser.loads(contents)   
-   
+
     savefile = savedir .. "/" .. "objects.dat"
     contents, _ = nativefs.read(savefile) 
     garrObjects = bitser.loads(contents)  
-    
-  
+
 end
 
 
@@ -153,6 +152,71 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 
 end
 
+function functions.HandleSockets()
+	
+	-- add lander info to the outgoing queue
+	local msg = {}
+	msg.x = garrLanders[1].x
+	msg.y = garrLanders[1].y
+	msg.angle = garrLanders[1].angle
+	msg.name = garrLanders[1].name
+	-- ** msg is set here and sent below
+	
+	if gbolIsAHost then
+		ss.HostListenPort()
+		
+		-- get just one item from the queue and process it
+		repeat
+			local incoming = ss.GetItemInHostQueue()		-- could be nil
+			if incoming ~= nil then
+				if incoming.name == "ConnectionRequest" then
+					gbolIsConnected = true
+					msg = {}
+					msg.name = "ConnectionAccepted"
+
+				else
+					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end	
+			end
+		until incoming == nil
+			
+		ss.AddItemToHostOutgoingQueue(msg)
+		ss.SendToClients()
+		msg = {}
+	end
+	
+	if gbolIsAClient then
+		ss.ClientListenPort()
+		
+		-- get item from the queue and process it
+		repeat
+			local incoming = ss.GetItemInClientQueue()		-- could be nil
+			if incoming ~= nil then
+				if incoming.name == "ConnectionAccepted" then
+					gbolIsConnected = true
+					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
+						fun.SaveGameSettings()
+						fun.AddScreen("World")
+					end
+				else	
+					garrLanders[2] = {}
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end
+			end
+		until incoming == nil
+
+		ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
+		ss.SendToHost()
+		msg = {}
+	end
+end
 
 function functions.ResetGame()
 

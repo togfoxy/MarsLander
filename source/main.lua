@@ -29,13 +29,13 @@ lovelyToasts = require("lib.lovelyToasts")
 -- gintScreenWidth = 1920
 -- gintScreenHeight = 1080
 
-Lander = require("lander")
-Terrain = require("terrain")
-
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
 
 garrCurrentScreen = {}	
+
+Lander = require("lander")
+Terrain = require("terrain")
 
 cobjs = require "createobjects"
 dobjs = require "drawobjects"
@@ -199,7 +199,7 @@ function love.update(dt)
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 	
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" or strCurrentScreen == "Settings" then
-		Lander.handleSockets()
+		fun.HandleSockets()
 		Slab.Update(dt)		
 	end
 	
@@ -209,7 +209,7 @@ function love.update(dt)
 		
 		gLandingLightsAnimation:update(dt)
 		
-		Lander.handleSockets()
+		fun.HandleSockets()
 	end
 	
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
