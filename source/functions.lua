@@ -4,6 +4,7 @@ function functions.AddScreen(strNewScreen)
 	table.insert(garrCurrentScreen, strNewScreen)
 end
 
+
 function functions.RemoveScreen()
 	table.remove(garrCurrentScreen)
 	if #garrCurrentScreen < 1 then
@@ -14,6 +15,7 @@ function functions.RemoveScreen()
 	end
 end
 
+
 function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.
@@ -22,34 +24,6 @@ function functions.SwapScreen(newscreen)
     table.remove(garrCurrentScreen, #garrCurrentScreen - 1)
 end
 
-function functions.GetTerrainNoise(intAmountToCreate)
--- gets a predictable terrain value (deterministic) base on x
-
-	local groundtablesize = #garrGround
-	
-	local gameID = math.pi
-	
-	local terrainmaxheight = (gintScreenHeight * 0.90)
-	local terrainminheight = (gintScreenHeight * 0.65)
-	local terrainstep = (terrainmaxheight - terrainminheight) / 2
-	local terrainoctaves = 8
-	
-	repeat
-		terrainoctaves = terrainoctaves + 1
-	until 2 ^ terrainoctaves >= terrainstep
-	
-	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
-	
-		local newgroundaltitude
-		for oct = 1, terrainoctaves do
-			newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
-		end
-		if newgroundaltitude < terrainminheight then newgroundaltitude = terrainminheight end
-		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
-
-		table.insert(garrGround, newgroundaltitude)
-	end
-end
 
 function functions.GetLanderMass()
 -- return the mass of all the bits on the lander
@@ -67,6 +41,7 @@ function functions.GetLanderMass()
 	return result
 end
 
+
 function functions.SaveGameSettings()
 -- save game settings so they can be autoloaded next session
 	local savefile
@@ -78,6 +53,7 @@ function functions.SaveGameSettings()
     serialisedString = bitser.dumps(garrGameSettings)
     success, message = nativefs.write(savefile, serialisedString )
 end
+
 
 function functions.LoadGameSettings()
 
@@ -114,6 +90,7 @@ function functions.LoadGameSettings()
 	end
 end
 
+
 function functions.SaveGame()
 -- uses the globals because too hard to pass params
 
@@ -140,6 +117,7 @@ function functions.SaveGame()
     
 end
 
+
 function functions.LoadGame()
     
     local savedir = love.filesystem.getSource()
@@ -162,6 +140,7 @@ function functions.LoadGame()
     
   
 end
+
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
@@ -191,6 +170,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 
 end
 
+
 function functions.IsOnLandingPad(intBaseType)
 -- returns a true / false value
 
@@ -202,67 +182,12 @@ function functions.IsOnLandingPad(intBaseType)
 	end
 end
 
-function functions.InitialiseGround()
--- initialise the ground array to be a flat line
--- add bases to garrObjects
-
-	-- this creates a big flat space at the start of the game
-	for i = 0, (gintScreenWidth * 0.90) do
-		garrGround[i] = gintScreenHeight * 0.80
-	end
-	
-	fun.GetTerrainNoise(gintScreenWidth * 2)
-
-	-- Place bases
-	local basedistance = cf.round(gintScreenWidth * 1.5,0)
-	for i = 1, 20 do
-		cobjs.CreateObject(enum.basetypeFuel, basedistance)		-- 2 = fuel base
-		basedistance = cf.round(basedistance * 1.3,0)
-		if basedistance > #garrGround then fun.GetTerrainNoise(basedistance * 2) end
-	end
-	
-	-- place random buildings
-	for i = 1, 50 do
-		local bolPlacementOkay = false
-		local rndnum
-		repeat
-			rndnum = love.math.random(1, #garrGround)
-			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
-			if disttobase <= 250 and disttobase >= -250 then
-				-- too close to fuel base
-			else
-				bolPlacementOkay = true
-			end
-		until bolPlacementOkay
-		cobjs.CreateObject(enum.basetypeBuilding1, rndnum)
-	end
-	
-	-- place random buildings
-	for i = 1, 50 do
-		local bolPlacementOkay = false
-		local rndnum
-		repeat
-			rndnum = love.math.random(1, #garrGround)
-			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
-			if disttobase <= 250 and disttobase >= -250 then
-				-- too close to fuel base
-			else
-				bolPlacementOkay = true
-			end
-		until bolPlacementOkay
-		cobjs.CreateObject(enum.basetypeBuilding2, rndnum)
-	end
-	
-	--! Place spikes
-	
-	
-end
 
 function functions.ResetGame()
 
 	garrGround = {}
 	garrObjects = {}
-	fun.InitialiseGround()
+	Terrain.initialize()
 
 	garrLanders = {}
 	table.insert(garrLanders, cobjs.CreateLander())

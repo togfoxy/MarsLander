@@ -30,6 +30,8 @@ lovelyToasts = require("lib.lovelyToasts")
 -- gintScreenHeight = 1080
 
 
+Terrain = require("terrain")
+
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
 
