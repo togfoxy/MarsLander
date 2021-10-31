@@ -50,13 +50,17 @@ local function DetermineAction(LanderObj)
 	local preferredthrust, preferredangle
 	local landerx = cf.round(LanderObj.x, 0)
 	
-
+	-- get some important stats
 	if LanderObj.lastbaseid == nil then
 		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
 	end
-	
+	local lastbasex
+	if LanderObj.lastbaseid == 0 then
+		lastbasex = gintOriginX
+	else
+		lastbasex = garrObjects[LanderObj.lastbaseid].x 	
+	end
 	local nextbasex = garrObjects[LanderObj.nextbaseid].x 		
-	
 	local midpointx, midpointy
 	if LanderObj.lastbaseid == 0 then
 		midpointx = ((nextbasex - gintOriginX) / 2) + gintOriginX
@@ -68,46 +72,89 @@ local function DetermineAction(LanderObj)
 	
 	if landerx < midpointx then
 		-- lander is before the midpoint
-		-- ensure vertical velocity is appropriate relative to the midpoint
-		local ydelta = LanderObj.y - midpointy
-		local bestvy = (ydelta / 1000) * -1
-
-		if LanderObj.vy >= bestvy then
-			preferredthrust = true
+		
+		-- determine position relative to slope
+		local besty = garrGround[lastbasex] + (landerx - lastbasex)
+		if LanderObj.y > besty then
+			QIndex1 = "low"
+		else
+			QIndex1 = "high"
 		end
 		
-		preferredangle = 300
+		-- determine movement relative to slope
+		if LanderObj.vy < 0 then
+			-- gaining altiude
+			QIndex2 = "rising"
+		else
+			QIndex2 = "falling"
+		end
+		
+print(QIndex1,QIndex2)
+		
+		-- choose random actions
+		if love.math.random(1,2) == 1 then
+			preferredthrust = true
+		else
+			preferredthrust = false
+		end
+		
+		preferredangle = 265 + love.math.random(1,4) * 15
+		
+		-- capture this now to determine rewards later
+		LanderObj.previousydelta = math.abs(besty - LanderObj.y)
+		LanderObj.previousangle = preferredangle
+		LanderObj.previousthrust = preferredthrust
+		LanderObj.QIndex1 = QIndex1
+		LanderObj.QIndex2 = QIndex2
+		
+		preferredangle = 270+15
+		
+		-- ensure vertical velocity is appropriate relative to the midpoint
+		-- local ydelta = LanderObj.y - midpointy
+		-- local bestvy = (ydelta / 1000) * -1
+
+		-- if LanderObj.vy >= bestvy then
+			-- preferredthrust = true
+		-- end
+	
 	else
 		-- ensure vertical velocity is appropriate relative to the ground
 		preferredangle = 240
 		
-		local distfromnextbase = nextbasex + 85 - landerx			-- 85 is for the landing lights
+		-- calculate vy relative to slope
+		-- calculate vy relative to ground
+		-- calculate vx relative to slope
 		
-		local besty
-		if distfromnextbase < 0 then
-			besty = garrGround[landerx] + 50
-		else
-			besty = garrGround[landerx] - distfromnextbase
-		end
 		
-		if LanderObj.y > besty then
-			preferredthrust = true
-		end
+		
+		
+		-- local distfromnextbase = nextbasex + 125 - landerx			-- 85 is for the landing lights + 50 for margin
+		
+		-- local besty
+		-- if distfromnextbase < 0 then
+			-- -- gone past the base
+			-- besty = garrGround[landerx] + 50		-- set preferred altitude to above the base
+		-- else
+			-- besty = garrGround[landerx] - distfromnextbase
+		-- end
+		
+		-- if LanderObj.y > besty then
+			-- preferredthrust = true
+		-- end
 
-		local landeralt = garrGround[landerx] - LanderObj.y
-		local bestvy = landeralt / 175
-		if LanderObj.vy > bestvy then
-			preferredthrust = true
-		end
+		-- local landeralt = garrGround[landerx] - LanderObj.y
+		-- local bestvy = landeralt / 175
+		-- if LanderObj.vy > bestvy then
+			-- preferredthrust = true
+		-- end
 		
-		if LanderObj.vx > 0 and LanderObj.x > nextbasex + 85 then		-- the landing lights are actually past the base/object
-			-- drifting too far to the right
-			preferredangle = 240
-		end
-		if LanderObj.vx < 0 and LanderObj.x < nextbasex + 85 then
-			-- drifting too far to the right
-			preferredangle = 300
-		end		
+		-- if LanderObj.x > nextbasex + 125 then		-- the landing lights are actually past the base/object
+			-- -- drifting too far to the right
+			-- preferredangle = 240
+		-- end
+		-- if LanderObj.x < nextbasex + 125 then
+			-- preferredangle = 300
+		-- end		
 
 	end
 
@@ -116,15 +163,55 @@ local function DetermineAction(LanderObj)
 
 end
 
+local function ComputeRewards(LanderObj)
+-- calculate and assign rewards
+
+	local landerx = cf.round(LanderObj.x, 0)
+	if LanderObj.lastbaseid == nil then
+		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
+	end
+	local lastbasex
+	if LanderObj.lastbaseid == 0 then
+		lastbasex = gintOriginX
+	else
+		lastbasex = garrObjects[LanderObj.lastbaseid].x 	
+	end
+	
+	local besty = garrGround[lastbasex] + (landerx - lastbasex)
+	local currentydelta = math.abs(besty - LanderObj.y)
+	local previousydelta = LanderObj.previousydelta
+
+-- print(previousydelta,currentydelta)
+	
+	if currentydelta < previousydelta then
+		-- reward
+		QTable1[LanderObj.QIndex1][LanderObj.QIndex2][LanderObj.previousangle][LanderObj.previousthrust] = QTable1[LanderObj.QIndex1][LanderObj.QIndex2][LanderObj.previousangle][LanderObj.previousthrust] + 1
+	
+print(inspect(QTable1))	
+	else
+	
+	end
+	
+
+
+
+
+end
+
 function ai.DoAI(LanderObj, dt)
 
+	if QTable1 == nil then
+		QTable1 = {}
+	end
+
 	LanderObj.aitimer = LanderObj.aitimer - dt
-	if LanderObj.previousAngle == nil or LanderObj.aitimer <= 0 then
+	if LanderObj.aitimer <= 0 then
 		-- decide a new action
 		LanderObj.aitimer = 2		--! make this an enum later
 		
+		ComputeRewards(LanderObj)
 		LanderObj.preferredangle, LanderObj.preferredthrust = DetermineAction(LanderObj)
-	
+		
 	end
 	
 	if LanderObj.preferredthrust == true then
@@ -138,16 +225,14 @@ function ai.DoAI(LanderObj, dt)
 		Lander.TurnLeft(LanderObj,dt)
 	end	
 	
-	
-	
 	Lander.MoveShip(LanderObj, dt)
 	
 	Lander.CheckForContact(LanderObj, false, dt)
 	
-	if LanderObj.landed == true and LanderObj.fuel == LanderObj.fueltanksize then 
-		-- set new targets
-		DetermineAction(LanderObj)
-	end
+	-- if LanderObj.landed == true and LanderObj.fuel == LanderObj.fueltanksize then 
+		-- -- set new targets
+		-- DetermineAction(LanderObj)
+	-- end
 
 end
 

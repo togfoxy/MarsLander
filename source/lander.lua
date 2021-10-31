@@ -504,9 +504,11 @@ function Lander.update(dt)
 		local newLander = {}
 		newLander = Lander.create()
 		newLander.name = "AI"
-		newLander.aitimer = 2
+		newLander.aitimer = 1		--! make an enum later
 		newLander.angle = 270
 		newLander.preferredangle = 300
+		newLander.preferredthrust = true
+		newLander.previousydelta = 0
 		table.insert(garrLanders, newLander)
 	end	
 	
