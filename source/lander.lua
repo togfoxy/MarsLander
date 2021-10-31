@@ -118,18 +118,22 @@ function Lander.MoveShip(landerObj, dt)
 	
 end
 
-local function RefuelLander(landerObj, objBase, dt)
+local function RefuelLander(landerObj, objBase, bolIsPlayerVessel, dt)
 -- drain fuel from the base and add it to the lander
 -- objBase is an object/table item from garrObjects
 
-	local refuelamt = math.min(objBase.fuelqty, (landerObj.fueltanksize - landerObj.fuel), dt)
+	if bolIsPlayerVessel then
+		local refuelamt = math.min(objBase.fuelqty, (landerObj.fueltanksize - landerObj.fuel), dt)
 
-	objBase.fuelqty = objBase.fuelqty - refuelamt
-	landerObj.fuel = landerObj.fuel + refuelamt
-	
-	-- disable the base if the tanks are empty
-	if objBase.fuelqty <= 0 then objBase.active = false end
-
+		objBase.fuelqty = objBase.fuelqty - refuelamt
+		landerObj.fuel = landerObj.fuel + refuelamt
+		
+		-- disable the base if the tanks are empty
+		if objBase.fuelqty <= 0 then objBase.active = false end
+	else
+		local refuelamt = math.min((landerObj.fueltanksize - landerObj.fuel), dt)
+		landerObj.fuel = landerObj.fuel + refuelamt
+	end
 end
 
 local function PayLanderFromBase(landerObj, objBase, fltDist)
@@ -169,7 +173,7 @@ local function CheckForDamage(landerObj)
 
 end
 
-function Lander.CheckForContact(landerObj, dt)
+function Lander.CheckForContact(landerObj, bolIsPlayerVessel, dt)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(landerObj.x)
@@ -189,15 +193,18 @@ function Lander.CheckForContact(landerObj, dt)
 	groundYvalue = cf.round(garrGround[LanderXValue],0)
 
 	-- check if lander is at or below the terrain
-	if landerObj.y > groundYvalue - 8 then		-- the offset is the size of the lander image
+	if landerObj.y > groundYvalue - enum.constLanderImageYOffset then		-- the offset is the size of the lander image
 		landerObj.landed = true
 
 		if onbase then
-			RefuelLander(landerObj, bestbase,dt)
-			PayLanderFromBase(landerObj, bestbase, bestdist)
+			RefuelLander(landerObj, bestbase, bolIsPlayerVessel, dt)
+			
+			if bolIsPlayerVessel then
+				PayLanderFromBase(landerObj, bestbase, bestdist)
+			end
 			
 			-- if lander was airborne then track that now it's not.
-			if landerObj.airborne then
+			if landerObj.airborne and bolIsPlayerVessel then
 				-- this is the first landing on this base so pay wealth based on vertical and horizontal speed
 				PayLanderForControl(landerObj, bestbase)
 				bestbase.paid = true
@@ -491,7 +498,7 @@ function Lander.update(dt)
     
     PlaySoundEffects(garrLanders[1])
     
-    Lander.CheckForContact(garrLanders[1], dt)
+    Lander.CheckForContact(garrLanders[1], true, dt)
 	
 	if #garrLanders < 2 then
 		local newLander = {}

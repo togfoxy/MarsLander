@@ -4,6 +4,7 @@ module(...,package.seeall)
 constSmokeTimer = 0.5
 constVYThreshold = 0.60
 constGravity = 0.6
+constLanderImageYOffset = 8
 
 
 -- enumerators -- 

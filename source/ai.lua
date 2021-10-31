@@ -81,9 +81,21 @@ local function DetermineAction(LanderObj)
 		-- ensure vertical velocity is appropriate relative to the ground
 		preferredangle = 240
 		
+		local distfromnextbase = nextbasex + 85 - landerx			-- 85 is for the landing lights
+		
+		local besty
+		if distfromnextbase < 0 then
+			besty = garrGround[landerx] + 50
+		else
+			besty = garrGround[landerx] - distfromnextbase
+		end
+		
+		if LanderObj.y > besty then
+			preferredthrust = true
+		end
+
 		local landeralt = garrGround[landerx] - LanderObj.y
 		local bestvy = landeralt / 175
-		
 		if LanderObj.vy > bestvy then
 			preferredthrust = true
 		end
@@ -130,7 +142,12 @@ function ai.DoAI(LanderObj, dt)
 	
 	Lander.MoveShip(LanderObj, dt)
 	
-	Lander.CheckForContact(LanderObj, dt)
+	Lander.CheckForContact(LanderObj, false, dt)
+	
+	if LanderObj.landed == true and LanderObj.fuel == LanderObj.fueltanksize then 
+		-- set new targets
+		DetermineAction(LanderObj)
+	end
 
 end
 
