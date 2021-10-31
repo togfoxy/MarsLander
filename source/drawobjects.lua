@@ -108,11 +108,13 @@ end
 local function DrawScore()
 -- score is simply the amount of forward distance travelled (lander.x)
 	
-	local score = cf.strFormatThousand(tonumber(cf.round(garrLanders[1].x - gintOriginX,0)))
-	love.graphics.setColor(1,1,1,1)
-	
-	love.graphics.print("score: " .. score, (gintScreenWidth / 2) - 50,75)
+	local score = cf.strFormatThousand(tonumber(cf.round(fun.calculateScore())))
+	local highscore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
+	love.graphics.setColor(1,1,1,1)
+
+	love.graphics.print("score: " .. score, (gintScreenWidth / 2) - 50,75)
+	love.graphics.print("High Score: " .. highscore, (gintScreenWidth / 2) - 75, 90)
 end
 
 function HUD.draw(worldoffset)
