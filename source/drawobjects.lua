@@ -225,7 +225,7 @@ local function DrawDebug(worldoffset)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)
 	
 	-- print x/y info
-	local strText = "X " .. cf.round(garrLanders[1].x,0) .. " : Y " .. cf.round(garrLanders[1].y,0) .. " : vy " .. cf.round(garrLanders[1].vy,3)
+	local strText = "X " .. cf.round(garrLanders[1].x,0) .. " : Y " .. cf.round(garrLanders[1].y,0) .. " : vx " .. cf.round(garrLanders[1].vx,3)   .. " : vy " .. cf.round(garrLanders[1].vy,3)
 	love.graphics.print(strText, garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
 end

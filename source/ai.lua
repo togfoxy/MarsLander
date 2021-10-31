@@ -75,9 +75,8 @@ local function DetermineAction(LanderObj)
 	if landerx < midpointx then
 		-- lander is before the midpoint
 		
-		-- determine position relative to slope
+		-- determine vertical position relative to slope
 		local besty = garrGround[lastbasex] - (landerx - lastbasex)
--- print(besty, garrGround[lastbasex], landerx,  lastbasex)
 		
 		if LanderObj.y > besty then
 			QIndex1 = "low"
@@ -85,9 +84,7 @@ local function DetermineAction(LanderObj)
 			QIndex1 = "high"
 		end
 		
--- print(LanderObj.y, besty, QIndex1)
-		
-		-- determine movement relative to slope
+		-- determine vertical movement
 		if LanderObj.vy < 0 then
 			-- gaining altiude
 			QIndex2 = "rising"
@@ -134,7 +131,7 @@ local function DetermineAction(LanderObj)
 					preferredthrust = true 
 				end
 				
-				print(QIndex1, QIndex2, preferredangle, preferredthrust)
+				-- print(QIndex1, QIndex2, preferredangle, preferredthrust)
 		
 			end
 		end
@@ -150,54 +147,94 @@ local function DetermineAction(LanderObj)
 		else
 			LanderObj.previousthrust = 0
 		end
-		
-		-- ensure vertical velocity is appropriate relative to the midpoint
-		-- local ydelta = LanderObj.y - midpointy
-		-- local bestvy = (ydelta / 1000) * -1
-
-		-- if LanderObj.vy >= bestvy then
-			-- preferredthrust = true
-		-- end
 	
-	else
+	else	-- after midpoint. Use different logic
+	
 		-- ensure vertical velocity is appropriate relative to the ground
 		preferredangle = 240
 		preferredthrust = false
 		
-		-- calculate vy relative to slope
-		-- calculate vy relative to ground
-		-- calculate vx relative to slope
+		if not LanderObj.landed then
 		
 		
+			-- determine vertical position relative to slope
+			local besty = garrGround[nextbasex] - (nextbasex - landerx)
+			
+			if LanderObj.y > besty then
+				QIndex1 = "toolow"
+			else
+				QIndex1 = "toohigh"
+			end			
 		
-		
-		-- local distfromnextbase = nextbasex + 125 - landerx			-- 85 is for the landing lights + 50 for margin
-		
-		-- local besty
-		-- if distfromnextbase < 0 then
-			-- -- gone past the base
-			-- besty = garrGround[landerx] + 50		-- set preferred altitude to above the base
-		-- else
-			-- besty = garrGround[landerx] - distfromnextbase
-		-- end
-		
-		-- if LanderObj.y > besty then
-			-- preferredthrust = true
-		-- end
+			-- determine appropriate vx
+			local disttonextbase = nextbasex + 125 - landerx			-- 85 is for the landing lights + 50 for margin
+			local bestvx = disttonextbase / 200
 
-		-- local landeralt = garrGround[landerx] - LanderObj.y
-		-- local bestvy = landeralt / 175
-		-- if LanderObj.vy > bestvy then
-			-- preferredthrust = true
-		-- end
+			if LanderObj.vx > bestvx then
+				QIndex2 = "toofast"
+			else
+				QIndex2 = "tooslow"
+			end
+			
+			if love.math.random(1,2) == 1 then
+				-- do random exploratory moves
+			
+				-- choose random actions - exploratory
+				if love.math.random(1,2) == 1 then
+					preferredthrust = true
+				else
+					preferredthrust = false
+				end
+				
+				preferredangle = 180 + love.math.random(1,6) * 15		-- exploratory
+
+			else			
+				-- explotive
+				-- query best result from QTable1
+				local strTemp = QIndex1 .. QIndex2
+
+				if QTable1[strTemp] ~= nil then
+					local largestValue, key1, key2 = -999, "", ""
+					for k1,v1 in pairs(QTable1[strTemp]) do
+						if v1 > largestValue then
+							key1 = k1
+							largestValue = v1
+						end
+					end
+					
+					-- preferred action is key1
+					preferredangle = string.sub(key1, 1,3)
+					preferredangle = tonumber(preferredangle)
+					strThrust = string.sub(key1, 4,4)
+					
+
+					if strThrust == '0' then 
+						preferredthrust = false 
+					end
+					if strThrust == '1' then 
+						preferredthrust = true 
+					end
+					
+					--print(QIndex1, QIndex2, preferredangle, preferredthrust)
+			
+				end				
+
+			end
 		
-		-- if LanderObj.x > nextbasex + 125 then		-- the landing lights are actually past the base/object
-			-- -- drifting too far to the right
-			-- preferredangle = 240
-		-- end
-		-- if LanderObj.x < nextbasex + 125 then
-			-- preferredangle = 300
-		-- end		
+			-- capture this now to determine rewards later
+			LanderObj.previousydelta = math.abs(besty - LanderObj.y)
+			LanderObj.previousangle = preferredangle
+			
+			LanderObj.QIndex1 = QIndex1
+			LanderObj.QIndex2 = QIndex2
+			if preferredthrust then		-- convert true/false into 1/0
+				LanderObj.previousthrust = 1
+			else
+				LanderObj.previousthrust = 0
+			end		
+		
+
+		end
 
 	end
 
@@ -224,13 +261,10 @@ local function ComputeRewards(LanderObj)
 	local currentydelta = math.abs(besty - LanderObj.y)
 	local previousydelta = LanderObj.previousydelta
 	
--- print(LanderObj.QIndex1, LanderObj.QIndex2)
 	if LanderObj.QIndex1 ~= nil and LanderObj.QIndex2 ~= nil and LanderObj.previousangle ~= nil then
 
 		local strTemp1 = tostring(LanderObj.QIndex1 .. LanderObj.QIndex2)
 		local strTemp2 = tostring(LanderObj.previousangle .. LanderObj.previousthrust)
-
-	--print(strTemp1,strTemp2)
 		
 		if QTable1 == nil then QTable1 = {} end
 		if QTable1[strTemp1] == nil then QTable1[strTemp1] = {} end
