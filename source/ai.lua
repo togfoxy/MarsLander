@@ -132,13 +132,24 @@ local function newComputeRewards(LanderObj)
 		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
 	end
 	
-	-- is agent on base?
-	if LanderObj.x >= LanderObj.nextbasex and LanderObj.x <= LanderObj.nextbasex + 85 then
-		-- on base
-		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 10
-		LanderObj.lastbaseid = nil
-	end
 
+	-- did agent touch terrain?
+	-- get the height of the terrain under the lander
+	local LanderXValue = cf.round(LanderObj.x)
+	local groundYvalue = garrGround[LanderXValue]
+	if LanderObj.y > (groundYvalue - enum.constLanderImageYOffset) then		-- the offset is the size of the lander image
+		if LanderObj.x >= LanderObj.nextbasex and LanderObj.x <= LanderObj.nextbasex + 85 then
+			-- on base
+			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 10
+			LanderObj.lastbaseid = nil
+		else
+			-- off base
+			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 10
+		end
+	end
+	
+
+	if QTable1[strTemp1][strTemp2] > 30 then QTable1[strTemp1][strTemp2] = 30 end
 	fun.SaveQTable1()
 
 end
@@ -152,7 +163,7 @@ function ai.DoAI(LanderObj, dt)
 	LanderObj.aitimer = LanderObj.aitimer - dt
 	if LanderObj.aitimer <= 0 and LanderObj.fuel > 1 then
 		-- decide a new action
-		LanderObj.aitimer = 2		--! make this an enum later
+		LanderObj.aitimer = 1		--! make this an enum later
 		
 		if LanderObj.nextbaseid ~= nil then		-- these will be set on the first 'DetermineAction'
 			newComputeRewards(LanderObj)

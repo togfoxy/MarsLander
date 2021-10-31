@@ -409,6 +409,8 @@ function Lander.create()
     
     -- modules
     landerObj.modules = {}		-- this will be strings/names of modules
+	
+	landerObj.aitimer = 1
     
     return landerObj
 
@@ -515,6 +517,7 @@ function Lander.update(dt)
 		table.insert(garrLanders, newLander)
 	end	
 	
+	-- ai.DoAI(garrLanders[1], dt)
 	ai.DoAI(garrLanders[2], dt)
 end
 
