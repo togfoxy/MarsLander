@@ -13,7 +13,7 @@ local Lander = {}
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
-local function DoThrust(landerObj, dt)
+function DoThrust(landerObj, dt)
 
 	if landerObj.fuel - dt >= 0 or (Lander.hasUpgrade(landerObj, enum.moduleNamesThrusters) and landerObj.fuel - (dt * 0.80) >= 0) then
 
@@ -44,7 +44,7 @@ end
 
 
 
-local function TurnLeft(landerObj, dt)
+function TurnLeft(landerObj, dt)
 -- rotate the lander anti-clockwise
 
 	landerObj.angle = landerObj.angle - (90 * dt)
@@ -53,7 +53,7 @@ end
 
 
 
-local function TurnRight(landerObj, dt)
+function TurnRight(landerObj, dt)
 -- rotate the lander clockwise
 
 	landerObj.angle = landerObj.angle + (90 * dt)
@@ -63,7 +63,7 @@ end
 
 
 
-local function ThrustLeft(landerObj, dt)
+function ThrustLeft(landerObj, dt)
 
 	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
@@ -76,7 +76,7 @@ end
 
 
 
-local function ThrustRight(landerObj, dt)
+function ThrustRight(landerObj, dt)
 
 	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
@@ -90,7 +90,7 @@ end
 
 
 
-local function MoveShip(landerObj, dt)
+function MoveShip(landerObj, dt)
 
 	landerObj.x = landerObj.x + landerObj.vx
 	landerObj.y = landerObj.y + landerObj.vy
@@ -188,7 +188,7 @@ end
 
 
 
-local function CheckForContact(landerObj, dt)
+function CheckForContact(landerObj, dt)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(landerObj.x)
@@ -506,7 +506,7 @@ function Lander.update(dt)
         fun.AddScreen("Settings")
     end
 
-    MoveShip(garrLanders[1], dt)		--! some really inconsistent use of parameters here
+    MoveShip(garrLanders[1], dt)
     
     UpdateSmoke(dt)
     
@@ -514,7 +514,7 @@ function Lander.update(dt)
     
     CheckForContact(garrLanders[1], dt)
 	
-	ai.DoAI()
+	ai.DoAI(dt)
 end
 
 

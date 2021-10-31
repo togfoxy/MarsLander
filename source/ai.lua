@@ -46,7 +46,7 @@ end
 local ai = {}
 
 
-function ai.DoAI()
+function ai.DoAI(dt)
 
 	if #garrLanders < 2 then
 		local newLander = {}
@@ -54,9 +54,10 @@ function ai.DoAI()
 		newLander.name = "AI"
 		table.insert(garrLanders, newLander)
 	end
-
-
-
+	
+	lander.MoveShip(garrLanders[2], dt)
+	
+	lander.CheckForContact(garrLanders[2], dt)
 
 end
 
