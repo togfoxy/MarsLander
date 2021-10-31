@@ -16,6 +16,8 @@ if x seconds since last decision or no previous action then
 	end
 end
 
+MoveShip()
+
 function DetermineAction()
 	Ensure the previous base is understood							Lander.previousbaseid (int)
 	Ensure the next base is understood								Lander.nextbaseid (int)
@@ -45,6 +47,13 @@ local ai = {}
 
 
 function ai.DoAI()
+
+	if #garrLanders < 2 then
+		local newLander = {}
+		newLander = Lander.create()
+		newLander.name = "AI"
+		table.insert(garrLanders, newLander)
+	end
 
 
 
