@@ -117,11 +117,16 @@ function fltAbsoluteTileDistance(x1,y1,x2,y2)
 end
 
 function strFormatThousand(v)
-    local s = string.format("%d", math.floor(v))
-    local pos = string.len(s) % 3
-    if pos == 0 then pos = 3 end
-    return string.sub(s, 1, pos)
-    .. string.gsub(string.sub(s, pos+1), "(...)", ",%1")
+    local s = string.format("%d", math.floor(math.abs(v)))
+	local sign = ""
+
+	local pos = string.len(s) % 3
+	if pos == 0 then pos = 3 end
+	
+	-- special case for negative numbers
+	if v < 0 then sign = "-" end
+	
+    return sign .. string.sub(s, 1, pos) .. string.gsub(string.sub(s, pos+1), "(...)", ",%1")
 end
 
 local function GetCollisionMap(objMap)
