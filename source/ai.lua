@@ -54,46 +54,65 @@ local function DetermineAction(LanderObj)
 		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
 	end
 	
-	local disttopreviousbase = landerx - gintOriginX
-	if LanderObj.lastbaseid > 0 then
-		disttopreviousbase = landerx - garrObjects[LanderObj.lastbaseid].x
+	local midpointx, midpointy
+	if LanderObj.lastbaseid == 0 then
+		midpointx = ((garrObjects[LanderObj.nextbaseid].x - gintOriginX) / 2) + gintOriginX
+	else
+		midpointx = ((garrObjects[LanderObj.nextbaseid].x - garrObjects[LanderObj.lastbaseid].x) / 2) + garrObjects[LanderObj.lastbaseid].x
 	end
-	local disttonextbase = garrObjects[LanderObj.nextbaseid].x - landerx
+	midpointy = garrGround[midpointx] - garrObjects[LanderObj.nextbaseid].x - midpointx
 	
-	-- if before the midpoint then best slope is rising 
-	if disttonextbase > disttopreviousbase then
-		-- not yet at midpoint. Best slope is a rising slope
+	if landerx < midpointx then
+		-- lander is before the midpoint
+		-- ensure vertical velocity is appropriate
 		
-		-- determine rising slope y value
-		local previousbasex 
-		if LanderObj.lastbaseid >  0 then
-			previousbasex = garrObjects[LanderObj.lastbaseid].x
-		else
-			previousbasex = gintOriginX
-		end
+		local ydelta = LanderObj.y - midpointy
+		local bestvy = ydelta * -1
 		
-		besty = garrGround[landerx] - (landerx - previousbasex) - 8		-- the image size is 8 high (offset)
-		--besty = besty - 20		-- aim above the slope
+print(ydelta, bestvy)
 		
-		love.graphics.setColor(1,1,1,1)
-		love.graphics.circle("fill", landerx, besty, 5)
-		
-		
-		
-		
-		
-		
-		
-		if LanderObj.y > besty then
+		if LanderObj.vy >= bestvy then
 			preferredthrust = true
-		else
-			preferredthrust = false
 		end
 			
-		
-	else
-		-- past midpoint. Best slope is a falling slope
+	
 	end
+	
+	
+	
+	
+	
+	-- local disttopreviousbase = landerx - gintOriginX
+	-- if LanderObj.lastbaseid > 0 then
+		-- disttopreviousbase = landerx - garrObjects[LanderObj.lastbaseid].x
+	-- end
+	-- local disttonextbase = garrObjects[LanderObj.nextbaseid].x - landerx
+
+	
+	-- -- if before the midpoint then best slope is rising 
+	-- if disttonextbase > disttopreviousbase then
+		-- -- not yet at midpoint. Best slope is a rising slope
+		
+		-- -- determine rising slope y value
+		-- local previousbasex 
+		-- if LanderObj.lastbaseid >  0 then
+			-- previousbasex = garrObjects[LanderObj.lastbaseid].x
+		-- else
+			-- previousbasex = gintOriginX
+		-- end
+		
+		-- besty = garrGround[landerx] - (landerx - previousbasex) - 8		-- the image size is 8 high (offset)
+	
+		-- if LanderObj.y > besty then
+			-- preferredthrust = true
+		-- else
+			-- preferredthrust = false
+		-- end
+			
+		
+	-- else
+		-- -- past midpoint. Best slope is a falling slope
+	-- end
 	
 	return 300, preferredthrust
 
