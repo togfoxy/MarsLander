@@ -49,22 +49,26 @@ local function DetermineAction(LanderObj)
 
 	local preferredthrust, preferredangle
 	local landerx = cf.round(LanderObj.x, 0)
+	
 
 	if LanderObj.lastbaseid == nil then
 		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
 	end
 	
+	local nextbasex = garrObjects[LanderObj.nextbaseid].x 		
+	
 	local midpointx, midpointy
 	if LanderObj.lastbaseid == 0 then
-		midpointx = ((garrObjects[LanderObj.nextbaseid].x - gintOriginX) / 2) + gintOriginX
+		midpointx = ((nextbasex - gintOriginX) / 2) + gintOriginX
 	else
-		midpointx = ((garrObjects[LanderObj.nextbaseid].x - garrObjects[LanderObj.lastbaseid].x) / 2) + garrObjects[LanderObj.lastbaseid].x
+		midpointx = ((nextbasex - garrObjects[LanderObj.lastbaseid].x) / 2) + garrObjects[LanderObj.lastbaseid].x
 	end
-	midpointy = garrGround[midpointx] - (garrObjects[LanderObj.nextbaseid].x - midpointx)
+	midpointx = midpointx - 150		-- the 'goal' is before the apex
+	midpointy = garrGround[midpointx] - (nextbasex - midpointx)
 	
 	if landerx < midpointx then
 		-- lander is before the midpoint
-		-- ensure vertical velocity is appropriate
+		-- ensure vertical velocity is appropriate relative to the midpoint
 		local ydelta = LanderObj.y - midpointy
 		local bestvy = (ydelta / 1000) * -1
 
@@ -74,10 +78,26 @@ local function DetermineAction(LanderObj)
 		
 		preferredangle = 300
 	else
+		-- ensure vertical velocity is appropriate relative to the ground
 		preferredangle = 240
+		
+		local landeralt = garrGround[landerx] - LanderObj.y
+		local bestvy = landeralt / 175
+		
+		if LanderObj.vy > bestvy then
+			preferredthrust = true
+		end
+		
+		if LanderObj.vx > 0 and LanderObj.x > nextbasex + 85 then		-- the landing lights are actually past the base/object
+			-- drifting too far to the right
+			preferredangle = 240
+		end
+		if LanderObj.vx < 0 and LanderObj.x < nextbasex + 85 then
+			-- drifting too far to the right
+			preferredangle = 300
+		end		
 
 	end
-	
 
 	return preferredangle, preferredthrust
 
