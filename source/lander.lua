@@ -482,10 +482,10 @@ function Lander.update(dt)
         Lander.TurnRight(garrLanders[1], dt)
     end
     if love.keyboard.isDown("q") or love.keyboard.isDown("kp7") then
-        ThrustLeft(garrLanders[1], dt)
+        Lander.ThrustLeft(garrLanders[1], dt)
     end
     if love.keyboard.isDown("e") or love.keyboard.isDown("kp9") then
-        ThrustRight(garrLanders[1], dt)
+        Lander.ThrustRight(garrLanders[1], dt)
     end		
     if love.keyboard.isDown("p") then
         fun.AddScreen("Pause")
