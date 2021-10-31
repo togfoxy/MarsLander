@@ -30,7 +30,7 @@ function DetermineAction()
 	else
 		Determine if above or below slope
 		Determine if targetx is in-front or behind
-		Look up QTable
+		Look up QTable1
 		Slope / direction
 		[above slope / below slope] = thrust on / thrust off
 		
@@ -47,7 +47,7 @@ local ai = {}
 
 local function DetermineAction(LanderObj)
 
-	local preferredthrust, preferredangle
+	local preferredthrust, preferredangle = true, 270
 	local landerx = cf.round(LanderObj.x, 0)
 	
 	-- get some important stats
@@ -70,16 +70,22 @@ local function DetermineAction(LanderObj)
 	midpointx = midpointx - 150		-- the 'goal' is before the apex
 	midpointy = garrGround[midpointx] - (nextbasex - midpointx)
 	
+	-- no do some smarts
+	
 	if landerx < midpointx then
 		-- lander is before the midpoint
 		
 		-- determine position relative to slope
-		local besty = garrGround[lastbasex] + (landerx - lastbasex)
-		if LanderObj.y < besty then
+		local besty = garrGround[lastbasex] - (landerx - lastbasex)
+-- print(besty, garrGround[lastbasex], landerx,  lastbasex)
+		
+		if LanderObj.y > besty then
 			QIndex1 = "low"
 		else
 			QIndex1 = "high"
 		end
+		
+-- print(LanderObj.y, besty, QIndex1)
 		
 		-- determine movement relative to slope
 		if LanderObj.vy < 0 then
@@ -89,15 +95,49 @@ local function DetermineAction(LanderObj)
 			QIndex2 = "falling"
 		end
 		
-		-- choose random actions
 		if love.math.random(1,2) == 1 then
-			preferredthrust = true
-		else
-			preferredthrust = false
-		end
+			-- do random exploratory moves
 		
-		preferredangle = 255 + love.math.random(1,4) * 15
-		preferredangle = 270
+			-- choose random actions - exploratory
+			if love.math.random(1,2) == 1 then
+				preferredthrust = true
+			else
+				preferredthrust = false
+			end
+			
+			preferredangle = 255 + love.math.random(1,4) * 15		-- exploratory
+			-- preferredangle = 270
+		else
+			-- explotive
+			-- query best result from QTable1
+			local strTemp = QIndex1 .. QIndex2
+
+			if QTable1[strTemp] ~= nil then
+				local largestValue, key1, key2 = -999, "", ""
+				for k1,v1 in pairs(QTable1[strTemp]) do
+					if v1 > largestValue then
+						key1 = k1
+						largestValue = v1
+					end
+				end
+				
+				-- preferred action is key1
+				preferredangle = string.sub(key1, 1,3)
+				preferredangle = tonumber(preferredangle)
+				strThrust = string.sub(key1, 4,4)
+				
+
+				if strThrust == '0' then 
+					preferredthrust = false 
+				end
+				if strThrust == '1' then 
+					preferredthrust = true 
+				end
+				
+				print(QIndex1, QIndex2, preferredangle, preferredthrust)
+		
+			end
+		end
 		
 		-- capture this now to determine rewards later
 		LanderObj.previousydelta = math.abs(besty - LanderObj.y)
@@ -122,6 +162,7 @@ local function DetermineAction(LanderObj)
 	else
 		-- ensure vertical velocity is appropriate relative to the ground
 		preferredangle = 240
+		preferredthrust = false
 		
 		-- calculate vy relative to slope
 		-- calculate vy relative to ground
@@ -179,30 +220,34 @@ local function ComputeRewards(LanderObj)
 		lastbasex = garrObjects[LanderObj.lastbaseid].x 	
 	end
 	
-	local besty = garrGround[lastbasex] - (landerx - lastbasex)
+	local besty = garrGround[lastbasex] - (landerx - lastbasex)	
 	local currentydelta = math.abs(besty - LanderObj.y)
 	local previousydelta = LanderObj.previousydelta
-
-print (landerx, cf.round(LanderObj.y, 0), besty)
 	
-	if currentydelta < previousydelta then
-		-- reward
-		local strTemp = LanderObj.QIndex1 .. LanderObj.QIndex2 .. LanderObj.previousangle .. LanderObj.previousthrust
+-- print(LanderObj.QIndex1, LanderObj.QIndex2)
+	if LanderObj.QIndex1 ~= nil and LanderObj.QIndex2 ~= nil and LanderObj.previousangle ~= nil then
 
-		if QTable1[strTemp] ==  nil then
-			QTable1[strTemp] = {}
-			QTable1[strTemp].value = 0
+		local strTemp1 = tostring(LanderObj.QIndex1 .. LanderObj.QIndex2)
+		local strTemp2 = tostring(LanderObj.previousangle .. LanderObj.previousthrust)
+
+	--print(strTemp1,strTemp2)
+		
+		if QTable1 == nil then QTable1 = {} end
+		if QTable1[strTemp1] == nil then QTable1[strTemp1] = {} end
+		if QTable1[strTemp1][strTemp2] == nil then
+			QTable1[strTemp1][strTemp2] = {}
+			QTable1[strTemp1][strTemp2] = 0
 		end
-		QTable1[strTemp].value = QTable1[strTemp].value + 1
-	
---print(inspect(QTable1))
-	
-	else
-		-- no reward
-	
+		
+		if currentydelta < previousydelta then
+			-- reward
+			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 1
+		else
+			-- negative reward
+			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
+		end
+		fun.SaveQTable1()
 	end
-
-
 end
 
 function ai.DoAI(LanderObj, dt)
@@ -225,12 +270,15 @@ function ai.DoAI(LanderObj, dt)
 		Lander.DoThrust(LanderObj, dt)
 	end
 	
-	if LanderObj.angle < LanderObj.preferredangle then
-		Lander.TurnRight(LanderObj,dt)
+	if LanderObj.preferredangle ~= nil then
+		if LanderObj.angle < LanderObj.preferredangle then
+			Lander.TurnRight(LanderObj,dt)
+		end
+
+		if LanderObj.angle > LanderObj.preferredangle then
+			Lander.TurnLeft(LanderObj,dt)
+		end	
 	end
-	if LanderObj.angle > LanderObj.preferredangle then
-		Lander.TurnLeft(LanderObj,dt)
-	end	
 	
 	Lander.MoveShip(LanderObj, dt)
 	

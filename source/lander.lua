@@ -25,7 +25,7 @@ function Lander.DoThrust(landerObj, dt)
 		
 		-- adjust the thrust based on ship mass
 		local massratio = gintDefaultMass / Lander.getMass(landerObj)	-- less mass = higher ratio = more thrust = less fuel needed to move
-		if gbolDebug then garrMassRatio = massratio end			-- for debugging only
+		garrMassRatio = massratio		-- for debugging only
 		force_x = force_x * massratio
 		force_y = force_y * massratio
 
@@ -382,6 +382,8 @@ function Lander.create()
     landerObj.y = 500
     landerObj.y = garrGround[landerObj.x] - 8
     landerObj.angle = 270		-- 270 = up
+	landerObj.preferredangle = 270
+	landerObj.preferredthrust = true
     landerObj.vx = 0
     landerObj.vy = 0
     landerObj.engineOn = false

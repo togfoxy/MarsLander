@@ -4,7 +4,6 @@ function functions.AddScreen(strNewScreen)
 	table.insert(garrCurrentScreen, strNewScreen)
 end
 
-
 function functions.RemoveScreen()
 	table.remove(garrCurrentScreen)
 	if #garrCurrentScreen < 1 then
@@ -15,7 +14,6 @@ function functions.RemoveScreen()
 	end
 end
 
-
 function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.
@@ -24,6 +22,17 @@ function functions.SwapScreen(newscreen)
     table.remove(garrCurrentScreen, #garrCurrentScreen - 1)
 end
 
+function functions.SaveQTable1()
+	local savefile
+	local serialisedString
+	local success, message
+	local savedir = love.filesystem.getSource()
+
+    savefile = savedir .. "/" .. "qtable1.dat"
+    serialisedString = bitser.dumps(QTable1)
+    success, message = nativefs.write(savefile, serialisedString )
+
+end
 
 function functions.SaveGameSettings()
 -- save game settings so they can be autoloaded next session
@@ -37,12 +46,11 @@ function functions.SaveGameSettings()
     success, message = nativefs.write(savefile, serialisedString )
 end
 
-
 function functions.LoadGameSettings()
 
     local savedir = love.filesystem.getSource()
     love.filesystem.setIdentity( savedir )
-    
+
     local savefile, contents
 
     savefile = savedir .. "/" .. "settings.dat"
@@ -74,10 +82,19 @@ function functions.LoadGameSettings()
 	if garrGameSettings.HighScore == nil then
 		garrGameSettings.HighScore = 0
 	end
+	
+    savefile = savedir .. "/" .. "qtable1.dat"
+    contents, _ = nativefs.read(savefile) 
+	local success
+    success, QTable1 = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
+	if not success then QTable1 = {} end
+	
+print("QTable1 row count: " .. #QTable1)
+print(inspect(QTable1))
+	
 end
 
-
-function functions.SaveGame()
+function functions.SaveGame()	--! can these save games be 'parameterised' and consolidated into a single function?
 -- uses the globals because too hard to pass params
 
 --! for some reason bitser throws runtime error when serialising true / false values.
@@ -102,7 +119,6 @@ function functions.SaveGame()
 	lovelyToasts.show("Game saved",3, "middle")
     
 end
-
 
 function functions.LoadGame()
 
