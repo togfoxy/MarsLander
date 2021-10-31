@@ -4,259 +4,103 @@
 
 local ai = {}
 
-local function DetermineAction(LanderObj)
+local function newDetermineAction(LanderObj)
 
-	local preferredthrust, preferredangle = true, 270
-	local landerx = cf.round(LanderObj.x, 0)
-	local besty		-- will be set further down and reflects the 'slope'
+	local preferredangle, preferredthrust
 	
 	-- get some important stats
 	if LanderObj.lastbaseid == nil then
 		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
+		LanderObj.nextbasex = garrObjects[LanderObj.nextbaseid].x
 	end
-	local lastbasex
-	if LanderObj.lastbaseid == 0 then
-		lastbasex = gintOriginX
+	
+	if love.math.random(1,2) == 1 then
+		-- exploratory
+		preferredangle = 180 + love.math.random(1,11) * 15
+		preferredthrust = love.math.random(1,2)
+	
 	else
-		lastbasex = garrObjects[LanderObj.lastbaseid].x 	
-	end
-	local nextbasex = garrObjects[LanderObj.nextbaseid].x 		
-	local midpointx, midpointy
-	if LanderObj.lastbaseid == 0 then
-		midpointx = ((nextbasex - gintOriginX) / 2) + gintOriginX
-	else
-		midpointx = ((nextbasex - garrObjects[LanderObj.lastbaseid].x) / 2) + garrObjects[LanderObj.lastbaseid].x
-	end
-	midpointx = midpointx - 150		-- the 'goal' is before the apex
-	midpointy = garrGround[midpointx] - (nextbasex - midpointx)
+		-- exploitive
+		local distance = cf.round(math.abs(LanderObj.nextbasex - LanderObj.x),0)
+		local strTemp = tostring(distance) .. tostring(LanderObj.y) .. tostring(LanderObj.vx) .. tostring(LanderObj.vy)
 	
-	-- no do some smarts
-	
-	if landerx < midpointx then
-		-- lander is before the midpoint
-		
-		-- determine vertical position relative to slope
-		besty = garrGround[lastbasex] - (landerx - lastbasex)
-		
-		if LanderObj.y > besty then
-			QIndex1 = "low"
+		-- query best result from QTable1
+		if QTable1[strTemp] ~= nil then
+			local largestValue, key1, key2 = -999, "", ""
+			for k1,v1 in pairs(QTable1[strTemp]) do
+				if v1 > largestValue then
+					key1 = k1
+					largestValue = v1
+				end
+			end
+			
+			-- preferred action is key1
+			preferredangle = string.sub(key1, 1,3)
+			preferredangle = tonumber(preferredangle)
+			strThrust = string.sub(key1, 4,4)
+
+print("Found an option: " .. strTemp, preferredangle, preferredthrust)
 		else
-			QIndex1 = "high"
-		end
-		
-		-- determine vertical movement
-		if LanderObj.vy < 0 then
-			-- gaining altiude
-			QIndex2 = "rising"
-		else
-			QIndex2 = "falling"
-		end
-		
-		if love.math.random(1,5) == 1 then
-			-- do random exploratory moves
-		
-			-- choose random actions - exploratory
-			if love.math.random(1,2) == 1 then
-				preferredthrust = true
-			else
-				preferredthrust = false
-			end
-			
-			preferredangle = 255 + love.math.random(1,4) * 15		-- exploratory
-			-- preferredangle = 270
-		else
-			-- explotive
-			-- query best result from QTable1
-			local strTemp = QIndex1 .. QIndex2
-
-			if QTable1[strTemp] ~= nil then
-				local largestValue, key1, key2 = -999, "", ""
-				for k1,v1 in pairs(QTable1[strTemp]) do
-					if v1 > largestValue then
-						key1 = k1
-						largestValue = v1
-					end
-				end
-				
-				-- preferred action is key1
-				preferredangle = string.sub(key1, 1,3)
-				preferredangle = tonumber(preferredangle)
-				strThrust = string.sub(key1, 4,4)
-				
-
-				if strThrust == '0' then 
-					preferredthrust = false 
-				end
-				if strThrust == '1' then 
-					preferredthrust = true 
-				end
-				
-				-- print(QIndex1, QIndex2, preferredangle, preferredthrust)
-			end
-		end
-
-	else	-- after midpoint. Use different logic
-	
-		-- ensure vertical velocity is appropriate relative to the ground
-		preferredangle = 240
-		preferredthrust = false
-		
-		besty = garrGround[nextbasex] - (nextbasex - landerx)
-		
-		if not LanderObj.landed then
-		
-		
-			-- determine vertical position relative to slope
-			besty = garrGround[nextbasex] - (nextbasex - landerx)
-			
-			if LanderObj.y > besty then
-				QIndex1 = "toolow"
-			else
-				QIndex1 = "toohigh"
-			end			
-		
-			-- determine appropriate vx
-			local disttonextbase = nextbasex + 125 - landerx			-- 85 is for the landing lights + 50 for margin
-			local bestvx = disttonextbase / 200
-
-			if LanderObj.vx > bestvx then
-				QIndex2 = "toofast"
-			else
-				QIndex2 = "tooslow"
-			end
-			
-			if love.math.random(1,5) == 1 then
-				-- do random exploratory moves
-			
-				-- choose random actions - exploratory
-				if love.math.random(1,2) == 1 then
-					preferredthrust = true
-				else
-					preferredthrust = false
-				end
-				
-				preferredangle = 180 + love.math.random(1,11) * 15		-- exploratory
-
-			else			
-				-- explotive
-				-- query best result from QTable1
-				local strTemp = QIndex1 .. QIndex2
-
-				if QTable1[strTemp] ~= nil then
-					local largestValue, key1, key2 = -999, "", ""
-					for k1,v1 in pairs(QTable1[strTemp]) do
-						if v1 > largestValue then
-							key1 = k1
-							largestValue = v1
-						end
-					end
-					
-					-- preferred action is key1
-					preferredangle = string.sub(key1, 1,3)
-					preferredangle = tonumber(preferredangle)
-					strThrust = string.sub(key1, 4,4)
-					
-
-					if strThrust == '0' then 
-						preferredthrust = false 
-					end
-					if strThrust == '1' then 
-						preferredthrust = true 
-					end
-					
-					--print(QIndex1, QIndex2, preferredangle, preferredthrust)
-			
-				end				
-
-			end
-			
-			-- automatically apply thrusters if close to ground. This overwrites any AI decision
-			local bestvy = (garrGround[nextbasex] - LanderObj.y) / 240
-
-print(LanderObj.vy , bestvy)
-			
-			if LanderObj.vy > bestvy then
-				preferredthrust = true
-print("delta")
-			end
-
-		end
-
+			-- go random
+			-- exploratory
+			preferredangle = 180 + love.math.random(1,11) * 15
+			preferredthrust = love.math.random(1,2)			
+		end		
 	end
-	
-	-- automatically set direction if clearly wrong
-	if landerx < nextbasex and LanderObj.vx < 0 and LanderObj.preferredangle < 285 then 
-		LanderObj.preferredangle = 285 
-print("alpha")
-	end
-	if landerx > nextbasex and LanderObj.vx > 0 and LanderObj.preferredangle > 255 then 
-		LanderObj.preferredangle = 255 
-print("bravo")
-	end	
-	
-	if LanderObj.y < 0 then 
-		preferredthrust = false
-print("charlie")
-	end
-	
 	
 	-- capture this now to determine rewards later
-	LanderObj.previousydelta = math.abs(besty - LanderObj.y)
-	LanderObj.previousangle = preferredangle
+	LanderObj.previousdistance = cf.round(math.abs(LanderObj.nextbasex - LanderObj.x),0)
+	LanderObj.previousy = cf.round(LanderObj.y)
+	LanderObj.previousvx = cf.round(LanderObj.vx,1)
+	LanderObj.previousvy = cf.round(LanderObj.vy,1)
 	
-	LanderObj.QIndex1 = QIndex1
-	LanderObj.QIndex2 = QIndex2
-	if preferredthrust then		-- convert true/false into 1/0
-		LanderObj.previousthrust = 1
+	LanderObj.previousangle = preferredangle
+	LanderObj.previousthrust = preferredthrust		-- 1 or 2
+	
+	
+	-- convert to boolean just prior to RETURN
+	if preferredthrust == 1 then 
+		preferredthrust = false
 	else
-		LanderObj.previousthrust = 0
-	end	
-			
+		preferredthrust = true
+	end
 	return preferredangle, preferredthrust
-
-
 end
 
-local function ComputeRewards(LanderObj)
--- calculate and assign rewards
+local function newComputeRewards(LanderObj)
 
-	local landerx = cf.round(LanderObj.x, 0)
-	if LanderObj.lastbaseid == nil then
-		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
+	-- is agent closer to base?
+	local olddistance = LanderObj.previousdistance
+	local newdistance = math.abs(LanderObj.nextbasex - LanderObj.x)
+	
+	local strTemp1 = tostring(LanderObj.previousdistance) .. tostring(LanderObj.previousy) .. tostring(LanderObj.previousvx) .. tostring(LanderObj.previousvy)
+	local strTemp2 = tostring(LanderObj.previousangle .. LanderObj.previousthrust)
+	
+	-- initialise QTable1
+	if QTable1 == nil then QTable1 = {} end
+	if QTable1[strTemp1] == nil then QTable1[strTemp1] = {} end
+	if QTable1[strTemp1][strTemp2] == nil then
+		QTable1[strTemp1][strTemp2] = {}
+		QTable1[strTemp1][strTemp2] = 0
 	end
-	local lastbasex
-	if LanderObj.lastbaseid == 0 then
-		lastbasex = gintOriginX
-	else
-		lastbasex = garrObjects[LanderObj.lastbaseid].x 	
+		
+	if newdistance < olddistance then
+		-- reward
+		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 1
+	elseif newdistance > olddistance then
+		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
 	end
 	
-	local besty = garrGround[lastbasex] - (landerx - lastbasex)	
-	local currentydelta = math.abs(besty - LanderObj.y)
-	local previousydelta = LanderObj.previousydelta
-	
-	if LanderObj.QIndex1 ~= nil and LanderObj.QIndex2 ~= nil and LanderObj.previousangle ~= nil then
-
-		local strTemp1 = tostring(LanderObj.QIndex1 .. LanderObj.QIndex2)
-		local strTemp2 = tostring(LanderObj.previousangle .. LanderObj.previousthrust)
-		
-		if QTable1 == nil then QTable1 = {} end
-		if QTable1[strTemp1] == nil then QTable1[strTemp1] = {} end
-		if QTable1[strTemp1][strTemp2] == nil then
-			QTable1[strTemp1][strTemp2] = {}
-			QTable1[strTemp1][strTemp2] = 0
-		end
-		
-		if currentydelta < previousydelta then
-			-- reward
-			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 1
-print("REWARD")
-		else
-			-- negative reward
-			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
-		end
-		fun.SaveQTable1()
+	-- is agent off the top of the screen?
+	if LanderObj.y <= 0 then
+		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
 	end
+	
+	
+	
+	
+	fun.SaveQTable1()
+
 end
 
 function ai.DoAI(LanderObj, dt)
@@ -270,8 +114,10 @@ function ai.DoAI(LanderObj, dt)
 		-- decide a new action
 		LanderObj.aitimer = 2		--! make this an enum later
 		
-		ComputeRewards(LanderObj)
-		LanderObj.preferredangle, LanderObj.preferredthrust = DetermineAction(LanderObj)
+		if LanderObj.nextbaseid ~= nil then		-- these will be set on the first 'DetermineAction'
+			newComputeRewards(LanderObj)
+		end
+		LanderObj.preferredangle, LanderObj.preferredthrust = newDetermineAction(LanderObj)
 		
 	end
 	
