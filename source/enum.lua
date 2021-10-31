@@ -10,6 +10,7 @@ constGravity = 0.6
 
 basetypeFuel = 2
 basetypeBuilding1 = 7
+basetypeBuilding1 = 8
 
 baseMaxFuel = 15
 

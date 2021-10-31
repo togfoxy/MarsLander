@@ -8,8 +8,9 @@ if x seconds since last decision or no previous action then
 
 		Record action in lander
 	else
-		Reward if closer to slope
-		Reward if closer to base
+		Reward if y = closer to slope
+		Reward if x = closer to base
+		Reward if vx = reasonable range
 		
 		DetermineAction
 	end
@@ -43,10 +44,12 @@ end
 local ai = {}
 
 
+function ai.DoAI()
 
 
 
 
+end
 
 return ai
 

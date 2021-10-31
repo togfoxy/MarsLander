@@ -4,6 +4,7 @@ function functions.AddScreen(strNewScreen)
 	table.insert(garrCurrentScreen, strNewScreen)
 end
 
+
 function functions.RemoveScreen()
 	table.remove(garrCurrentScreen)
 	if #garrCurrentScreen < 1 then
@@ -14,6 +15,7 @@ function functions.RemoveScreen()
 	end
 end
 
+
 function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.
@@ -22,50 +24,6 @@ function functions.SwapScreen(newscreen)
     table.remove(garrCurrentScreen, #garrCurrentScreen - 1)
 end
 
-function functions.GetTerrainNoise(intAmountToCreate)
--- gets a predictable terrain value (deterministic) base on x
-
-	local groundtablesize = #garrGround
-	
-	local gameID = math.pi
-	
-	local terrainmaxheight = (gintScreenHeight * 0.90)
-	local terrainminheight = (gintScreenHeight * 0.65)
-	local terrainstep = (terrainmaxheight - terrainminheight) / 2
-	local terrainoctaves = 8
-	
-	repeat
-		terrainoctaves = terrainoctaves + 1
-	until 2 ^ terrainoctaves >= terrainstep
-	
-	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
-	
-		local newgroundaltitude
-		for oct = 1, terrainoctaves do
-			newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
-		end
-		if newgroundaltitude < terrainminheight then newgroundaltitude = terrainminheight end
-		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
-
-		table.insert(garrGround, newgroundaltitude)
-	end
-end
-
-function functions.GetLanderMass(Lander)
--- return the mass of all the bits on the lander
-
-	local result = 0
-
-	-- all the masses are stored in this table so add them up
-	for i = 1, #Lander.mass do
-		result = result + Lander.mass[i]
-	end
-	
-	-- add the mass of the fuel
-	result = result + Lander.fuel
-	
-	return result
-end
 
 function functions.SaveGameSettings()
 -- save game settings so they can be autoloaded next session
@@ -78,6 +36,7 @@ function functions.SaveGameSettings()
     serialisedString = bitser.dumps(garrGameSettings)
     success, message = nativefs.write(savefile, serialisedString )
 end
+
 
 function functions.LoadGameSettings()
 
@@ -112,7 +71,11 @@ function functions.LoadGameSettings()
 	if garrGameSettings.FullScreen == nil then
 		garrGameSettings.FullScreen = false
 	end
+	if garrGameSettings.HighScore == nil then
+		garrGameSettings.HighScore = 0
+	end
 end
+
 
 function functions.SaveGame()
 -- uses the globals because too hard to pass params
@@ -140,11 +103,12 @@ function functions.SaveGame()
     
 end
 
+
 function functions.LoadGame()
-    
+
     local savedir = love.filesystem.getSource()
     love.filesystem.setIdentity( savedir )
-    
+
     local savefile
     local contents
 
@@ -155,12 +119,22 @@ function functions.LoadGame()
     savefile = savedir .. "/" .. "ground.dat"
     contents, _ = nativefs.read( savefile) 
     garrGround = bitser.loads(contents)   
-   
+
     savefile = savedir .. "/" .. "objects.dat"
     contents, _ = nativefs.read(savefile) 
     garrObjects = bitser.loads(contents)  
-    
-  
+
+end
+
+function functions.CalculateScore()
+	local score = garrLanders[1].x - gintOriginX
+	
+	if score > garrGameSettings.HighScore then
+		garrGameSettings.HighScore = score
+		fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
+	end
+
+	return score
 end
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
@@ -191,93 +165,82 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 
 end
 
-function functions.IsOnLandingPad(intBaseType)
--- returns a true / false value
-
-	local mydist, _ = fun.GetDistanceToClosestBase(garrLanders[1].x, intBaseType)
-	if mydist >= -80 and mydist <= 40 then
-		return true
-	else
-		return false
-	end
-end
-
-function functions.InitialiseGround()
--- initialise the ground array to be a flat line
--- add bases to garrObjects
-
-	-- this creates a big flat space at the start of the game
-	for i = 0, (gintScreenWidth * 0.90) do
-		garrGround[i] = gintScreenHeight * 0.80
-	end
+function functions.HandleSockets()
 	
-	fun.GetTerrainNoise(gintScreenWidth * 2)
-
-	-- Place bases
-	local basedistance = cf.round(gintScreenWidth * 1.5,0)
-	for i = 1, 20 do
-		cobjs.CreateObject(enum.basetypeFuel, basedistance)		-- 2 = fuel base
-		basedistance = cf.round(basedistance * 1.3,0)
-		if basedistance > #garrGround then fun.GetTerrainNoise(basedistance * 2) end
-	end
+	-- add lander info to the outgoing queue
+	local msg = {}
+	msg.x = garrLanders[1].x
+	msg.y = garrLanders[1].y
+	msg.angle = garrLanders[1].angle
+	msg.name = garrLanders[1].name
+	-- ** msg is set here and sent below
 	
-	-- place random buildings
-	for i = 1, 50 do
-		local bolPlacementOkay = false
-		local rndnum
+	if gbolIsAHost then
+		ss.HostListenPort()
+		
+		-- get just one item from the queue and process it
 		repeat
-			rndnum = love.math.random(1, #garrGround)
-			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
-			if disttobase <= 250 and disttobase >= -250 then
-				-- too close to fuel base
-			else
-				bolPlacementOkay = true
+			local incoming = ss.GetItemInHostQueue()		-- could be nil
+			if incoming ~= nil then
+				if incoming.name == "ConnectionRequest" then
+					gbolIsConnected = true
+					msg = {}
+					msg.name = "ConnectionAccepted"
+
+				else
+					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end	
 			end
-		until bolPlacementOkay
-		cobjs.CreateObject(enum.basetypeBuilding1, rndnum)
+		until incoming == nil
+			
+		ss.AddItemToHostOutgoingQueue(msg)
+		ss.SendToClients()
+		msg = {}
 	end
 	
-	-- place random buildings
-	for i = 1, 50 do
-		local bolPlacementOkay = false
-		local rndnum
+	if gbolIsAClient then
+		ss.ClientListenPort()
+		
+		-- get item from the queue and process it
 		repeat
-			rndnum = love.math.random(1, #garrGround)
-			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
-			if disttobase <= 250 and disttobase >= -250 then
-				-- too close to fuel base
-			else
-				bolPlacementOkay = true
+			local incoming = ss.GetItemInClientQueue()		-- could be nil
+			if incoming ~= nil then
+				if incoming.name == "ConnectionAccepted" then
+					gbolIsConnected = true
+					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
+						fun.SaveGameSettings()
+						fun.AddScreen("World")
+					end
+				else	
+					garrLanders[2] = {}
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+				end
 			end
-		until bolPlacementOkay
-		cobjs.CreateObject(enum.basetypeBuilding2, rndnum)
+		until incoming == nil
+
+		ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
+		ss.SendToHost()
+		msg = {}
 	end
-	
-	--! Place spikes
-	
-	
 end
 
 function functions.ResetGame()
 
 	garrGround = {}
 	garrObjects = {}
-	fun.InitialiseGround()
+
+	Terrain.initialize()
 
 	garrLanders = {}
-	table.insert(garrLanders, cobjs.CreateLander())
+	table.insert(garrLanders, Lander.create())
 
-	end
-
-function functions.LanderHasUpgrade(Lander, strModuleName)
-
-	for i = 1, #Lander.modules do
-		if Lander.modules[i] == strModuleName then
-			return true
-		end
-	end
-	return false
 end
-
 
 return functions
