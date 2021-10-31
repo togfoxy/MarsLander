@@ -498,7 +498,7 @@ function Lander.update(dt)
 		newLander = Lander.create()
 		newLander.name = "AI"
 		newLander.aitimer = 2
-		newLander.angle = 300
+		newLander.angle = 270
 		newLander.preferredangle = 300
 		table.insert(garrLanders, newLander)
 	end	

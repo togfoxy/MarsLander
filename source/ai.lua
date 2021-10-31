@@ -47,7 +47,7 @@ local ai = {}
 
 local function DetermineAction(LanderObj)
 
-	local preferredthrust
+	local preferredthrust, preferredangle
 	local landerx = cf.round(LanderObj.x, 0)
 
 	if LanderObj.lastbaseid == nil then
@@ -60,61 +60,26 @@ local function DetermineAction(LanderObj)
 	else
 		midpointx = ((garrObjects[LanderObj.nextbaseid].x - garrObjects[LanderObj.lastbaseid].x) / 2) + garrObjects[LanderObj.lastbaseid].x
 	end
-	midpointy = garrGround[midpointx] - garrObjects[LanderObj.nextbaseid].x - midpointx
+	midpointy = garrGround[midpointx] - (garrObjects[LanderObj.nextbaseid].x - midpointx)
 	
 	if landerx < midpointx then
 		-- lander is before the midpoint
 		-- ensure vertical velocity is appropriate
-		
 		local ydelta = LanderObj.y - midpointy
-		local bestvy = ydelta * -1
-		
-print(ydelta, bestvy)
-		
+		local bestvy = (ydelta / 1000) * -1
+
 		if LanderObj.vy >= bestvy then
 			preferredthrust = true
 		end
-			
-	
+		
+		preferredangle = 300
+	else
+		preferredangle = 240
+
 	end
 	
-	
-	
-	
-	
-	-- local disttopreviousbase = landerx - gintOriginX
-	-- if LanderObj.lastbaseid > 0 then
-		-- disttopreviousbase = landerx - garrObjects[LanderObj.lastbaseid].x
-	-- end
-	-- local disttonextbase = garrObjects[LanderObj.nextbaseid].x - landerx
 
-	
-	-- -- if before the midpoint then best slope is rising 
-	-- if disttonextbase > disttopreviousbase then
-		-- -- not yet at midpoint. Best slope is a rising slope
-		
-		-- -- determine rising slope y value
-		-- local previousbasex 
-		-- if LanderObj.lastbaseid >  0 then
-			-- previousbasex = garrObjects[LanderObj.lastbaseid].x
-		-- else
-			-- previousbasex = gintOriginX
-		-- end
-		
-		-- besty = garrGround[landerx] - (landerx - previousbasex) - 8		-- the image size is 8 high (offset)
-	
-		-- if LanderObj.y > besty then
-			-- preferredthrust = true
-		-- else
-			-- preferredthrust = false
-		-- end
-			
-		
-	-- else
-		-- -- past midpoint. Best slope is a falling slope
-	-- end
-	
-	return 300, preferredthrust
+	return preferredangle, preferredthrust
 
 
 end
@@ -133,6 +98,15 @@ function ai.DoAI(LanderObj, dt)
 	if LanderObj.preferredthrust == true then
 		Lander.DoThrust(LanderObj, dt)
 	end
+	
+	if LanderObj.angle < LanderObj.preferredangle then
+		Lander.TurnRight(LanderObj,dt)
+	end
+	if LanderObj.angle > LanderObj.preferredangle then
+		Lander.TurnLeft(LanderObj,dt)
+	end	
+	
+	
 	
 	Lander.MoveShip(LanderObj, dt)
 	

@@ -188,6 +188,14 @@ local function DrawObjects(worldoffset)
 					love.graphics.setColor(0,1,0,1)
 				end
 				gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ), drawingy + garrImages[2]:getHeight())		-- the -10 bit is a small adjustment as the png file is not quite right
+				
+				if gbolDebug then
+					-- draw 'slope' guides for AI
+					love.graphics.setColor(1,1,1,0.5)
+					love.graphics.line(drawingx + 40,drawingy + 84, (drawingx + 40) - 1000, (drawingy + 84) - 1000)
+				
+				end
+				
 			end
 			if objectvalue == enum.basetypeBuilding1 then
 				local drawingx = xvalue - worldoffset
