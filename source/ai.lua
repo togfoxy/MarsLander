@@ -75,7 +75,7 @@ local function DetermineAction(LanderObj)
 		
 		-- determine position relative to slope
 		local besty = garrGround[lastbasex] + (landerx - lastbasex)
-		if LanderObj.y > besty then
+		if LanderObj.y < besty then
 			QIndex1 = "low"
 		else
 			QIndex1 = "high"
@@ -89,8 +89,6 @@ local function DetermineAction(LanderObj)
 			QIndex2 = "falling"
 		end
 		
-print(QIndex1,QIndex2)
-		
 		-- choose random actions
 		if love.math.random(1,2) == 1 then
 			preferredthrust = true
@@ -98,16 +96,20 @@ print(QIndex1,QIndex2)
 			preferredthrust = false
 		end
 		
-		preferredangle = 265 + love.math.random(1,4) * 15
+		preferredangle = 255 + love.math.random(1,4) * 15
+		preferredangle = 270
 		
 		-- capture this now to determine rewards later
 		LanderObj.previousydelta = math.abs(besty - LanderObj.y)
 		LanderObj.previousangle = preferredangle
-		LanderObj.previousthrust = preferredthrust
+		
 		LanderObj.QIndex1 = QIndex1
 		LanderObj.QIndex2 = QIndex2
-		
-		preferredangle = 270+15
+		if preferredthrust then		-- convert true/false into 1/0
+			LanderObj.previousthrust = 1
+		else
+			LanderObj.previousthrust = 0
+		end
 		
 		-- ensure vertical velocity is appropriate relative to the midpoint
 		-- local ydelta = LanderObj.y - midpointy
@@ -177,23 +179,28 @@ local function ComputeRewards(LanderObj)
 		lastbasex = garrObjects[LanderObj.lastbaseid].x 	
 	end
 	
-	local besty = garrGround[lastbasex] + (landerx - lastbasex)
+	local besty = garrGround[lastbasex] - (landerx - lastbasex)
 	local currentydelta = math.abs(besty - LanderObj.y)
 	local previousydelta = LanderObj.previousydelta
 
--- print(previousydelta,currentydelta)
+print (landerx, cf.round(LanderObj.y, 0), besty)
 	
 	if currentydelta < previousydelta then
 		-- reward
-		QTable1[LanderObj.QIndex1][LanderObj.QIndex2][LanderObj.previousangle][LanderObj.previousthrust] = QTable1[LanderObj.QIndex1][LanderObj.QIndex2][LanderObj.previousangle][LanderObj.previousthrust] + 1
+		local strTemp = LanderObj.QIndex1 .. LanderObj.QIndex2 .. LanderObj.previousangle .. LanderObj.previousthrust
+
+		if QTable1[strTemp] ==  nil then
+			QTable1[strTemp] = {}
+			QTable1[strTemp].value = 0
+		end
+		QTable1[strTemp].value = QTable1[strTemp].value + 1
 	
-print(inspect(QTable1))	
+--print(inspect(QTable1))
+	
 	else
+		-- no reward
 	
 	end
-	
-
-
 
 
 end
