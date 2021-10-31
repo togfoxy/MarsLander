@@ -13,6 +13,9 @@ local Lander = {}
 
 function Lander.DoThrust(landerObj, dt)
 
+-- print(landerObj.fuel)
+-- print(Lander.hasUpgrade(landerObj, enum.moduleNamesThrusters))
+
 	if landerObj.fuel - dt >= 0 or (Lander.hasUpgrade(landerObj, enum.moduleNamesThrusters) and landerObj.fuel - (dt * 0.80) >= 0) then
 
 		landerObj.engineOn = true
@@ -495,6 +498,8 @@ function Lander.update(dt)
 		newLander = Lander.create()
 		newLander.name = "AI"
 		newLander.aitimer = 2
+		newLander.angle = 300
+		newLander.preferredangle = 300
 		table.insert(garrLanders, newLander)
 	end	
 	

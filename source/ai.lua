@@ -47,17 +47,61 @@ local ai = {}
 
 local function DetermineAction(LanderObj)
 
+	local preferredthrust
+	local landerx = cf.round(LanderObj.x, 0)
+
 	if LanderObj.lastbaseid == nil then
 		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
 	end
+	
+	local disttopreviousbase = landerx - gintOriginX
+	if LanderObj.lastbaseid > 0 then
+		disttopreviousbase = landerx - garrObjects[LanderObj.lastbaseid].x
+	end
+	local disttonextbase = garrObjects[LanderObj.nextbaseid].x - landerx
+	
+	-- if before the midpoint then best slope is rising 
+	if disttonextbase > disttopreviousbase then
+		-- not yet at midpoint. Best slope is a rising slope
+		
+		-- determine rising slope y value
+		local previousbasex 
+		if LanderObj.lastbaseid >  0 then
+			previousbasex = garrObjects[LanderObj.lastbaseid].x
+		else
+			previousbasex = gintOriginX
+		end
+		
+		besty = garrGround[landerx] - (landerx - previousbasex) - 8		-- the image size is 8 high (offset)
+		--besty = besty - 20		-- aim above the slope
+		
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.circle("fill", landerx, besty, 5)
+		
+		
+		
+		
+		
+		
+		
+		if LanderObj.y > besty then
+			preferredthrust = true
+		else
+			preferredthrust = false
+		end
+			
+		
+	else
+		-- past midpoint. Best slope is a falling slope
+	end
+	
+	return 300, preferredthrust
 
 
 end
 
 function ai.DoAI(LanderObj, dt)
 
-
-	
 	LanderObj.aitimer = LanderObj.aitimer - dt
 	if LanderObj.previousAngle == nil or LanderObj.aitimer <= 0 then
 		-- decide a new action
@@ -67,8 +111,9 @@ function ai.DoAI(LanderObj, dt)
 	
 	end
 	
-
-	
+	if LanderObj.preferredthrust == true then
+		Lander.DoThrust(LanderObj, dt)
+	end
 	
 	Lander.MoveShip(LanderObj, dt)
 	
