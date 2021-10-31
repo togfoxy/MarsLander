@@ -193,25 +193,35 @@ function menus.DrawCredits()
 		Slab.Textf("Mini Yum",{Align = 'right'})
 		Slab.NewLine()
 
+		local URLOptions = function(url) 
+			local option = {}
+			option.URL = url
+			option.Color={1, 1, 1}
+			option.IsSelectable = true
+			option.IsSelectableTextOnly = true
+			option.HoverColor = {1, 0.9, 0.9}
+			return option
+		end
+
 		local fltHyperlinkColorR = 1
 		local fltHyperlinkColorG = 0.9
 		Slab.SetLayoutColumn(2)
 		Slab.Text("Acknowledgements:")
 		Slab.NewLine()
-		Slab.Text("Love2D", {URL="https://love2d.org",Color={1,1,1}, IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("SLAB for Love2D", {URL="https://github.com/coding-jackalope/Slab", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("tlsfres", {URL="https://love2d.org/wiki/TLfres",Color={1,1,1}, IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("inspect", {URL="https://github.com/kikito/inspect.lua",Color={1,1,1}, IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("freesound.org", {URL="https://freesound.org/",Color={1,1,1}, IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
- 		Slab.Text("Kenney.nl", {URL="https://kenney.nl", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("bitser", {URL="https://github.com/gvx/bitser", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("nativefs", {URL="https://github.com/megagrump/nativefs", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("anim8", {URL="https://github.com/kikito/anim8", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
-		Slab.Text("Lovely-Toasts", {URL="https://github.com/Loucee/Lovely-Toasts", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
+		Slab.Text("Love2D", URLOptions("https://love2d.org"))
+		Slab.Text("SLAB for Love2D", URLOptions("https://github.com/coding-jackalope/Slab"))
+		Slab.Text("tlsfres", URLOptions("https://love2d.org/wiki/TLfres"))
+		Slab.Text("inspect", URLOptions("https://github.com/kikito/inspect.lua"))
+		Slab.Text("freesound.org", URLOptions("https://freesound.org/"))
+ 		Slab.Text("Kenney.nl", URLOptions("https://kenney.nl"))
+		Slab.Text("bitser", URLOptions("https://github.com/gvx/bitser"))
+		Slab.Text("nativefs", URLOptions("https://github.com/megagrump/nativefs"))
+		Slab.Text("anim8", URLOptions("https://github.com/kikito/anim8"))
+		Slab.Text("Lovely-Toasts", URLOptions("https://github.com/Loucee/Lovely-Toasts"))
 		
-		Slab.Text("Galactic Pole Position by Eric Matyas. ", {URL="www.soundimage.org", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
+		Slab.Text("Galactic Pole Position by Eric Matyas. ", URLOptions("www.soundimage.org"))
 
-		--Slab.Text("Dark Fantasy Studio", {URL="http://darkfantasystudio.com/", IsSelectable = true, IsSelectableTextOnly = true, HoverColor = {fltHyperlinkColorR,fltHyperlinkColorG,fltHyperlinkColorG}})
+		--Slab.Text("Dark Fantasy Studio", URLOptions("http://darkfantasystudio.com/"))
 
 		Slab.EndLayout()
 		Slab.BeginLayout('credits-bottom', {AlignX = 'center', AlignY = 'bottom', AlignRowY='bottom'})
