@@ -26,6 +26,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - added wallpaper to the main menu
 - added parameters to some functions to remove reliance on globals
 - re-organized lander and terrain functionality into separate files
+- credits window how has 2 columns and is more compact
 
 ### Fixed
 - fixed crash when the port number on the main menu was blank. Now only supports numbers
