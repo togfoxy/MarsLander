@@ -45,19 +45,34 @@ end
 
 local ai = {}
 
+local function DetermineAction(LanderObj)
 
-function ai.DoAI(dt)
+	if LanderObj.lastbaseid == nil then
+		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
+	end
 
-	if #garrLanders < 2 then
-		local newLander = {}
-		newLander = Lander.create()
-		newLander.name = "AI"
-		table.insert(garrLanders, newLander)
+
+end
+
+function ai.DoAI(LanderObj, dt)
+
+
+	
+	LanderObj.aitimer = LanderObj.aitimer - dt
+	if LanderObj.previousAngle == nil or LanderObj.aitimer <= 0 then
+		-- decide a new action
+		LanderObj.aitimer = 2		--! make this an enum later
+		
+		LanderObj.preferredangle, LanderObj.preferredthrust = DetermineAction(LanderObj)
+	
 	end
 	
-	Lander.MoveShip(garrLanders[2], dt)
+
 	
-	Lander.CheckForContact(garrLanders[2], dt)
+	
+	Lander.MoveShip(LanderObj, dt)
+	
+	Lander.CheckForContact(LanderObj, dt)
 
 end
 

@@ -7,8 +7,6 @@
 
 local Lander = {}
 
-
-
 -- ~~~~~~~~~~~~~~~~
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
@@ -42,16 +40,12 @@ function Lander.DoThrust(landerObj, dt)
 	end
 end
 
-
-
 function Lander.TurnLeft(landerObj, dt)
 -- rotate the lander anti-clockwise
 
 	landerObj.angle = landerObj.angle - (90 * dt)
 	if landerObj.angle < 0 then landerObj.angle = 360 end
 end
-
-
 
 function Lander.TurnRight(landerObj, dt)
 -- rotate the lander clockwise
@@ -60,8 +54,6 @@ function Lander.TurnRight(landerObj, dt)
 	if landerObj.angle > 360 then landerObj.angle = 0 end
 
 end
-
-
 
 function Lander.ThrustLeft(landerObj, dt)
 
@@ -74,8 +66,6 @@ function Lander.ThrustLeft(landerObj, dt)
 	end
 end
 
-
-
 function Lander.ThrustRight(landerObj, dt)
 
 	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
@@ -87,8 +77,6 @@ function Lander.ThrustRight(landerObj, dt)
 	end
 
 end
-
-
 
 function Lander.MoveShip(landerObj, dt)
 
@@ -109,7 +97,7 @@ function Lander.MoveShip(landerObj, dt)
 	end
 	
 	-- capture a new smoke location every x seconds
-	gfltSmokeTimer = gfltSmokeTimer - dt
+	gfltSmokeTimer = gfltSmokeTimer - dt		--! The AI bit make this fail for some reason
 	if gfltSmokeTimer <= 0 then
 		-- only produce smoke when not landed or any of the engines aren't firing
 		if (landerObj.landed == false) and (landerObj.engineOn or landerObj.enginelefton or landerObj.enginerighton) then
@@ -127,8 +115,6 @@ function Lander.MoveShip(landerObj, dt)
 	
 end
 
-
-
 local function RefuelLander(landerObj, objBase, dt)
 -- drain fuel from the base and add it to the lander
 -- objBase is an object/table item from garrObjects
@@ -143,8 +129,6 @@ local function RefuelLander(landerObj, objBase, dt)
 
 end
 
-
-
 local function PayLanderFromBase(landerObj, objBase, fltDist)
 -- pay some wealth based on distance to the base
 -- objBase is an object/table item from garrObjects
@@ -158,8 +142,6 @@ local function PayLanderFromBase(landerObj, objBase, fltDist)
 
 end
 
-
-
 local function PayLanderForControl(landerObj, objBase)
 
 	if objBase.paid == false then
@@ -172,8 +154,6 @@ local function PayLanderForControl(landerObj, objBase)
 	end
 end
 
-
-
 local function CheckForDamage(landerObj)
 -- apply damage if vertical speed is too higher
 	
@@ -185,8 +165,6 @@ local function CheckForDamage(landerObj)
 	end
 
 end
-
-
 
 function Lander.CheckForContact(landerObj, dt)
 -- see if lander has contacted the ground
@@ -243,8 +221,6 @@ function Lander.CheckForContact(landerObj, dt)
 	end
 end
 
-
-
 local function PlaySoundEffects(landerObj)
 
 	if landerObj.engineOn then
@@ -261,8 +237,6 @@ local function PlaySoundEffects(landerObj)
 	end
 end
 
-
-
 local function RecalcDefaultMass(landerObj)
 -- need to recalc the default mass
 -- usually called after buying a module
@@ -274,8 +248,6 @@ local function RecalcDefaultMass(landerObj)
 		return (result + landerObj.fueltanksize)		-- mass of all the components + mass of fuel if the tank was full (i.e. fueltanksize)
 
 end
-
-
 
 local function PurchaseThrusters(landerObj)
 -- add fuel efficient thrusters to the lander
@@ -302,8 +274,6 @@ local function PurchaseThrusters(landerObj)
 		garrSound[6]:play()
 	end
 end
-
-
 
 local function PurchaseLargeTank(landerObj)
 -- add a larger tank to carry more fuelqty
@@ -333,8 +303,6 @@ local function PurchaseLargeTank(landerObj)
 
 end
 
-
-
 local function PurchaseRangeFinder(landerObj)
 -- the rangefinder points to the nearest base
 
@@ -362,8 +330,6 @@ local function PurchaseRangeFinder(landerObj)
 
 end
 
-
-
 local function PurchaseSideThrusters(landerObj)
 
 	if landerObj.wealth >= enum.moduleCostSideThrusters then
@@ -382,8 +348,6 @@ local function PurchaseSideThrusters(landerObj)
 	end
 end
 
-
-
 local function UpdateSmoke(dt)
 -- each entry in the smoke table tracks it's own life (dt) so it knows when to expire
 
@@ -394,7 +358,6 @@ local function UpdateSmoke(dt)
 		end
 	end
 end
-
 
 
 -- ~~~~~~~~~~~~~~~~~
@@ -438,8 +401,6 @@ function Lander.create()
 
 end
 
-
-
 function Lander.getMass(landerObj)
 -- return the mass of all the bits on the lander
 
@@ -456,8 +417,6 @@ function Lander.getMass(landerObj)
     return result
 end
 
-
-
 function Lander.isOnLandingPad(landerObj, intBaseType)
 -- returns a true / false value
 
@@ -469,8 +428,6 @@ function Lander.isOnLandingPad(landerObj, intBaseType)
     end
 end
 
-
-
 function Lander.hasUpgrade(landerObj, strModuleName)
 
 	for i = 1, #landerObj.modules do
@@ -481,9 +438,28 @@ function Lander.hasUpgrade(landerObj, strModuleName)
 	return false
 end
 
+function Lander.GetLastNextBaseID(landerObj, intBaseType)
+-- return the index of the most recently passed base + the next based
 
+	local previousid = 0		-- table index of the base the lander just passed
+	local nextid = 0			
+	
+	for k,v in pairs(garrObjects) do
+		if v.objecttype == intBaseType then
+			if v.x < landerObj.x then
+				previousid = k
+			else
+				previousid = k - 1
+				nextid = k
+				return previousid, nextid
+			end
+		end
+	end
+
+end
 
 function Lander.update(dt)
+
     if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
         Lander.DoThrust(garrLanders[1], dt)
     end
@@ -514,10 +490,16 @@ function Lander.update(dt)
     
     Lander.CheckForContact(garrLanders[1], dt)
 	
-	ai.DoAI(dt)
+	if #garrLanders < 2 then
+		local newLander = {}
+		newLander = Lander.create()
+		newLander.name = "AI"
+		newLander.aitimer = 2
+		table.insert(garrLanders, newLander)
+	end	
+	
+	ai.DoAI(garrLanders[2], dt)
 end
-
-
 
 function Lander.draw(worldoffset)
 
@@ -576,8 +558,6 @@ function Lander.draw(worldoffset)
 		end
 	end
 end
-
-
 
 function Lander.keypressed(key, scancode, isrepeat)
 	if Lander.isOnLandingPad(garrLanders[1], 2) then	-- 2 = base type (fuel)
