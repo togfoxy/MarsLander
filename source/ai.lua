@@ -47,7 +47,7 @@ local function newDetermineAction(LanderObj)
 		LanderObj.nextbasex = garrObjects[LanderObj.nextbaseid].x
 	end
 	
-	if love.math.random(1,5) == 1 then
+	if love.math.random(1,4) == 1 then
 		-- exploratory
 		preferredangle = 180 + love.math.random(1,11) * 15
 		preferredthrust = love.math.random(1,2)
@@ -131,6 +131,13 @@ local function newComputeRewards(LanderObj)
 	if LanderObj.y <= 0 then
 		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
 	end
+	
+	-- is agent on base?
+	if LanderObj.x >= LanderObj.nextbasex and LanderObj.x <= LanderObj.nextbasex + 85 then
+		-- on base
+		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 10
+		LanderObj.lastbaseid = nil
+	end
 
 	fun.SaveQTable1()
 
@@ -143,7 +150,7 @@ function ai.DoAI(LanderObj, dt)
 	end
 
 	LanderObj.aitimer = LanderObj.aitimer - dt
-	if LanderObj.aitimer <= 0 then
+	if LanderObj.aitimer <= 0 and LanderObj.fuel > 1 then
 		-- decide a new action
 		LanderObj.aitimer = 2		--! make this an enum later
 		
@@ -151,7 +158,6 @@ function ai.DoAI(LanderObj, dt)
 			newComputeRewards(LanderObj)
 		end
 		LanderObj.preferredangle, LanderObj.preferredthrust = newDetermineAction(LanderObj)
-		
 	end
 
 	if LanderObj.preferredthrust == true then
@@ -176,6 +182,10 @@ function ai.DoAI(LanderObj, dt)
 		-- -- set new targets
 		-- DetermineAction(LanderObj)
 	-- end
+	
+	if LanderObj.fuel <= 1 then
+		fun.ResetGame()
+	end
 
 end
 

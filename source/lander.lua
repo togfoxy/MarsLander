@@ -40,6 +40,7 @@ function Lander.DoThrust(landerObj, dt)
 	else
 		-- no fuel to thrust
 		--! probably need to make a serious alert here
+print("no fuel")
 	end
 end
 
