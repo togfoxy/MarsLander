@@ -55,9 +55,9 @@ function ai.DoAI(dt)
 		table.insert(garrLanders, newLander)
 	end
 	
-	lander.MoveShip(garrLanders[2], dt)
+	Lander.MoveShip(garrLanders[2], dt)
 	
-	lander.CheckForContact(garrLanders[2], dt)
+	Lander.CheckForContact(garrLanders[2], dt)
 
 end
 

@@ -13,7 +13,7 @@ local Lander = {}
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
-function DoThrust(landerObj, dt)
+function Lander.DoThrust(landerObj, dt)
 
 	if landerObj.fuel - dt >= 0 or (Lander.hasUpgrade(landerObj, enum.moduleNamesThrusters) and landerObj.fuel - (dt * 0.80) >= 0) then
 
@@ -44,7 +44,7 @@ end
 
 
 
-function TurnLeft(landerObj, dt)
+function Lander.TurnLeft(landerObj, dt)
 -- rotate the lander anti-clockwise
 
 	landerObj.angle = landerObj.angle - (90 * dt)
@@ -53,7 +53,7 @@ end
 
 
 
-function TurnRight(landerObj, dt)
+function Lander.TurnRight(landerObj, dt)
 -- rotate the lander clockwise
 
 	landerObj.angle = landerObj.angle + (90 * dt)
@@ -63,7 +63,7 @@ end
 
 
 
-function ThrustLeft(landerObj, dt)
+function Lander.ThrustLeft(landerObj, dt)
 
 	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
@@ -76,7 +76,7 @@ end
 
 
 
-function ThrustRight(landerObj, dt)
+function Lander.ThrustRight(landerObj, dt)
 
 	if Lander.hasUpgrade(landerObj, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
@@ -90,7 +90,7 @@ end
 
 
 
-function MoveShip(landerObj, dt)
+function Lander.MoveShip(landerObj, dt)
 
 	landerObj.x = landerObj.x + landerObj.vx
 	landerObj.y = landerObj.y + landerObj.vy
@@ -188,7 +188,7 @@ end
 
 
 
-function CheckForContact(landerObj, dt)
+function Lander.CheckForContact(landerObj, dt)
 -- see if lander has contacted the ground
 
 	local LanderXValue = cf.round(landerObj.x)
@@ -485,13 +485,13 @@ end
 
 function Lander.update(dt)
     if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
-        DoThrust(garrLanders[1], dt)
+        Lander.DoThrust(garrLanders[1], dt)
     end
     if love.keyboard.isDown("left") or love.keyboard.isDown("a") or love.keyboard.isDown("kp4") then
-        TurnLeft(garrLanders[1], dt)
+        Lander.TurnLeft(garrLanders[1], dt)
     end
     if love.keyboard.isDown("right") or love.keyboard.isDown("d") or love.keyboard.isDown("kp6") then
-        TurnRight(garrLanders[1], dt)
+        Lander.TurnRight(garrLanders[1], dt)
     end
     if love.keyboard.isDown("q") or love.keyboard.isDown("kp7") then
         ThrustLeft(garrLanders[1], dt)
@@ -506,13 +506,13 @@ function Lander.update(dt)
         fun.AddScreen("Settings")
     end
 
-    MoveShip(garrLanders[1], dt)
+    Lander.MoveShip(garrLanders[1], dt)
     
     UpdateSmoke(dt)
     
     PlaySoundEffects(garrLanders[1])
     
-    CheckForContact(garrLanders[1], dt)
+    Lander.CheckForContact(garrLanders[1], dt)
 	
 	ai.DoAI(dt)
 end
