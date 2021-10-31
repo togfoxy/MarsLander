@@ -126,6 +126,16 @@ function functions.LoadGame()
 
 end
 
+function functions.calculateScore()
+	local score = garrLanders[1].x - gintOriginX
+	
+	if score > garrGameSettings.HighScore then
+		garrGameSettings.HighScore = score
+		fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
+	end
+
+	return score
+end
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
