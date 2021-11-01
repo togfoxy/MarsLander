@@ -17,7 +17,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 
 
-## v0.09
+## v0.10
 ### Added
 - added a player name label to the lander (set via the main menu)
 - added a FAILED audio file
