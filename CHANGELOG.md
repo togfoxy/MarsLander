@@ -6,6 +6,19 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ## UNRELEASED
 ### Added
+
+
+
+
+### Changed
+
+
+
+
+
+
+## v0.09
+### Added
 - added a player name label to the lander (set via the main menu)
 - added a FAILED audio file
 - FAILED audio file plays when trying to purchase something that can't be afforded
