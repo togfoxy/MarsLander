@@ -34,9 +34,10 @@ gintScreenHeight = 768-- 1080
 
 garrCurrentScreen = {}	
 
-Lander = require("lander")
-Terrain = require("terrain")
+Lander = require "lander"
+Terrain = require "terrain"
 
+HUD = require "hud"
 cobjs = require "createobjects"
 dobjs = require "drawobjects"
 fun = require "functions"
@@ -173,7 +174,7 @@ function love.draw()
 	
 	if strCurrentScreen == "Pause" then
 		dobjs.DrawWorld() -- Still draw the world
-		dobjs.DrawPause() -- Display on top of world
+		HUD.DrawPause() -- Display on top of world
 	end
 
 	if strCurrentScreen == "Settings" then
