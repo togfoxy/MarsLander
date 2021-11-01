@@ -45,6 +45,10 @@ local function newDetermineAction(LanderObj)
 	if LanderObj.lastbaseid == nil then
 		LanderObj.lastbaseid, LanderObj.nextbaseid = Lander.GetLastNextBaseID(LanderObj, enum.basetypeFuel)
 		LanderObj.nextbasex = garrObjects[LanderObj.nextbaseid].x
+		LanderObj.nextbasey = garrGround[LanderObj.nextbasex]
+		
+print("New base is " .. LanderObj.nextbaseid)
+ 
 	end
 	
 	if love.math.random(1,4) == 1 then
@@ -83,7 +87,8 @@ local function newDetermineAction(LanderObj)
 	end
 	
 	-- capture some stuff to determine rewards later
-	LanderObj.olddistance = cf.round(LanderObj.nextbasex - LanderObj.x,0)
+	LanderObj.olddistance = math.abs(cf.GetDistance(LanderObj.x, LanderObj.y, LanderObj.nextbasex, LanderObj.nextbasey))
+	
 	LanderObj.previousdistance = mapdistance(cf.round(LanderObj.nextbasex - LanderObj.x,0))
 	LanderObj.previousy = mapy(LanderObj.y)
 	LanderObj.previousvx = mapvx(LanderObj.vx)
@@ -92,21 +97,16 @@ local function newDetermineAction(LanderObj)
 	LanderObj.previousangle = preferredangle
 	LanderObj.previousthrust = preferredthrust		-- 1 or 2
 	
-	
 	-- convert to boolean just prior to RETURN
 	if preferredthrust == 1 then 
-		preferredthrust = false
+		preferredthrust = false		-- 1
 	else
-		preferredthrust = true
+		preferredthrust = true		-- 2
 	end
 	return preferredangle, preferredthrust
 end
 
 local function newComputeRewards(LanderObj)
-
-	-- is agent closer to base?
-	local olddistance = LanderObj.olddistance
-	local newdistance = cf.round(LanderObj.nextbasex - LanderObj.x,0)
 	
 	local strTemp1 = tostring(LanderObj.previousdistance) .. tostring(LanderObj.previousy) .. tostring(LanderObj.previousvx) .. tostring(LanderObj.previousvy)
 	local strTemp2 = tostring(LanderObj.previousangle .. LanderObj.previousthrust)
@@ -118,11 +118,17 @@ local function newComputeRewards(LanderObj)
 		QTable1[strTemp1][strTemp2] = {}
 		QTable1[strTemp1][strTemp2] = 0
 	end
-		
+	
+	if LanderObj.preferredangleangle == nil then LanderObj.preferredangleangle = 270 end
+	if LanderObj.preferredthrust == nil then LanderObj.preferredthrust = 1 end
+
+	-- is agent closer to base?
+	local olddistance = LanderObj.olddistance
+	local newdistance = math.abs(cf.GetDistance(LanderObj.x, LanderObj.y, LanderObj.nextbasex, LanderObj.nextbasey))
+	
 	if newdistance < olddistance then
 		-- reward
 		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 1
--- print("REWARD")
 	elseif newdistance > olddistance then
 		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
 	end
@@ -132,7 +138,6 @@ local function newComputeRewards(LanderObj)
 		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 1
 	end
 	
-
 	-- did agent touch terrain?
 	-- get the height of the terrain under the lander
 	local LanderXValue = cf.round(LanderObj.x)
@@ -141,14 +146,22 @@ local function newComputeRewards(LanderObj)
 		if LanderObj.x >= LanderObj.nextbasex and LanderObj.x <= LanderObj.nextbasex + 85 then
 			-- on base
 			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 10
+			LanderObj.fuel = LanderObj.fueltanksize
 			LanderObj.lastbaseid = nil
 		else
 			-- off base
 			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] - 10
 		end
 	end
-	
 
+	-- is bad motion being corrected?
+	if LanderObj.x > LanderObj.nextbasex and LanderObj.vx > 0 and LanderObj.preferredangleangle <= 270 and LanderObj.preferredthrust == 2 then
+		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 1
+	end
+	if LanderObj.x < LanderObj.nextbasex and LanderObj.vx < 0 and LanderObj.preferredangleangle >= 270 and LanderObj.preferredthrust == 2 then
+		QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + 1
+	end	
+	
 	if QTable1[strTemp1][strTemp2] > 30 then QTable1[strTemp1][strTemp2] = 30 end
 	fun.SaveQTable1()
 

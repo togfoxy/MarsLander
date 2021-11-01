@@ -457,7 +457,7 @@ function Lander.GetLastNextBaseID(landerObj, intBaseType)
 -- return the index of the most recently passed base + the next based
 
 	local previousid = 0		-- table index of the base the lander just passed
-	local nextid = 0			
+	local nextid = 1			
 	
 	for k,v in pairs(garrObjects) do
 		if v.objecttype == intBaseType then

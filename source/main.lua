@@ -109,7 +109,7 @@ function love.load()
 	
 	fun.AddScreen("MainMenu")
 	fun.ResetGame()
-	
+		
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = Lander.getMass(garrLanders[1])
 
