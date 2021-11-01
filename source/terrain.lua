@@ -88,8 +88,8 @@ function Terrain.getNoise(intAmountToCreate)
 
 	local terrainmaxheight = (gintScreenHeight * 0.90)
 	local terrainminheight = (gintScreenHeight * 0.65)
-	local terrainstep = (terrainmaxheight - terrainminheight) / 10
-	local terrainoctaves = 1
+	local terrainstep = (terrainmaxheight - terrainminheight) / 2
+	local terrainoctaves = 8
 
 	repeat
 		terrainoctaves = terrainoctaves + 1
