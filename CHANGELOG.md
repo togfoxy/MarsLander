@@ -15,7 +15,9 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 
 
-
+### Fixed
+- Fixed saved player name not being displayed correctly in-game
+- Fixed regression introduced in v0.10 causing the rangefinder indicator not being displayed correctly
 
 ## v0.10
 ### Added
