@@ -82,13 +82,13 @@ local function DrawRangefinder(landerObj)
 		local mydist, _ = fun.GetDistanceToClosestBase(landerObj.x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
 		
+		love.graphics.setNewFont(20)
+
 		-- don't draw if close to base
 		if math.abs(mydist) > 100 then
 		
 			if mydist <= 0 then
-
-				love.graphics.setNewFont(14)
-
+				
 				-- closest base is to the right (forward)
 				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
 			else
