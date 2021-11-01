@@ -135,10 +135,12 @@ local function DrawScore()
 	local score = cf.strFormatThousand(tonumber(cf.round(fun.calculateScore())))
 	local highscore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
+	love.graphics.setNewFont(14)
+
 	love.graphics.setColor(1,1,1,1)
 
-	love.graphics.print("score: " .. score, (gintScreenWidth / 2) - 50,75)
-	love.graphics.print("High Score: " .. highscore, (gintScreenWidth / 2) - 75, 90)
+	love.graphics.printf("Score: " .. score, 0, 75, gintScreenWidth, "center")
+	love.graphics.printf("High Score: " .. highscore, 0, 90, gintScreenWidth, "center")
 end
 
 
