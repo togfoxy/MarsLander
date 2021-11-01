@@ -420,7 +420,7 @@ function Lander.create()
     landerObj.health = 100				-- this is % meaning 100 = no damage
     landerObj.bolGameOver = false
 	landerObj.score = landerObj.x - gintOriginX
-    landerObj.name = gstrCurrentPlayerName	
+    landerObj.name = gstrCurrentPlayerName
     
     -- mass	
     landerObj.mass = {}

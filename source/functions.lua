@@ -74,6 +74,9 @@ function functions.LoadGameSettings()
 	if garrGameSettings.HighScore == nil then
 		garrGameSettings.HighScore = 0
 	end
+
+	-- Set the gloal player name to the new value
+	gstrCurrentPlayerName = garrGameSettings.PlayerName
 end
 
 
@@ -240,7 +243,6 @@ function functions.ResetGame()
 
 	garrLanders = {}
 	table.insert(garrLanders, Lander.create())
-
 end
 
 return functions
