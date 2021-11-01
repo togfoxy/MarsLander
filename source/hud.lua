@@ -86,6 +86,9 @@ local function DrawRangefinder(landerObj)
 		if math.abs(mydist) > 100 then
 		
 			if mydist <= 0 then
+
+				love.graphics.setNewFont(14)
+
 				-- closest base is to the right (forward)
 				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
 			else
@@ -107,6 +110,8 @@ local function DrawHealthIndicator()
 	local width     = 10
 	local height    = indicatorlength
 	
+	love.graphics.setNewFont(14)
+
 	love.graphics.print("Health", drawingx - 20, drawingy)
 
 	love.graphics.setColor(1,0,0,1)
@@ -162,8 +167,11 @@ end
 local function DrawPortInformation()
 
 	if gbolIsAHost then
+
 		love.graphics.setColor(1,1,1,0.50)
+
 		love.graphics.setNewFont(12)
+		
 		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
 	end
 
