@@ -87,7 +87,7 @@ local function DrawRangefinder(landerObj)
 		
 			if mydist <= 0 then
 
-				love.graphics.setNewFont(14)
+				love.graphics.setNewFont(20)
 
 				-- closest base is to the right (forward)
 				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
