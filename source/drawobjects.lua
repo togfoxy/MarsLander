@@ -192,9 +192,9 @@ local function DrawObjects(worldoffset)
 				if gbolDebug then
 				
 					-- draw 'slope' guides for AI
-					love.graphics.setColor(1,1,1,0.5)
+					--love.graphics.setColor(1,1,1,0.5)
 					
-					love.graphics.line(drawingx + 40,drawingy + 84, (drawingx + 40) - 1000, (drawingy + 84) - 1000)
+					--love.graphics.line(drawingx + 40,drawingy + 84, (drawingx + 40) - 1000, (drawingy + 84) - 1000)
 				
 				end
 				

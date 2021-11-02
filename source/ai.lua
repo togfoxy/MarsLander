@@ -37,6 +37,14 @@ local function mapvy(fltvy)
 	return cf.round(fltvy * 5) 
 end
 
+local function DetermineExploreAction()
+	
+	pa = 180 + love.math.random(1,11) * 15
+	pt = love.math.random(1,2)
+	
+	return pa,pt
+end
+
 local function newDetermineAction(LanderObj)
 
 	local preferredangle, preferredthrust = 270, 1
@@ -51,11 +59,10 @@ print("New base is " .. LanderObj.nextbaseid)
  
 	end
 	
-	if love.math.random(1,10) == 1 then
+	if love.math.random(1,20) == 1 then
 		-- exploratory
-		preferredangle = 180 + love.math.random(1,11) * 15
-		preferredthrust = love.math.random(1,2)
-print("Exploring")
+		preferredangle,preferredthrust = DetermineExploreAction()
+print("Exploring by choice")
 	
 	else
 		-- exploitive
@@ -71,19 +78,23 @@ print("Exploring")
 					largestValue = v1
 				end
 			end
-			
+
 			-- preferred action is key1
 			preferredangle = string.sub(key1, 1,3)
 			preferredangle = tonumber(preferredangle)
 			strThrust = string.sub(key1, 4,4)
 			preferredthrust = tonumber(strThrust)
+			
+			if largestValue <= -49 then
+				preferredangle,preferredthrust = DetermineExploreAction()
+print("Exploring due to no good options")
+			end
 
 			-- print("Agent option: " .. strTemp, preferredangle, preferredthrust, "score : " .. largestValue)
 		else
 			-- go random
 			-- exploratory
-			preferredangle = 180 + love.math.random(1,11) * 15
-			preferredthrust = love.math.random(1,2)	
+			preferredangle,preferredthrust = DetermineExploreAction()
 print("Exploring")			
 		end		
 	end
@@ -111,6 +122,8 @@ end
 
 local function newComputeRewards(LanderObj)
 	
+	if garrAIHistory == nil then garrAIHistory = {} end
+	
 	local totalreward = 0
 	local strTemp1 = tostring(LanderObj.previousdistance) .. tostring(LanderObj.previousy) .. tostring(LanderObj.previousvx) .. tostring(LanderObj.previousvy)
 	local strTemp2 = tostring(LanderObj.previousangle .. LanderObj.previousthrust)
@@ -119,14 +132,18 @@ local function newComputeRewards(LanderObj)
 	if LanderObj.preferredthrust == nil then LanderObj.preferredthrust = 1 end
 
 	-- is agent closer to base?
-	local olddistance = LanderObj.olddistance
-	local newdistance = math.abs(cf.GetDistance(LanderObj.x, LanderObj.y, LanderObj.nextbasex, LanderObj.nextbasey))
-	
-	if newdistance < olddistance then
-		-- reward
-		totalreward = totalreward + 1
-	elseif newdistance > olddistance then
-		totalreward = totalreward - 1
+	local olddistance
+	local newdistance
+	if #garrAIHistory > 1 then
+		olddistance = math.abs(cf.GetDistance(garrAIHistory[1].previousx, garrAIHistory[1].previousy, LanderObj.nextbasex, LanderObj.nextbasey))
+		newdistance = math.abs(cf.GetDistance(LanderObj.x, LanderObj.y, LanderObj.nextbasex, LanderObj.nextbasey))
+		
+		if newdistance < olddistance then
+			-- reward
+			totalreward = totalreward + 1
+		elseif newdistance > olddistance then
+			totalreward = totalreward - 1
+		end
 	end
 	
 	-- is agent off the top of the screen?
@@ -159,12 +176,18 @@ local function newComputeRewards(LanderObj)
 	if LanderObj.x > LanderObj.nextbasex and LanderObj.vx > 0 and LanderObj.preferredangleangle <= 270 and LanderObj.preferredthrust == 2 then
 		totalreward = totalreward + 1
 	end
+	if LanderObj.x > LanderObj.nextbasex and LanderObj.vx > 0 and LanderObj.preferredangleangle >= 270 and LanderObj.preferredthrust == 2 then
+		totalreward = totalreward - 1
+	end	
 	if LanderObj.x < LanderObj.nextbasex and LanderObj.vx < 0 and LanderObj.preferredangleangle >= 270 and LanderObj.preferredthrust == 2 then
 		totalreward = totalreward + 1
 	end	
+	if LanderObj.x < LanderObj.nextbasex and LanderObj.vx < 0 and LanderObj.preferredangleangle <= 270 and LanderObj.preferredthrust == 2 then
+		totalreward = totalreward - 1
+	end	
 	
 	-- is lander fuel efficient?
-	if LanderObj.previousfuel ~= nil then
+	if LanderObj.previousfuel ~= nil and olddistance ~= nil then
 		local fuelused = LanderObj.previousfuel - LanderObj.fuel
 		local distancemoved = olddistance - newdistance
 		local distperfuel = cf.round(distancemoved / fuelused, 0)
@@ -173,8 +196,6 @@ local function newComputeRewards(LanderObj)
 		gfltfuelused = gfltfuelused + fuelused
 		gfltdistancemoved = gfltdistancemoved + distancemoved
 		gfltavgdistperfuel = cf.round(gfltdistancemoved / gfltfuelused)
-		
--- print(gfltavgdistperfuel)
 		
 		if fuelused == 0 then distperfuel = 99 end
 		if distancemoved == 0 then distperfuel = -99 end
@@ -201,46 +222,55 @@ local function newComputeRewards(LanderObj)
 	-- QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + totalreward
 	
 	-- add steps to long memory
-	if garrAIHistory == nil then garrAIHistory = {} end
 	
 	local strTemp3 = strTemp1 .. ":" .. strTemp2
 	mystep = {}
 	mystep.key = strTemp3
 	mystep.reward = totalreward
+	mystep.previousx = LanderXValue
+	mystep.previousy = LanderObj.y
 	table.insert(garrAIHistory, mystep)
 
 	-- reward long memory
-	if #garrAIHistory > 2 then
+	local tempreward = 0
+	local memsize = 4
+	if #garrAIHistory >= memsize then
 		-- check the reward over the last 3 steps
-		local tempreward = 0
-		local lowestreward = math.min(garrAIHistory[1].reward,garrAIHistory[2].reward,garrAIHistory[3].reward)
+		
+
+		local lowestreward = 999
+		for i = 1, memsize do
+			lowestreward = math.min(lowestreward, garrAIHistory[i].reward)
+			tempreward = tempreward + garrAIHistory[i].reward		-- this might be overwritten but it might not.
+		end
 		
 		if lowestreward < 0 then
 			-- at least one thing bad happened.
 			-- punish the whole chain
 			tempreward = lowestreward
-		else
-			tempreward = garrAIHistory[1].reward + garrAIHistory[2].reward + garrAIHistory[3].reward
 		end
-		
-print("Reward = " .. tempreward)		
-		
+
 		-- now loop and apply the reward
-		for i = 1,3 do
+		for i = 1,memsize do
 			-- unpack the state and action
 			local pos = string.find(garrAIHistory[i].key, ":")
 			strTemp1 = string.sub(garrAIHistory[i].key, 1, pos - 1)
 			strTemp2 = string.sub(garrAIHistory[i].key, pos + 1)
 			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + tempreward
+
+			if QTable1[strTemp1][strTemp2] > 50 then QTable1[strTemp1][strTemp2] = 50 end
+			if QTable1[strTemp1][strTemp2] < -50 then QTable1[strTemp1][strTemp2] = -50 end
 		end
-		
 		table.remove(garrAIHistory, 1)		-- remove the oldest entry
 	end
-	
-	if QTable1[strTemp1][strTemp2] > 50 then QTable1[strTemp1][strTemp2] = 50 end
-	if QTable1[strTemp1][strTemp2] < -50 then QTable1[strTemp1][strTemp2] = -50 end
+
+print("Reward = " .. tempreward .. ". New value is now " .. QTable1[strTemp1][strTemp2])	
 	
 	fun.SaveQTable1()
+	
+	if LanderObj.lastbaseid == nil then
+		fun.ResetGame()		-- found base - start again
+	end
 end
 
 function ai.DoAI(LanderObj, dt)
@@ -286,7 +316,8 @@ function ai.DoAI(LanderObj, dt)
 	-- end
 	
 	if LanderObj.fuel <= 1 then
-		fun.ResetGame()
+		--fun.ResetGame()
+		LanderObj.fuel = LanderObj.fueltanksize
 	end
 
 end
