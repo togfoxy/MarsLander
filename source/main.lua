@@ -139,11 +139,13 @@ function love.load()
 	local path 		= "assets/sounds/"
 	garrSound[1] = newSource(path .. "wind.ogg", "static")
 	garrSound[2] = newSource(path .. "landingSuccess.ogg", "static")
-	garrSound[3] = newSource(path .. "menuTheme.mp3", "stream")
-	garrSound[3]:setVolume(0.25)
 	garrSound[5] = newSource(path .. "lowFuel.ogg", "static")
 	garrSound[5]:setVolume(0.25)
 	garrSound[6] = newSource(path .. "wrong.ogg", "static")
+
+	local path = "assets/music/"
+	garrSound[3] = newSource(path .. "menuTheme.mp3", "stream")
+	garrSound[3]:setVolume(0.25)
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
