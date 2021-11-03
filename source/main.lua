@@ -34,7 +34,7 @@ gintScreenHeight = 768-- 1080
 
 garrCurrentScreen = {}	
 
-Lander = require "lander"
+Lander = require "objects.lander"
 Terrain = require "terrain"
 
 Hud = require "hud"
