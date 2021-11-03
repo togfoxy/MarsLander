@@ -137,14 +137,42 @@ local function newComputeRewards(LanderObj)
 	if #garrAIHistory > 1 then
 		olddistance = math.abs(cf.GetDistance(garrAIHistory[1].previousx, garrAIHistory[1].previousy, LanderObj.nextbasex, LanderObj.nextbasey))
 		newdistance = math.abs(cf.GetDistance(LanderObj.x, LanderObj.y, LanderObj.nextbasex, LanderObj.nextbasey))
+		local distancegained = olddistance - newdistance
+		local gainpercent = distancegained / newdistance
 		
-		if newdistance < olddistance then
-			-- reward
-			totalreward = totalreward + 1
-		elseif newdistance > olddistance then
+print(gainpercent)
+
+		if gainpercent <= 0 then
 			totalreward = totalreward - 1
 		end
+		if gainpercent > 0.05 then
+			totalreward = totalreward + 1
+		end
+		if gainpercent > 0.10 then
+			totalreward = totalreward + 1
+		end		
+			if gainpercent > 0.15 then
+			totalreward = totalreward + 1
+		end
+		if gainpercent > 0.20 then
+			totalreward = totalreward + 1
+		end		
+		if gainpercent > 0.25 then
+			totalreward = totalreward - 5
+		end	
+		if gainpercent > 0.25 then
+			totalreward = totalreward - 1
+		end			
+		
+		-- if newdistance < olddistance then
+			-- -- reward
+			-- totalreward = totalreward + 1 -- (olddistance - newdistance) * 10
+		-- elseif newdistance > olddistance then
+			-- -- totalreward = totalreward - 1
+		-- end
 	end
+
+
 	
 	-- is agent off the top of the screen?
 	if LanderObj.y <= 0 then
@@ -158,7 +186,7 @@ local function newComputeRewards(LanderObj)
 	if LanderObj.y > (groundYvalue - enum.constLanderImageYOffset) then		-- the offset is the size of the lander image
 		if Lander.isOnLandingPad(LanderObj, 2) then
 			-- on base
-			totalreward = totalreward + 1
+			totalreward = totalreward + 5
 			LanderObj.fuel = LanderObj.fueltanksize
 			
 			-- but is it the right base?
@@ -168,7 +196,12 @@ local function newComputeRewards(LanderObj)
 			end
 		else
 			-- off base
-			totalreward = totalreward - 10
+			totalreward = totalreward - 5
+			
+			if LanderObj.vy > enum.constVYThreshold then
+				local excessspeed = LanderObj.vy - enum.constVYThreshold
+				totalreward = totalreward - (excessspeed * 100)
+			end
 		end
 	end
 
@@ -185,32 +218,7 @@ local function newComputeRewards(LanderObj)
 	if LanderObj.x < LanderObj.nextbasex and LanderObj.vx < 0 and LanderObj.preferredangleangle <= 270 and LanderObj.preferredthrust == 2 then
 		totalreward = totalreward - 1
 	end	
-	
-	-- is lander fuel efficient?
-	if LanderObj.previousfuel ~= nil and olddistance ~= nil then
-		local fuelused = LanderObj.previousfuel - LanderObj.fuel
-		local distancemoved = olddistance - newdistance
-		local distperfuel = cf.round(distancemoved / fuelused, 0)
-		
-		-- globals
-		gfltfuelused = gfltfuelused + fuelused
-		gfltdistancemoved = gfltdistancemoved + distancemoved
-		gfltavgdistperfuel = cf.round(gfltdistancemoved / gfltfuelused)
-		
-		if fuelused == 0 then distperfuel = 99 end
-		if distancemoved == 0 then distperfuel = -99 end
 
-		if distperfuel < 0 then
-			--totalreward = totalreward - 1
-		end
-		if distperfuel > 0 then 
-			totalreward = totalreward + 1
-		end
-		if distperfuel > gfltavgdistperfuel then
-			totalreward = totalreward + 1
-		end
-	end
-	
 	-- commit learnings to table
 
 	if QTable1[strTemp1] == nil then QTable1[strTemp1] = {} end
@@ -244,6 +252,8 @@ local function newComputeRewards(LanderObj)
 			tempreward = tempreward + garrAIHistory[i].reward		-- this might be overwritten but it might not.
 		end
 		
+		-- tempreward = tempreward / memsize
+		
 		if lowestreward < 0 then
 			-- at least one thing bad happened.
 			-- punish the whole chain
@@ -256,7 +266,7 @@ local function newComputeRewards(LanderObj)
 			local pos = string.find(garrAIHistory[i].key, ":")
 			strTemp1 = string.sub(garrAIHistory[i].key, 1, pos - 1)
 			strTemp2 = string.sub(garrAIHistory[i].key, pos + 1)
-			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + tempreward
+			QTable1[strTemp1][strTemp2] = QTable1[strTemp1][strTemp2] + tempreward / memsize
 
 			if QTable1[strTemp1][strTemp2] > 50 then QTable1[strTemp1][strTemp2] = 50 end
 			if QTable1[strTemp1][strTemp2] < -50 then QTable1[strTemp1][strTemp2] = -50 end
@@ -268,9 +278,9 @@ print("Reward = " .. tempreward .. ". New value is now " .. QTable1[strTemp1][st
 	
 	fun.SaveQTable1()
 	
-	if LanderObj.lastbaseid == nil then
-		fun.ResetGame()		-- found base - start again
-	end
+	-- if LanderObj.lastbaseid == nil then
+		-- fun.ResetGame()		-- found base - start again
+	-- end
 end
 
 function ai.DoAI(LanderObj, dt)
@@ -312,12 +322,12 @@ function ai.DoAI(LanderObj, dt)
 	
 	-- if LanderObj.landed == true and LanderObj.fuel == LanderObj.fueltanksize then 
 		-- -- set new targets
-		-- DetermineAction(LanderObj)
+		--- DetermineAction(LanderObj)
 	-- end
 	
 	if LanderObj.fuel <= 1 then
-		--fun.ResetGame()
-		LanderObj.fuel = LanderObj.fueltanksize
+		fun.ResetGame()
+		--LanderObj.fuel = LanderObj.fueltanksize
 	end
 
 end
