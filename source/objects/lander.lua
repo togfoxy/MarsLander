@@ -8,12 +8,16 @@
 local Lander = {}
 
 
+local keyDown = love.keyboard.isDown
+
+
 
 -- ~~~~~~~~~~~~~~~~
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
 local function doThrust(lander, dt)
+	-- FIXME: This statement potentially doesn't work as expected. Check and verify!
 	if lander.fuel - dt >= 0 or (Lander.hasUpgrade(lander, enum.moduleNamesThrusters) and lander.fuel - (dt * 0.80) >= 0) then
 		lander.engineOn = true
 		local angle_radian = math.rad(lander.angle)
@@ -24,7 +28,9 @@ local function doThrust(lander, dt)
 		-- less mass = higher ratio = more thrust = less fuel needed to move
 		local massratio = gintDefaultMass / Lander.getMass(lander)
 		-- for debugging only
-		if gbolDebug then garrMassRatio = massratio end
+		if gbolDebug then
+			garrMassRatio = massratio
+		end
 
 		force_x = force_x * massratio
 		force_y = force_y * massratio
@@ -66,7 +72,7 @@ local function thrustLeft(lander, dt)
 		local force_x = 0.5 * dt		--!
 		lander.vx = lander.vx - force_x
 		-- opposite engine is on
-		lander.enginerighton = true
+		lander.rightEngineOn = true
 		lander.fuel = lander.fuel - force_x
 	end
 end
@@ -79,7 +85,7 @@ local function thrustRight(lander, dt)
 		lander.vx = lander.vx + force_x
 		lander.fuel = lander.fuel - force_x
 		-- opposite engine is on
-		lander.enginelefton = true
+		lander.leftEngineOn = true
 	end
 end
 
@@ -90,10 +96,12 @@ local function moveShip(lander, dt)
 	lander.y = lander.y + lander.vy
 
 	local leftedge = gintOriginX - (gintScreenWidth / 2)
-	if lander.x < leftedge then lander.x = leftedge end
+	if lander.x < leftedge then
+		lander.x = leftedge
+	end
 
 	-- apply gravity
-	if lander.landed == false then
+	if not lander.landed then
 		lander.vy = lander.vy + (enum.constGravity * dt)
 	end
 
@@ -108,7 +116,7 @@ local function moveShip(lander, dt)
 
 	if gfltSmokeTimer <= 0 then
 		-- only produce smoke when not landed or any of the engines aren't firing
-		if (lander.landed == false) and (lander.engineOn or lander.enginelefton or lander.enginerighton) then
+		if lander.landed and (lander.engineOn or lander.leftEngineOn or lander.rightEngineOn) then
 			gfltSmokeTimer = enum.constSmokeTimer	-- a new 'puff' is added when this timer expires (and above conditions are met)
 
 			local mysmoke = {}
@@ -139,7 +147,7 @@ local function payLanderFromBase(lander, objBase, fltDist)
 	-- objBase is an object/table item from garrObjects
 	-- fltDist is the distance from the base
 	local dist = math.abs(fltDist)
-	if objBase.paid == false then
+	if not objBase.paid then
 		lander.wealth = cf.round(lander.wealth + (100 - dist),0)
 		garrSound[2]:play()
 	end
@@ -212,7 +220,7 @@ local function checkForContact(lander, dt)
 		if lander.vy > 0 then lander.vy = 0 end			
 
 		-- check for game-over conditions
-		if lander.fuel <= 1 and lander.landed == true and onbase == false then
+		if lander.fuel <= 1 and lander.landed and onbase then
 			lander.bolGameOver = true
 		end
 	else
@@ -229,7 +237,7 @@ local function playSoundEffects(lander)
 	else
 		garrSound[1]:stop()
 	end
-	
+
 	local fuelpercent = lander.fuel / lander.fueltanksize
 
 	-- play alert if fuel is low (but not empty because that's just annoying)
@@ -382,8 +390,8 @@ function Lander.create()
     lander.vx = 0
     lander.vy = 0
     lander.engineOn = false
-    lander.enginelefton = false
-    lander.enginerighton = false
+    lander.leftEngineOn = false
+    lander.rightEngineOn = false
     lander.landed = false			-- true = on the ground
     lander.airborne = false			-- false = on the ground FOR THE FIRST TIME
     lander.wealth = 0
@@ -449,27 +457,28 @@ end
 
 
 function Lander.update(dt)
-    if love.keyboard.isDown("up") or love.keyboard.isDown("w") or love.keyboard.isDown("kp8") then
+    if keyDown("up") or keyDown("w") or keyDown("kp8") then
         doThrust(garrLanders[1], dt)
     end
-    if love.keyboard.isDown("left") or love.keyboard.isDown("a") or love.keyboard.isDown("kp4") then
+    if keyDown("left") or keyDown("a") or keyDown("kp4") then
         turnLeft(garrLanders[1], dt)
     end
-    if love.keyboard.isDown("right") or love.keyboard.isDown("d") or love.keyboard.isDown("kp6") then
+    if keyDown("right") or keyDown("d") or keyDown("kp6") then
         turnRight(garrLanders[1], dt)
     end
-    if love.keyboard.isDown("q") or love.keyboard.isDown("kp7") then
+    if keyDown("q") or keyDown("kp7") then
         thrustLeft(garrLanders[1], dt)
     end
-    if love.keyboard.isDown("e") or love.keyboard.isDown("kp9") then
+    if keyDown("e") or keyDown("kp9") then
         thrustRight(garrLanders[1], dt)
-    end		
-    if love.keyboard.isDown("p") then
-        fun.AddScreen("Pause")
     end
-    if love.keyboard.isDown("o") then
+
+    if keyDown("p") then
+        fun.AddScreen("Pause")
+	elseif keyDown("o") then
         fun.AddScreen("Settings")
     end
+	
 	-- Update ship
     moveShip(garrLanders[1], dt)
     UpdateSmoke(dt)
@@ -481,52 +490,52 @@ end
 
 function Lander.draw(worldoffset)
 	-- draw the lander and flame
-	for k,v in ipairs(garrLanders) do
-		local drawingx = v.x - worldoffset
-		local drawingy = v.y
+	for landerId, lander in ipairs(garrLanders) do
+		local drawingx = lander.x - worldoffset
+		local drawingy = lander.y
 
 		if drawingx < -200 or drawingx > (gintScreenWidth * 1.1) then
 			-- off screen. do nothing.
 		else
 			-- fade other landers in multiplayer mode
-			if k == 1 then
+			if landerId == 1 then
 				love.graphics.setColor(1,1,1,1)
 			else
 				love.graphics.setColor(1,1,1,0.5)
 			end
 
-			love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
+			love.graphics.draw(garrImages[5], drawingx,drawingy, math.rad(lander.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
 
 			-- draw flames
-			if v.engineOn == true then
-				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-				v.engineOn = false
-			end	
-			if v.enginelefton == true then
-				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle + 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-				v.enginelefton = false
+			if lander.engineOn then
+				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(lander.angle), 1.5, 1.5, garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+				lander.engineOn = false
 			end
-			if v.enginerighton == true then
-				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(v.angle - 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
-				v.enginerighton = false
+			if lander.leftEngineOn then
+				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(lander.angle + 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+				lander.leftEngineOn = false
+			end
+			if lander.rightEngineOn then
+				love.graphics.draw(garrImages[4], drawingx, drawingy, math.rad(lander.angle - 90), 1.5,1.5,  garrImages[4]:getWidth()/2, garrImages[4]:getHeight()/2)
+				lander.rightEngineOn = false
 			end
 
 			-- draw smoke trail
-			for q,w in pairs(garrSmokeSprites) do
-				local drawingx = w.x - worldoffset
-				local drawingy = w.y
+			for _, smoke in pairs(garrSmokeSprites) do
+				local drawingx = smoke.x - worldoffset
+				local drawingy = smoke.y
 
-				local intSpriteNum = cf.round(w.dt)
+				local intSpriteNum = cf.round(smoke.dt)
 				if intSpriteNum < 1 then intSpriteNum = 1 end
 
 				-- not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
-				love.graphics.draw(gSmokeSheet,gSmokeImages[intSpriteNum], drawingx, drawingy, math.rad(v.angle + 135))
+				love.graphics.draw(gSmokeSheet,gSmokeImages[intSpriteNum], drawingx, drawingy, math.rad(lander.angle + 135))
 			end
 
 			-- draw label
 			love.graphics.setNewFont(10)
 			local offsetX, offsetY = 14, 10
-			love.graphics.print(v.name, drawingx + offsetX, drawingy - offsetY)
+			love.graphics.print(lander.name, drawingx + offsetX, drawingy - offsetY)
 			love.graphics.setColor(1,1,1,1)
 		end
 	end
@@ -536,16 +545,13 @@ end
 
 function Lander.keypressed(key, scancode, isrepeat)
 	if Lander.isOnLandingPad(garrLanders[1], 2) then	-- 2 = base type (fuel)
-		if key == "1" then			 
+		if key == "1" then
 			buyThrusters(garrLanders[1])
-		end
-		if key == "2" then			
+		elseif key == "2" then
 			buyLargeTank(garrLanders[1])
-		end	
-		if key == "3" then			
+		elseif key == "3" then
 			buyRangefinder(garrLanders[1])
-		end
-		if key == "4" then			
+		elseif key == "4" then
 			buySideThrusters(garrLanders[1])
 		end		
 	end
