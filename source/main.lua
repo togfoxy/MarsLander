@@ -37,7 +37,7 @@ garrCurrentScreen = {}
 Lander = require "lander"
 Terrain = require "terrain"
 
-HUD = require "hud"
+Hud = require "hud"
 cobjs = require "createobjects"
 dobjs = require "drawobjects"
 fun = require "functions"
@@ -115,32 +115,35 @@ function love.load()
 
 	-- stills/images
 	--! should make these numbers enums one day
-	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
-	garrImages[2] = love.graphics.newImage("/Assets/gastank1.png")
-	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
-	garrImages[4] = love.graphics.newImage("/Assets/engine.png")
-	garrImages[5] = love.graphics.newImage("/Assets/ship.png")
-	garrImages[6] = love.graphics.newImage("/Assets/gastank1off.png")
-	garrImages[7] = love.graphics.newImage("/Assets/building1.png")
-	garrImages[8] = love.graphics.newImage("/Assets/building2.png")
-	garrImages[9] = love.graphics.newImage("/Assets/apollo-11-clipart-9.png")
+	local newImage	= love.graphics.newImage
+	local path 		= "assets/images/"
+	garrImages[1] = newImage(path .. "tower.png")
+	garrImages[2] = newImage(path .. "gastank1.png")
+	garrImages[3] = newImage(path .. "background1.png")
+	garrImages[4] = newImage(path .. "engine.png")
+	garrImages[5] = newImage(path .. "ship.png")
+	garrImages[6] = newImage(path .. "gastank1_off.png")
+	garrImages[7] = newImage(path .. "building1.png")
+	garrImages[8] = newImage(path .. "building2.png")
+	garrImages[9] = newImage(path .. "logo_lander.png")
 	
 	-- spritesheets and animations
-	garrSprites[1] = love.graphics.newImage("Assets/landinglightsnew.png")
+	garrSprites[1] = newImage(path .. "landingLights.png")
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 	
-	gSmokeSheet = love.graphics.newImage("Assets/smoke.png")
+	gSmokeSheet = newImage(path .. "smoke.png")
 	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 30, 30)		-- w/h of each frame
 	
-	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
-	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
-	garrSound[3] = love.audio.newSource("Assets/Galactic-Pole-Position.mp3", "stream")
+	local newSource = love.audio.newSource
+	local path 		= "assets/sounds/"
+	garrSound[1] = newSource(path .. "wind.ogg", "static")
+	garrSound[2] = newSource(path .. "landingSuccess.ogg", "static")
+	garrSound[3] = newSource(path .. "menuTheme.mp3", "stream")
 	garrSound[3]:setVolume(0.25)
-	garrSound[4] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
-	garrSound[5] = love.audio.newSource("Assets/137920__ionicsmusic__robot-voice-low-fuel1.wav", "static")
+	garrSound[5] = newSource(path .. "lowFuel.ogg", "static")
 	garrSound[5]:setVolume(0.25)
-	garrSound[6] = love.audio.newSource("Assets/483598__raclure__wrong.mp3", "static")
+	garrSound[6] = newSource(path .. "wrong.ogg", "static")
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
@@ -174,7 +177,7 @@ function love.draw()
 	
 	if strCurrentScreen == "Pause" then
 		dobjs.DrawWorld() -- Still draw the world
-		HUD.DrawPause() -- Display on top of world
+		Hud.DrawPause() -- Display on top of world
 	end
 
 	if strCurrentScreen == "Settings" then

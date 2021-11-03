@@ -153,7 +153,7 @@ local function PayLanderFromBase(landerObj, objBase, fltDist)
 	local dist = math.abs(fltDist)
 	if objBase.paid == false then
 		landerObj.wealth = cf.round(landerObj.wealth + (100 - dist),0)
-		garrSound[4]:play()
+		garrSound[2]:play()
 	end
 
 end

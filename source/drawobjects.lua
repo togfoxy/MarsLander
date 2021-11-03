@@ -139,8 +139,8 @@ function drawobjects.DrawWorld()
 	-- draw the lander
     Lander.draw(worldoffset)
 
-    -- draw HUD elements
-    HUD.draw(worldoffset)
+    -- draw Hud elements
+    Hud.draw(worldoffset)
 
 	-- draw shop overlay
 	if garrLanders[1].landed then
