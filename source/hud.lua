@@ -28,7 +28,7 @@ local function DrawFuelIndicator()
 -- refactored by Fox
 
     -- Fuel indicator
-    local grad = garrLanders[1].fuel / garrLanders[1].fueltanksize
+    local grad = garrLanders[1].fuel / garrLanders[1].fuelCapacity
     local color = {1, grad, grad}
 	love.graphics.setColor(1,1,1,1)
     love.graphics.rectangle("fill", HUD.fuel.x, HUD.fuel.y, HUD.fuel.w, HUD.fuel.h, HUD.fuel.cornerSize, HUD.fuel.cornerSize)
