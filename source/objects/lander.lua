@@ -51,22 +51,6 @@ end
 
 
 
-local function turnLeft(lander, dt)
-	-- rotate the lander anti-clockwise
-	lander.angle = lander.angle - (90 * dt)
-	if lander.angle < 0 then lander.angle = 360 end
-end
-
-
-
-local function turnRight(lander, dt)
-	-- rotate the lander clockwise
-	lander.angle = lander.angle + (90 * dt)
-	if lander.angle > 360 then lander.angle = 0 end
-end
-
-
-
 local function thrustLeft(lander, dt)
 	if Lander.hasUpgrade(lander, enum.moduleNamesSideThrusters) then
 		local force_x = 0.5 * dt		--!
@@ -456,21 +440,23 @@ end
 
 
 
-function Lander.update(dt)
+function Lander.update(lander, dt)
     if keyDown("up") or keyDown("w") or keyDown("kp8") then
-        doThrust(garrLanders[1], dt)
+        doThrust(lander, dt)
     end
+	-- rotate the lander anti-clockwise
     if keyDown("left") or keyDown("a") or keyDown("kp4") then
-        turnLeft(garrLanders[1], dt)
+		lander.angle = lander.angle - (90 * dt)
     end
+	-- rotate the lander clockwise
     if keyDown("right") or keyDown("d") or keyDown("kp6") then
-        turnRight(garrLanders[1], dt)
+		lander.angle = lander.angle + (90 * dt)
     end
     if keyDown("q") or keyDown("kp7") then
-        thrustLeft(garrLanders[1], dt)
+        thrustLeft(lander, dt)
     end
     if keyDown("e") or keyDown("kp9") then
-        thrustRight(garrLanders[1], dt)
+        thrustRight(lander, dt)
     end
 
     if keyDown("p") then
@@ -478,12 +464,15 @@ function Lander.update(dt)
 	elseif keyDown("o") then
         fun.AddScreen("Settings")
     end
+
+	-- Rest angle
+	if math.max(lander.angle) > 360 then lander.angle = 0 end
 	
 	-- Update ship
-    moveShip(garrLanders[1], dt)
+    moveShip(lander, dt)
     UpdateSmoke(dt)
-    playSoundEffects(garrLanders[1])
-    checkForContact(garrLanders[1], dt)
+    playSoundEffects(lander)
+    checkForContact(lander, dt)
 end
 
 

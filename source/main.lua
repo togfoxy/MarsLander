@@ -209,7 +209,7 @@ function love.update(dt)
 	
 	if strCurrentScreen == "World" then
 
-		Lander.update(dt)
+		Lander.update(garrLanders[1], dt)
 		
 		gLandingLightsAnimation:update(dt)
 		
