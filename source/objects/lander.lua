@@ -171,6 +171,7 @@ local function checkForContact(lander, dt)
 
 	-- see if landed near a fuel base
 	-- bestDistance could be a negative number meaning not yet past the base (but maybe really close to it)
+	-- FIXME: Couldn't baseType be a string like "fuelStation" instead of numbers?
 	-- 2 = type of base = fuel
 	local bestDistance, bestBase = fun.GetDistanceToClosestBase(lander.x, 2)
 	-- bestBase is an object/table item
@@ -379,6 +380,9 @@ function Lander.create()
     local lander = {}
     lander.x = gintOriginX
     lander.y = garrGround[lander.x] - 8
+	lander.sprite = garrImages[5]
+	lander.width = lander.sprite:getWidth()
+	lander.height = lander.sprite:getHeight()
     lander.angle = 270		-- 270 = up
     lander.vx = 0
     lander.vy = 0
@@ -499,61 +503,63 @@ function Lander.draw(worldOffset)
 		local drawingX = lander.x - worldOffset
 		local drawingY = lander.y
 
-		-- FIXME: Why gintScreenWidth * 1.1? Is this accounting for the ship width?
-		if drawingX < -200 or drawingX > (gintScreenWidth * 1.1) then
-			-- off screen. do nothing.
-		else
-			-- fade other landers in multiplayer mode
-			if landerId == 1 then
-				love.graphics.setColor(1,1,1,1)
-			else
-				love.graphics.setColor(1,1,1,0.5)
-			end
-
-			love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), 1.5, 1.5, garrImages[5]:getWidth()/2, garrImages[5]:getHeight()/2)
-
-			-- draw flames
-			-- FIXME: Shouldn't be done in update or draw function but this will likely be fixed by further coe improvements
-			local flameSprite	= garrImages[4]
-			local flameWidth	= flameSprite:getWidth()
-			local flameHeight	= flameSprite:getHeight()
-			local ox 			= flameWidth / 2
-			local oy 			= flameHeight / 2
-
-			if lander.engineOn then
-				local angle = math.rad(lander.angle)
-				love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5, 1.5, ox, oy)
-				lander.engineOn = false
-			end
-			if lander.leftEngineOn then
-				local angle = math.rad(lander.angle + 90)
-				love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5,1.5, ox, oy)
-				lander.leftEngineOn = false
-			end
-			if lander.rightEngineOn then
-				local angle = math.rad(lander.angle - 90)
-				love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5,1.5, ox, oy)
-				lander.rightEngineOn = false
-			end
-
-			-- draw smoke trail
-			for _, smoke in pairs(garrSmokeSprites) do
-				local drawingX = smoke.x - worldOffset
-				local drawingY = smoke.y
-
-				local spriteId = cf.round(smoke.dt)
-				if spriteId < 1 then spriteId = 1 end
-
-				-- not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
-				love.graphics.draw(gSmokeSheet,gSmokeImages[spriteId], drawingX, drawingY, math.rad(lander.angle + 135))
-			end
-
-			-- draw label
-			love.graphics.setNewFont(10)
-			local offsetX, offsetY = 14, 10
-			love.graphics.print(lander.name, drawingX + offsetX, drawingY - offsetY)
+		-- fade other landers in multiplayer mode
+		if landerId == 1 then
 			love.graphics.setColor(1,1,1,1)
+		else
+			love.graphics.setColor(1,1,1,0.5)
 		end
+
+		local ox = lander.width / 2
+		local oy = lander.height / 2
+		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), 1.5, 1.5, ox, oy)
+
+		--[[
+			FIXME:
+			It would be better to avoid creating these variables every tick. This will likely
+			be resolved with further code improvements in the future.
+		--]]
+		-- draw flames
+		local flameSprite	= garrImages[4]
+		local flameWidth	= flameSprite:getWidth()
+		local flameHeight	= flameSprite:getHeight()
+		local ox 			= flameWidth / 2
+		local oy 			= flameHeight / 2
+
+		if lander.engineOn then
+			local angle = math.rad(lander.angle)
+			love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5, 1.5, ox, oy)
+			lander.engineOn = false
+		end
+		if lander.leftEngineOn then
+			local angle = math.rad(lander.angle + 90)
+			love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5,1.5, ox, oy)
+			lander.leftEngineOn = false
+		end
+		if lander.rightEngineOn then
+			local angle = math.rad(lander.angle - 90)
+			love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5,1.5, ox, oy)
+			lander.rightEngineOn = false
+		end
+
+		-- draw smoke trail
+		for _, smoke in pairs(garrSmokeSprites) do
+			-- FIXME: All images / frames should have a width/height variable to avoid hardcoded numbers!
+			-- 8 = smokeFrameWidth / 2
+			local drawingX = smoke.x - worldOffset - lander.width / 2 - 8
+			local drawingY = smoke.y
+
+			local spriteId = cf.round(smoke.dt)
+			if spriteId < 1 then spriteId = 1 end
+
+			love.graphics.draw(gSmokeSheet,gSmokeImages[spriteId], drawingX, drawingY)
+		end
+
+		-- draw label
+		love.graphics.setNewFont(10)
+		local offsetX, offsetY = 14, 10
+		love.graphics.print(lander.name, drawingX + offsetX, drawingY - offsetY)
+		love.graphics.setColor(1,1,1,1)
 	end
 end
 
