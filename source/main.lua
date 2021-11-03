@@ -104,15 +104,6 @@ function love.load()
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
-	fun.LoadGameSettings()
-	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
-	
-	fun.AddScreen("MainMenu")
-	fun.ResetGame()
-	
-	-- capture the 'normal' mass of the lander into a global variable
-	gintDefaultMass = Lander.getMass(garrLanders[1])
-
 	-- stills/images
 	--! should make these numbers enums one day
 	local newImage	= love.graphics.newImage
@@ -149,6 +140,15 @@ function love.load()
 	
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
+
+	fun.LoadGameSettings()
+	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
+	
+	fun.AddScreen("MainMenu")
+	fun.ResetGame()
+	
+	-- capture the 'normal' mass of the lander into a global variable
+	gintDefaultMass = Lander.getMass(garrLanders[1])
 
 	lovelyToasts.options.queueEnabled = true
 	
