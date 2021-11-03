@@ -68,7 +68,7 @@ end
 local function DrawWealth()
 
 	love.graphics.setNewFont(20)
-	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 75)
+	love.graphics.print("$" .. garrLanders[1].money, gintScreenWidth - 100, 75)
 
 end
 
