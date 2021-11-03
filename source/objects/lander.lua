@@ -18,7 +18,8 @@ local keyDown = love.keyboard.isDown
 
 local function doThrust(lander, dt)
 	-- FIXME: This statement potentially doesn't work as expected. Check and verify!
-	if lander.fuel - dt >= 0 or (Lander.hasUpgrade(lander, enum.moduleNamesThrusters) and lander.fuel - (dt * 0.80) >= 0) then
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, enum.moduleNamesThrusters)
+	if lander.fuel - dt >= 0 or (hasThrusterUpgrade and lander.fuel - (dt * 0.80) >= 0) then
 		lander.engineOn = true
 		local angleRadian = math.rad(lander.angle)
 		local forceX = math.cos(angleRadian) * dt
