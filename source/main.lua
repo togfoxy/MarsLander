@@ -1,5 +1,7 @@
 gstrGameVersion = "0.10"
 
+io.stdout:setvbuf("no")
+
 inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
 
