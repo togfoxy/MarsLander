@@ -22,6 +22,7 @@ anim8 = require 'lib.anim8'
 socket = require "socket"
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
 -- http://w3.impa.br/~diego/software/luasocket/reference.html
+-- https://aiq0.github.io/luasocket/reference.html
 
 lovelyToasts = require("lib.lovelyToasts")
 -- https://github.com/Loucee/Lovely-Toasts
@@ -70,7 +71,7 @@ gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
 gstrServerIP = nil					-- server's IP address
-gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gintServerPort = 6666 -- love.math.random(6000,6999)		-- this is the port each client needs to connect to
 gstrClientIP = nil
 gintClientPort = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
