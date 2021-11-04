@@ -88,7 +88,7 @@ function love.keypressed(key, scancode, isrepeat)
 	Lander.keypressed(key, scancode, isrepeat)
 
 	if key == "r" then
-		if garrLanders[1].bolGameOver then
+		if garrLanders[1].gameOver then
 			fun.ResetGame()
 		end
 	end
