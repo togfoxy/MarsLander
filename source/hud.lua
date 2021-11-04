@@ -205,7 +205,7 @@ function HUD.draw(worldoffset)
 	DrawRangefinder(garrLanders[1])
     DrawPortInformation()
 	
-	if garrLanders[1].bolGameOver then
+	if garrLanders[1].gameOver then
 		DrawGameOver()
 	end
     
