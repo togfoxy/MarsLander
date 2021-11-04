@@ -62,6 +62,8 @@ gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
 gfltSmokeTimer = enum.constSmokeTimer			-- track how often to capture smoke trail
+gfltSocketClientTimer = 0 -- enum.constSocketClientRate		
+gfltSocketHostTimer = enum.constSocketHostRate		
 
 gstrDefaultPlayerName = 'Player Name'
 gstrCurrentPlayerName = gstrDefaultPlayerName
@@ -208,7 +210,7 @@ function love.update(dt)
 		
 		gLandingLightsAnimation:update(dt)
 		
-		fun.HandleSockets()
+		fun.HandleSockets(dt)
 	end
 	
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu

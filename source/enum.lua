@@ -4,6 +4,8 @@ module(...,package.seeall)
 constSmokeTimer = 0.5
 constVYThreshold = 0.60
 constGravity = 0.6
+constSocketClientRate = 0.1		-- how frequently will client send to the host?
+constSocketHostRate = 0.1
 
 
 -- enumerators -- 

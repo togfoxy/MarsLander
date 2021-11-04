@@ -79,6 +79,9 @@ function socketstuff.HostListenPort()
 			table.insert(arrClientNodes,node)
 		end
 	end
+
+print("~~~")	
+print(#arrHostIncomingQueue)
 end
 
 function socketstuff.ClientListenPort()

@@ -137,7 +137,7 @@ end
 local function DrawScore()
 -- score is simply the amount of forward distance travelled (lander.x)
 	
-	local score = cf.strFormatThousand(tonumber(cf.round(fun.calculateScore())))
+	local score = cf.strFormatThousand(tonumber(cf.round(fun.CalculateScore())))
 	local highscore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
 	love.graphics.setNewFont(14)

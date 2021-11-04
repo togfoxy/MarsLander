@@ -129,7 +129,7 @@ function functions.LoadGame()
 
 end
 
-function functions.calculateScore()
+function functions.CalculateScore()
 	local score = garrLanders[1].x - gintOriginX
 	
 	if score > garrGameSettings.HighScore then
@@ -168,8 +168,8 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 
 end
 
-function functions.HandleSockets()
-	
+function functions.HandleSockets(dt)
+
 	-- add lander info to the outgoing queue
 	local msg = {}
 	msg.x = garrLanders[1].x
@@ -179,58 +179,70 @@ function functions.HandleSockets()
 	-- ** msg is set here and sent below
 	
 	if gbolIsAHost then
-		ss.HostListenPort()
+	
+		--gfltSocketHostTimer = gfltSocketHostTimer - dt
+		--if gfltSocketHostTimer <= 0 then
+		--	gfltSocketHostTimer = enum.constSocketHostRate
 		
-		-- get just one item from the queue and process it
-		repeat
-			local incoming = ss.GetItemInHostQueue()		-- could be nil
-			if incoming ~= nil then
-				if incoming.name == "ConnectionRequest" then
-					gbolIsConnected = true
-					msg = {}
-					msg.name = "ConnectionAccepted"
-
-				else
-					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
-					garrLanders[2].x = incoming.x
-					garrLanders[2].y = incoming.y
-					garrLanders[2].angle = incoming.angle
-					garrLanders[2].name = incoming.name
-				end	
-			end
-		until incoming == nil
+			ss.HostListenPort()
 			
-		ss.AddItemToHostOutgoingQueue(msg)
-		ss.SendToClients()
-		msg = {}
+			-- get just one item from the queue and process it
+			repeat
+				local incoming = ss.GetItemInHostQueue()		-- could be nil
+				if incoming ~= nil then
+					if incoming.name == "ConnectionRequest" then
+						gbolIsConnected = true
+						msg = {}
+						msg.name = "ConnectionAccepted"
+
+					else
+						garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
+						garrLanders[2].x = incoming.x
+						garrLanders[2].y = incoming.y
+						garrLanders[2].angle = incoming.angle
+						garrLanders[2].name = incoming.name
+					end	
+				end
+			until incoming == nil
+				
+			ss.AddItemToHostOutgoingQueue(msg)
+			ss.SendToClients()
+			msg = {}
+		--end
 	end
 	
 	if gbolIsAClient then
-		ss.ClientListenPort()
-		
-		-- get item from the queue and process it
-		repeat
-			local incoming = ss.GetItemInClientQueue()		-- could be nil
-			if incoming ~= nil then
-				if incoming.name == "ConnectionAccepted" then
-					gbolIsConnected = true
-					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
-						fun.SaveGameSettings()
-						fun.AddScreen("World")
-					end
-				else	
-					garrLanders[2] = {}
-					garrLanders[2].x = incoming.x
-					garrLanders[2].y = incoming.y
-					garrLanders[2].angle = incoming.angle
-					garrLanders[2].name = incoming.name
-				end
-			end
-		until incoming == nil
 
-		ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
-		ss.SendToHost()
-		msg = {}
+			ss.ClientListenPort()
+		
+			-- get item from the queue and process it
+			repeat
+				local incoming = ss.GetItemInClientQueue()		-- could be nil
+				if incoming ~= nil then
+					if incoming.name == "ConnectionAccepted" then
+						gbolIsConnected = true
+						if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
+							fun.SaveGameSettings()
+							fun.AddScreen("World")
+						end
+					else	
+						garrLanders[2] = {}
+						garrLanders[2].x = incoming.x
+						garrLanders[2].y = incoming.y
+						garrLanders[2].angle = incoming.angle
+						garrLanders[2].name = incoming.name
+					end
+				end
+			until incoming == nil
+
+			gfltSocketClientTimer = gfltSocketClientTimer - love.timer.getDelta()
+			if gfltSocketClientTimer <= 0 then			
+				gfltSocketClientTimer = enum.constSocketClientRate			
+			
+				ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
+				ss.SendToHost()
+				msg = {}
+			end
 	end
 end
 

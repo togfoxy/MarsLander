@@ -112,13 +112,14 @@ function menus.DrawMainMenu()
 				gbolIsAHost = false
 				gbolIsAClient = true
 
-				ss.ConnectToHost(garrGameSettings.HostIP, garrGameSettings.HostPort)		--! Note!!! ss.ConnectToHost does not use the IP address. socketstuff.lua needs to be finished/fixed
+				ss.ConnectToHost(garrGameSettings.HostIP, garrGameSettings.HostPort)
 
 				-- send a test message to the host. The host will return the client's IP and port
 				local msg = {}
 				msg.name = "ConnectionRequest"
 	
 				ss.AddItemToClientOutgoingQueue(msg)
+				ss.SendToHost()
 				-- gbolIsConnected = true	--!temporary code
 				-- fun.AddScreen("World")
 			end
