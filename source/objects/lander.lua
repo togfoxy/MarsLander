@@ -98,14 +98,15 @@ local function moveShip(lander, dt)
 	if gfltSmokeTimer <= 0 then
 		-- only produce smoke when not onGround or any of the engines aren't firing
 		if (lander.engineOn or lander.leftEngineOn or lander.rightEngineOn) then
-			local mysmoke = {}
-			mysmoke.x = lander.x
-			mysmoke.y = lander.y
+			-- FIXME: Smoke related stuff should be in it's own local function
+			local smoke = {}
+			smoke.x = lander.x
+			smoke.y = lander.y
 			-- a new 'puff' is added when this timer expires (and above conditions are met)
 			gfltSmokeTimer = enum.constSmokeTimer
 			-- this timer will count up and determine which sprite to display
-			mysmoke.dt = 0	
-			table.insert(garrSmokeSprites, mysmoke)
+			smoke.dt = 0
+			table.insert(garrSmokeSprites, smoke)
 		end
 	end
 end
@@ -150,7 +151,6 @@ end
 local function checkForDamage(lander)
 	-- FIXME: Health isn't calculated. Possibly caused by removing airborne variable.
 	-- apply damage if vertical speed is too higher
-	print("test")
 	if lander.vy > enum.constVYThreshold then
 		local excessSpeed = lander.vy - enum.constVYThreshold
 		lander.health = lander.health - (excessSpeed * 100)
@@ -289,7 +289,8 @@ local function buyLargeTank(lander)
 		table.insert(lander.modules, enum.moduleNamesLargeTank)
 		lander.money = lander.money - enum.moduleCostsLargeTank
 
-		lander.fuelCapacity = 32		-- an increase from the default (25)
+		-- an increase from the default (25)
+		lander.fuelCapacity = 32
 		lander.mass[2] = 23
 
 		-- need to recalc the default mass
@@ -317,14 +318,13 @@ local function buyRangefinder(lander)
 
 		table.insert(lander.modules, enum.moduleNamesRangeFinder)
 		lander.money = lander.money - enum.moduleCostsRangeFinder
-
-		lander.mass[3] = 2	-- this is the mass of the rangefinder
-
+		-- this is the mass of the rangefinder
+		lander.mass[3] = 2
 		-- need to recalc the default mass
-		gintDefaultMass = recalcDefaultMass(lander)		
+		gintDefaultMass = recalcDefaultMass(lander)
 	else
 		-- play 'failed' sound
-		garrSound[6]:play()		
+		garrSound[6]:play()
 	end
 end
 
@@ -336,14 +336,14 @@ local function buySideThrusters(lander)
 			table.insert(lander.modules, enum.moduleNamesSideThrusters)
 			lander.money = lander.money - enum.moduleCostSideThrusters
 			-- this is the mass of the side thrusters
-			lander.mass[4] = enum.moduleMassSideThrusters	
+			lander.mass[4] = enum.moduleMassSideThrusters
 
 			-- need to recalc the default mass
-			gintDefaultMass = recalcDefaultMass(lander)	
+			gintDefaultMass = recalcDefaultMass(lander)
 		end
 	else
 		-- play 'failed' sound
-		garrSound[6]:play()		
+		garrSound[6]:play()
 	end
 end
 
@@ -355,7 +355,7 @@ local function updateSmoke(dt)
 		-- 6 seems to give a good effect
 		smoke.dt = smoke.dt + (dt * 6)
 		-- the sprite sheet has 8 images
-		if smoke.dt > 8 then		
+		if smoke.dt > 8 then
 			table.remove(garrSmokeSprites,key)
 		end
 	end
@@ -375,7 +375,8 @@ function Lander.create()
 	lander.sprite = garrImages[5]
 	lander.width = lander.sprite:getWidth()
 	lander.height = lander.sprite:getHeight()
-    lander.angle = 270		-- 270 = up
+	-- 270 = up
+    lander.angle = 270
     lander.vx = 0
     lander.vy = 0
     lander.engineOn = false
@@ -383,10 +384,9 @@ function Lander.create()
     lander.rightEngineOn = false
 	-- true = on the ground
     lander.onGround = false
-	-- false = on the ground FOR THE FIRST TIME
-    lander.money = 0
 	-- this is % meaning 100 = no damage
     lander.health = 100
+    lander.money = 0
     lander.gameOver = false
 	lander.score = lander.x - gintOriginX
     lander.name = gstrCurrentPlayerName
@@ -538,7 +538,7 @@ function Lander.draw(worldOffset)
 		-- draw smoke trail
 		for _, smoke in pairs(garrSmokeSprites) do
 			-- FIXME: All images / frames should have a width/height variable to avoid hardcoded numbers!
-			-- 8 = smokeFrameWidth / 2
+			-- FIXME: Smoke related stuff should be in it's own local function
 			local drawingX = smoke.x - worldOffset
 			local drawingY = smoke.y
 			local spriteId = cf.round(smoke.dt)
