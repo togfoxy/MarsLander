@@ -66,7 +66,7 @@ end
 local function thrustRight(lander, dt)
 	if Lander.hasUpgrade(lander, enum.moduleNamesSideThrusters) then
 		local forceX = 0.5 * dt		--!
-		lander.vx 	= lander.vx + forceX
+		lander.vx	= lander.vx + forceX
 		lander.fuel = lander.fuel - forceX
 		-- opposite engine is on
 		lander.leftEngineOn = true
@@ -118,7 +118,7 @@ local function refuelLander(lander, base, dt)
 	-- base is an object/table item from garrObjects
 	local refuelAmount = math.min(base.totalFuel, (lander.fuelCapacity - lander.fuel), dt)
 	base.totalFuel	= base.totalFuel - refuelAmount
-	lander.fuel 	= lander.fuel + refuelAmount
+	lander.fuel		= lander.fuel + refuelAmount
 	-- disable the base if the tanks are empty
 	if base.totalFuel <= 0 then base.active = false end
 end
@@ -369,45 +369,45 @@ end
 
 function Lander.create()
 	-- create a lander and return it to the calling sub
-    local lander = {}
-    lander.x = gintOriginX
-    lander.y = garrGround[lander.x] - 8
+	local lander = {}
+	lander.x = gintOriginX
+	lander.y = garrGround[lander.x] - 8
 	lander.sprite = garrImages[5]
 	lander.width = lander.sprite:getWidth()
 	lander.height = lander.sprite:getHeight()
 	-- 270 = up
-    lander.angle = 270
-    lander.vx = 0
-    lander.vy = 0
-    lander.engineOn = false
-    lander.leftEngineOn = false
-    lander.rightEngineOn = false
+	lander.angle = 270
+	lander.vx = 0
+	lander.vy = 0
+	lander.engineOn = false
+	lander.leftEngineOn = false
+	lander.rightEngineOn = false
 	-- true = on the ground
-    lander.onGround = false
+	lander.onGround = false
 	-- this is % meaning 100 = no damage
-    lander.health = 100
-    lander.money = 0
-    lander.gameOver = false
+	lander.health = 100
+	lander.money = 0
+	lander.gameOver = false
 	lander.score = lander.x - gintOriginX
-    lander.name = gstrCurrentPlayerName
+	lander.name = gstrCurrentPlayerName
 
-    -- mass	
-    lander.mass = {}
+	-- mass	
+	lander.mass = {}
 	-- base mass of lander
-    table.insert(lander.mass, 100)
+	table.insert(lander.mass, 100)
 	-- volume in arbitrary units
-    lander.fuelCapacity = 25
+	lander.fuelCapacity = 25
 	-- start with a full tank
-    lander.fuel = lander.fuelCapacity
+	lander.fuel = lander.fuelCapacity
 	-- this is the mass of an empty tank
-    table.insert(lander.mass, 20)
+	table.insert(lander.mass, 20)
 	-- this is the mass of the rangefinder (not yet purchased)
-    table.insert(lander.mass, 0)
+	table.insert(lander.mass, 0)
 
-    -- modules
+	-- modules
 	-- this will be strings/names of modules
-    lander.modules = {}
-    return lander
+	lander.modules = {}
+	return lander
 end
 
 
