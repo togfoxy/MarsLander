@@ -79,9 +79,9 @@ local function moveShip(lander, dt)
 	lander.x = lander.x + lander.vx
 	lander.y = lander.y + lander.vy
 
-	local leftedge = gintOriginX - (gintScreenWidth / 2)
-	if lander.x < leftedge then
-		lander.x = leftedge
+	local leftEdge = gintOriginX - (gintScreenWidth / 2)
+	if lander.x < leftEdge then
+		lander.x = leftEdge
 	end
 
 	if not lander.onGround then
@@ -189,7 +189,9 @@ local function checkForContact(lander, dt)
 		lander.onGround = true
 		-- Stop x, y movement
 		lander.vx = 0
-		lander.vy = 0
+		if lander.vy > 0 then
+			lander.vy = 0
+		end
 
 		if onBase then
 			refuelLander(lander, bestBase,dt)
