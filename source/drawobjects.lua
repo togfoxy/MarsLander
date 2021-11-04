@@ -143,7 +143,7 @@ function drawobjects.DrawWorld()
     Hud.draw(worldoffset)
 
 	-- draw shop overlay
-	if garrLanders[1].landed then
+	if garrLanders[1].onGround then
 		DrawShopMenu()
 	end
 

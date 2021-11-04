@@ -17,10 +17,8 @@ local keyDown = love.keyboard.isDown
 -- ~~~~~~~~~~~~~~~~
 
 local function doThrust(lander, dt)
-	-- FIXME: This statement potentially doesn't work as expected. Check and verify!
 	local hasThrusterUpgrade = Lander.hasUpgrade(lander, enum.moduleNamesThrusters)
 	if lander.fuel - dt >= 0 or (hasThrusterUpgrade and lander.fuel - (dt * 0.80) >= 0) then
-		lander.engineOn = true
 		local angleRadian = math.rad(lander.angle)
 		local forceX = math.cos(angleRadian) * dt
 		local forceY = math.sin(angleRadian) * dt
@@ -33,9 +31,9 @@ local function doThrust(lander, dt)
 			garrMassRatio = massRatio
 		end
 
+		lander.engineOn = true
 		forceX = forceX * massRatio
 		forceY = forceY * massRatio
-
 		lander.vx = lander.vx + forceX
 		lander.vy = lander.vy + forceY
 
@@ -86,12 +84,9 @@ local function moveShip(lander, dt)
 		lander.x = leftedge
 	end
 
-	-- apply gravity
-	if not lander.landed then
+	if not lander.onGround then
+		-- apply gravity
 		lander.vy = lander.vy + (enum.constGravity * dt)
-	end
-
-	if not lander.landed then
 		-- used to determine speed right before touchdown
 		gfltLandervy = lander.vy
 		gfltLandervx = lander.vx
@@ -101,7 +96,7 @@ local function moveShip(lander, dt)
 	gfltSmokeTimer = gfltSmokeTimer - dt
 
 	if gfltSmokeTimer <= 0 then
-		-- only produce smoke when not landed or any of the engines aren't firing
+		-- only produce smoke when not onGround or any of the engines aren't firing
 		if (lander.engineOn or lander.leftEngineOn or lander.rightEngineOn) then
 			local mysmoke = {}
 			mysmoke.x = lander.x
@@ -153,7 +148,9 @@ end
 
 
 local function checkForDamage(lander)
+	-- FIXME: Health isn't calculated. Possibly caused by removing airborne variable.
 	-- apply damage if vertical speed is too higher
+	print("test")
 	if lander.vy > enum.constVYThreshold then
 		local excessSpeed = lander.vy - enum.constVYThreshold
 		lander.health = lander.health - (excessSpeed * 100)
@@ -169,7 +166,7 @@ local function checkForContact(lander, dt)
 	local roundedGroundY
 	local onBase = Lander.isOnLandingPad(lander, enum.basetypeFuel)
 
-	-- see if landed near a fuel base
+	-- see if onGround near a fuel base
 	-- bestDistance could be a negative number meaning not yet past the base (but maybe really close to it)
 	-- FIXME: Couldn't baseType be a string like "fuelStation" instead of numbers?
 	-- 2 = type of base = fuel
@@ -186,7 +183,13 @@ local function checkForContact(lander, dt)
 	-- check if lander is at or below the terrain
 	-- the offset is the size of the lander image
 	if lander.y > roundedGroundY - 8 then
-		lander.landed = true
+		-- a heavy landing will cause damage
+		checkForDamage(lander)
+		-- Lander is on ground
+		lander.onGround = true
+		-- Stop x, y movement
+		lander.vx = 0
+		lander.vy = 0
 
 		if onBase then
 			refuelLander(lander, bestBase,dt)
@@ -199,23 +202,12 @@ local function checkForContact(lander, dt)
 			end
 		end
 
-		if not lander.landed then
-			-- a heavy landing will cause damage
-			checkForDamage(lander)
-			lander.landed = true
-		end
-
-		lander.vx = 0
-		if lander.vy > 0 then
-			lander.vy = 0
-		end
-
 		-- check for game-over conditions
-		if lander.fuel <= 1 and lander.landed then
+		if lander.fuel <= 1 then
 			lander.gameOver = true
 		end
 	else
-		lander.landed = false
+		lander.onGround = false
 	end
 end
 
@@ -390,7 +382,7 @@ function Lander.create()
     lander.leftEngineOn = false
     lander.rightEngineOn = false
 	-- true = on the ground
-    lander.landed = false
+    lander.onGround = false
 	-- false = on the ground FOR THE FIRST TIME
     lander.money = 0
 	-- this is % meaning 100 = no damage
@@ -500,6 +492,7 @@ end
 function Lander.draw(worldOffset)
 	-- draw the lander and flame
 	for landerId, lander in ipairs(garrLanders) do
+		local sx, sy = 1.5, 1.5
 		local drawingX = lander.x - worldOffset
 		local drawingY = lander.y
 
@@ -512,7 +505,7 @@ function Lander.draw(worldOffset)
 
 		local ox = lander.width / 2
 		local oy = lander.height / 2
-		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), 1.5, 1.5, ox, oy)
+		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
 
 		--[[
 			FIXME:
@@ -528,17 +521,17 @@ function Lander.draw(worldOffset)
 
 		if lander.engineOn then
 			local angle = math.rad(lander.angle)
-			love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5, 1.5, ox, oy)
+			love.graphics.draw(flameSprite, drawingX, drawingY, angle, sx, sy, ox, oy)
 			lander.engineOn = false
 		end
 		if lander.leftEngineOn then
 			local angle = math.rad(lander.angle + 90)
-			love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5,1.5, ox, oy)
+			love.graphics.draw(flameSprite, drawingX, drawingY, angle, sx, sy, ox, oy)
 			lander.leftEngineOn = false
 		end
 		if lander.rightEngineOn then
 			local angle = math.rad(lander.angle - 90)
-			love.graphics.draw(flameSprite, drawingX, drawingY, angle, 1.5,1.5, ox, oy)
+			love.graphics.draw(flameSprite, drawingX, drawingY, angle, sx, sy, ox, oy)
 			lander.rightEngineOn = false
 		end
 
@@ -546,13 +539,12 @@ function Lander.draw(worldOffset)
 		for _, smoke in pairs(garrSmokeSprites) do
 			-- FIXME: All images / frames should have a width/height variable to avoid hardcoded numbers!
 			-- 8 = smokeFrameWidth / 2
-			local drawingX = smoke.x - worldOffset - lander.width / 2 - 8
+			local drawingX = smoke.x - worldOffset
 			local drawingY = smoke.y
-
 			local spriteId = cf.round(smoke.dt)
 			if spriteId < 1 then spriteId = 1 end
-
-			love.graphics.draw(gSmokeSheet,gSmokeImages[spriteId], drawingX, drawingY)
+			-- not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
+			love.graphics.draw(gSmokeSheet,gSmokeImages[spriteId], drawingX, drawingY, math.rad(lander.angle + 135))
 		end
 
 		-- draw label
