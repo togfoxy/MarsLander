@@ -536,7 +536,6 @@ function Lander.draw(worldOffset)
 
 		-- draw smoke trail
 		for _, smoke in pairs(garrSmokeSprites) do
-			-- TODO: All images / frames should have a width/height variable to avoid hardcoded numbers!
 			-- TODO: Smoke related stuff should be in it's own local function
 			local drawingX = smoke.x - worldOffset
 			local drawingY = smoke.y
