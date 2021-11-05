@@ -79,6 +79,7 @@ local function moveShip(lander, dt)
 	lander.x = lander.x + lander.vx
 	lander.y = lander.y + lander.vy
 
+	-- Set left boundary
 	if lander.x < gintOriginX then
 		lander.vx = 0
 		lander.x = gintOriginX
@@ -92,13 +93,13 @@ local function moveShip(lander, dt)
 		gfltLandervx = lander.vx
 	end
 
+	-- TODO: Smoke related stuff should be in it's own local function
 	-- capture a new smoke location every x seconds
 	gfltSmokeTimer = gfltSmokeTimer - dt
 
 	if gfltSmokeTimer <= 0 then
-		-- only produce smoke when not onGround or any of the engines aren't firing
+		-- only produce smoke when the engines are firing
 		if (lander.engineOn or lander.leftEngineOn or lander.rightEngineOn) then
-			-- FIXME: Smoke related stuff should be in it's own local function
 			local smoke = {}
 			smoke.x = lander.x
 			smoke.y = lander.y
@@ -223,9 +224,7 @@ local function playSoundEffects(lander)
 	end
 
 	local fuelPercent = lander.fuel / lander.fuelCapacity
-
 	-- play alert if fuel is low (but not empty because that's just annoying)
-	-- 1% because rounding (fuel is never actually zero)
 	if fuelPercent <= 0.33 and fuelPercent > 0.01 then
 		garrSound[5]:play()
 	end
@@ -234,14 +233,12 @@ end
 
 
 local function recalcDefaultMass(lander)
-	-- need to recalc the default mass
-	-- usually called after buying a module
 	local result = 0
 	-- all the masses are stored in this table so add them up
 	for i = 1, #lander.mass do
 		result = result + lander.mass[i]
 	end
-	-- return mass of all the components + mass of fuel if the tank was full (i.e. fuelCapacity)
+	-- return mass of all the components + mass of fuel
 	return (result + lander.fuelCapacity)
 end
 
@@ -339,7 +336,6 @@ local function buySideThrusters(lander)
 			lander.money = lander.money - enum.moduleCostSideThrusters
 			-- this is the mass of the side thrusters
 			lander.mass[4] = enum.moduleMassSideThrusters
-
 			-- need to recalc the default mass
 			gintDefaultMass = recalcDefaultMass(lander)
 		end
@@ -384,16 +380,15 @@ function Lander.create()
 	lander.engineOn = false
 	lander.leftEngineOn = false
 	lander.rightEngineOn = false
-	-- true = on the ground
 	lander.onGround = false
-	-- this is % meaning 100 = no damage
+	-- Health in percent
 	lander.health = 100
 	lander.money = 0
 	lander.gameOver = false
 	lander.score = lander.x - gintOriginX
 	lander.name = gstrCurrentPlayerName
 
-	-- mass	
+	-- mass
 	lander.mass = {}
 	-- base mass of lander
 	table.insert(lander.mass, 100)
@@ -479,7 +474,7 @@ function Lander.update(lander, dt)
         fun.AddScreen("Settings")
     end
 
-	-- Rest angle
+	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
 	
 	-- Update ship
@@ -510,9 +505,11 @@ function Lander.draw(worldOffset)
 		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
 
 		--[[
-			FIXME:
-			It would be better to avoid creating these variables every tick. This will likely
-			be resolved with further code improvements in the future.
+			TODO:
+			It would be better to avoid creating variables every tick. This will likely
+			resolve itself with more code improvements.
+			As a quick & dirty solution we could create the variables at the top of this
+			file and just use them here without the local keyword.
 		--]]
 		-- draw flames
 		local flameSprite	= garrImages[4]
@@ -539,12 +536,17 @@ function Lander.draw(worldOffset)
 
 		-- draw smoke trail
 		for _, smoke in pairs(garrSmokeSprites) do
-			-- FIXME: All images / frames should have a width/height variable to avoid hardcoded numbers!
-			-- FIXME: Smoke related stuff should be in it's own local function
+			-- TODO: All images / frames should have a width/height variable to avoid hardcoded numbers!
+			-- TODO: Smoke related stuff should be in it's own local function
 			local drawingX = smoke.x - worldOffset
 			local drawingY = smoke.y
 			local spriteId = cf.round(smoke.dt)
 			if spriteId < 1 then spriteId = 1 end
+			--[[ TODO: currently the sprite rotates around it's top left corner and kinda works visually because of the way
+				 the frames of the animation are drawn in the actual image file.
+				 It would be better to rotate around a center point of the frame and then adjust the position of the
+				 sprite to be fixed at a certain location. Some adjustments to the sprite itself might be nessecary.
+			--]]
 			-- not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
 			love.graphics.draw(gSmokeSheet,gSmokeImages[spriteId], drawingX, drawingY, math.rad(lander.angle + 135))
 		end
