@@ -201,6 +201,9 @@ function functions.HandleSockets(dt)
 						garrLanders[2].y = incoming.y
 						garrLanders[2].angle = incoming.angle
 						garrLanders[2].name = incoming.name
+						
+
+				
 					end	
 				end
 			until incoming == nil
@@ -213,36 +216,44 @@ function functions.HandleSockets(dt)
 	
 	if gbolIsAClient then
 
-			ss.ClientListenPort()
-		
-			-- get item from the queue and process it
-			repeat
-				local incoming = ss.GetItemInClientQueue()		-- could be nil
-				if incoming ~= nil then
-					if incoming.name == "ConnectionAccepted" then
-						gbolIsConnected = true
-						if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
-							fun.SaveGameSettings()
-							fun.AddScreen("World")
-						end
-					else	
-						garrLanders[2] = {}
-						garrLanders[2].x = incoming.x
-						garrLanders[2].y = incoming.y
-						garrLanders[2].angle = incoming.angle
-						garrLanders[2].name = incoming.name
-					end
-				end
-			until incoming == nil
+		ss.ClientListenPort()
+	
+		-- get item from the queue and process it
+		local incoming = ss.GetItemInClientQueue()		-- could be nil
 
-			gfltSocketClientTimer = gfltSocketClientTimer - love.timer.getDelta()
-			if gfltSocketClientTimer <= 0 then			
-				gfltSocketClientTimer = enum.constSocketClientRate			
-			
-				ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
-				ss.SendToHost()
-				msg = {}
+		repeat
+			if incoming ~= nil then
+				if incoming.name == "ConnectionAccepted" then
+					gbolIsConnected = true
+					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
+						fun.SaveGameSettings()
+						fun.AddScreen("World")
+					end
+				else	
+					garrLanders[2] = {}
+					garrLanders[2].x = incoming.x
+					garrLanders[2].y = incoming.y
+					garrLanders[2].angle = incoming.angle
+					garrLanders[2].name = incoming.name
+
+--!print(garrLanders[2].x)	
+
+				end
+			else
 			end
+			incoming = ss.GetItemInClientQueue()		-- could be nil
+		until incoming == nil
+
+		-- this time is needed to stop the client flooding the network
+		local deltatime = love.timer.getDelta()
+		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
+		if gfltSocketClientTimer <= 0 then			
+			gfltSocketClientTimer = enum.constSocketClientRate			
+		
+			ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
+			ss.SendToHost()
+			msg = {}
+		end
 	end
 end
 

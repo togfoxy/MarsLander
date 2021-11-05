@@ -65,7 +65,7 @@ function socketstuff.HostListenPort()
 		unpackeddata = bitser.loads(data)
         table.insert(arrHostIncomingQueue,unpackeddata)
     end
-    socket.sleep(0.01)    --! will this interfere with the client?
+    --socket.sleep(0.01)    -- this doesn't seem to do much so I removed it
 	
 	local node = {}
     node.ip = ip
@@ -74,14 +74,19 @@ function socketstuff.HostListenPort()
 	if port == nil or unpackeddata == nil then
 		-- no message, do nothing
 	else
-		if cf.bolTableHasValue (arrClientNodes, node) then
-		else
+		local bolAddClient = true
+		for k,v in pairs(arrClientNodes) do
+			if node.ip == v.ip and node.port == v.port then
+				-- this node is already captured.
+				bolAddClient = false
+				break
+			end
+		end
+		if bolAddClient then
 			table.insert(arrClientNodes,node)
 		end
 	end
 
-print("~~~")	
-print(#arrHostIncomingQueue)
 end
 
 function socketstuff.ClientListenPort()
@@ -91,7 +96,6 @@ function socketstuff.ClientListenPort()
 		local unpackeddata = bitser.loads(data)
         table.insert(arrClientIncomingQueue,unpackeddata)
     end
-
 end
 
 function socketstuff.GetItemInHostQueue()
@@ -108,7 +112,7 @@ function socketstuff.GetItemInHostQueue()
 end
 
 function socketstuff.GetItemInClientQueue()
--- returns the first/oldest item in the message queue
+-- returns the first/oldest item in the message queue and deletes that item from the queue
 
 	local retval
 	if #arrClientIncomingQueue > 0 then
@@ -151,11 +155,12 @@ end
 function socketstuff.SendToClients()
 -- sends the whole outgoing queue to all of the clients
 	while #arrHostOutgoingQueue > 0 do
-	
 		if arrHostOutgoingQueue[1] ~= nil then
+		
 			local serialdata = bitser.dumps(arrHostOutgoingQueue[1])
 			for k,v in pairs(arrClientNodes) do
-				udphost:sendto(serialdata, v.ip, v.port)		--! see if "send" will work and will be faster
+				udphost:sendto(serialdata, v.ip, v.port)
+print(#arrClientNodes)
 			end
 		end
 		table.remove(arrHostOutgoingQueue,1)
