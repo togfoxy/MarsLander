@@ -39,7 +39,7 @@ garrCurrentScreen = {}
 Lander = require "objects.lander"
 Terrain = require "terrain"
 
-Hud = require "hud"
+HUD = require "hud"
 cobjs = require "createobjects"
 dobjs = require "drawobjects"
 fun = require "functions"
@@ -181,7 +181,7 @@ function love.draw()
 	
 	if strCurrentScreen == "Pause" then
 		dobjs.DrawWorld() -- Still draw the world
-		Hud.DrawPause() -- Display on top of world
+		HUD.DrawPause() -- Display on top of world
 	end
 
 	if strCurrentScreen == "Settings" then
