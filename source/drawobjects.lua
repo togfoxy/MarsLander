@@ -36,7 +36,7 @@ local function DrawObjects(worldoffset)
 				love.graphics.rectangle("fill", drawingx + 40,drawingy + 84,5,40)
 				
 				-- draw green gauge
-				local gaugeheight = v.fuelqty / enum.baseMaxFuel * 36		-- pixel art gauge is 36 pixels high
+				local gaugeheight = v.totalFuel / enum.baseMaxFuel * 36		-- pixel art gauge is 36 pixels high
 				local gaugebottom = 120
 				love.graphics.setColor(0,1,0,1)
 				love.graphics.rectangle("fill", drawingx + 40, drawingy + gaugebottom - gaugeheight, 5, gaugeheight)
@@ -143,7 +143,7 @@ function drawobjects.DrawWorld()
     HUD.draw(worldoffset)
 
 	-- draw shop overlay
-	if garrLanders[1].landed then
+	if garrLanders[1].onGround then
 		DrawShopMenu()
 	end
 

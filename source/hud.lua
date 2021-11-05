@@ -28,7 +28,7 @@ local function DrawFuelIndicator()
 -- refactored by Fox
 
     -- Fuel indicator
-    local grad = garrLanders[1].fuel / garrLanders[1].fueltanksize
+    local grad = garrLanders[1].fuel / garrLanders[1].fuelCapacity
     local color = {1, grad, grad}
 	love.graphics.setColor(1,1,1,1)
     love.graphics.rectangle("fill", HUD.fuel.x, HUD.fuel.y, HUD.fuel.w, HUD.fuel.h, HUD.fuel.cornerSize, HUD.fuel.cornerSize)
@@ -68,7 +68,7 @@ end
 local function DrawWealth()
 
 	love.graphics.setNewFont(20)
-	love.graphics.print("$" .. garrLanders[1].wealth, gintScreenWidth - 100, 75)
+	love.graphics.print("$" .. garrLanders[1].money, gintScreenWidth - 100, 75)
 
 end
 
@@ -205,7 +205,7 @@ function HUD.draw(worldoffset)
 	DrawRangefinder(garrLanders[1])
     DrawPortInformation()
 	
-	if garrLanders[1].bolGameOver then
+	if garrLanders[1].gameOver then
 		DrawGameOver()
 	end
     

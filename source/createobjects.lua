@@ -7,12 +7,12 @@ function createobjects.CreateObject(intType, intXValue)
 	local mybase = {}
 	mybase.x = intXValue			-- where on the map this object is positioned.
 	mybase.objecttype = intType		-- 2 = a fuel base
-	mybase.fuelqty = 0
+	mybase.totalFuel = 0
 	mybase.active = true
 	mybase.paid = false				-- set true when lander lands and pays player. Ensures bases only pay once
 	
 	if intType == enum.basetypeFuel then
-		mybase.fuelqty = enum.baseMaxFuel
+		mybase.totalFuel = enum.baseMaxFuel
 		
 		-- smooth the terrain around the base
 		for i = 1, 125 do

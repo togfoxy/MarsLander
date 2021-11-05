@@ -1,5 +1,7 @@
 gstrGameVersion = "0.10"
 
+io.stdout:setvbuf("no")
+
 inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
 
@@ -35,7 +37,7 @@ gintScreenHeight = 768-- 1080
 
 garrCurrentScreen = {}	
 
-Lander = require "lander"
+Lander = require "objects.lander"
 Terrain = require "terrain"
 
 HUD = require "hud"
@@ -89,7 +91,7 @@ function love.keypressed(key, scancode, isrepeat)
 	Lander.keypressed(key, scancode, isrepeat)
 
 	if key == "r" then
-		if garrLanders[1].bolGameOver then
+		if garrLanders[1].gameOver then
 			fun.ResetGame()
 		end
 	end
@@ -107,6 +109,43 @@ function love.load()
 	
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
+	-- stills/images
+	--! should make these numbers enums one day
+	local newImage	= love.graphics.newImage
+	local path 		= "assets/images/"
+	garrImages[1] = newImage(path .. "tower.png")
+	garrImages[2] = newImage(path .. "gastank1.png")
+	garrImages[3] = newImage(path .. "background1.png")
+	garrImages[4] = newImage(path .. "flame.png")
+	garrImages[5] = newImage(path .. "ship.png")
+	garrImages[6] = newImage(path .. "gastank1_off.png")
+	garrImages[7] = newImage(path .. "building1.png")
+	garrImages[8] = newImage(path .. "building2.png")
+	garrImages[9] = newImage(path .. "logo_lander.png")
+	
+	-- spritesheets and animations
+	garrSprites[1] = newImage(path .. "landingLights.png")
+	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
+	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
+	
+	gSmokeSheet = newImage(path .. "smoke.png")
+	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 30, 30)		-- w/h of each frame
+	
+	local newSource = love.audio.newSource
+	local path 		= "assets/sounds/"
+	garrSound[1] = newSource(path .. "wind.ogg", "static")
+	garrSound[2] = newSource(path .. "landingSuccess.ogg", "static")
+	garrSound[5] = newSource(path .. "lowFuel.ogg", "static")
+	garrSound[5]:setVolume(0.25)
+	garrSound[6] = newSource(path .. "wrong.ogg", "static")
+
+	local path = "assets/music/"
+	garrSound[3] = newSource(path .. "menuTheme.mp3", "stream")
+	garrSound[3]:setVolume(0.25)
+	
+	-- fonts
+	font20 = love.graphics.newFont(20) -- the number denotes the font size
+
 	fun.LoadGameSettings()
 	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
 	
@@ -115,38 +154,6 @@ function love.load()
 	
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = Lander.getMass(garrLanders[1])
-
-	-- stills/images
-	--! should make these numbers enums one day
-	garrImages[1] = love.graphics.newImage("/Assets/tower.png")
-	garrImages[2] = love.graphics.newImage("/Assets/gastank1.png")
-	garrImages[3] = love.graphics.newImage("/Assets/Background-4.png")
-	garrImages[4] = love.graphics.newImage("/Assets/engine.png")
-	garrImages[5] = love.graphics.newImage("/Assets/ship.png")
-	garrImages[6] = love.graphics.newImage("/Assets/gastank1off.png")
-	garrImages[7] = love.graphics.newImage("/Assets/building1.png")
-	garrImages[8] = love.graphics.newImage("/Assets/building2.png")
-	garrImages[9] = love.graphics.newImage("/Assets/apollo-11-clipart-9.png")
-	
-	-- spritesheets and animations
-	garrSprites[1] = love.graphics.newImage("Assets/landinglightsnew.png")
-	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
-	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
-	
-	gSmokeSheet = love.graphics.newImage("Assets/smoke.png")
-	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 30, 30)		-- w/h of each frame
-	
-	garrSound[1] = love.audio.newSource("Assets/wind.wav", "static")
-	garrSound[2] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
-	garrSound[3] = love.audio.newSource("Assets/Galactic-Pole-Position.mp3", "stream")
-	garrSound[3]:setVolume(0.25)
-	garrSound[4] = love.audio.newSource("Assets/387232__steaq__badge-coin-win.wav", "static")
-	garrSound[5] = love.audio.newSource("Assets/137920__ionicsmusic__robot-voice-low-fuel1.wav", "static")
-	garrSound[5]:setVolume(0.25)
-	garrSound[6] = love.audio.newSource("Assets/483598__raclure__wrong.mp3", "static")
-	
-	-- fonts
-	font20 = love.graphics.newFont(20) -- the number denotes the font size
 
 	lovelyToasts.options.queueEnabled = true
 	
@@ -207,7 +214,7 @@ function love.update(dt)
 	
 	if strCurrentScreen == "World" then
 
-		Lander.update(dt)
+		Lander.update(garrLanders[1], dt)
 		
 		gLandingLightsAnimation:update(dt)
 		
