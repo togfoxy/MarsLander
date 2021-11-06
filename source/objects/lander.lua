@@ -80,9 +80,9 @@ local function moveShip(lander, dt)
 	lander.y = lander.y + lander.vy
 
 	-- Set left boundary
-	if lander.x < gintOriginX then
+	if lander.x < gintOriginX - (gintScreenWidth / 2) then
 		lander.vx = 0
-		lander.x = gintOriginX
+		lander.x =  gintOriginX - (gintScreenWidth / 2)
 	end
 
 	if not lander.onGround then
