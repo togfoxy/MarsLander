@@ -1,8 +1,8 @@
 # This is a basic workflow to help you get started with Actions
 
-name: LuaCheck
+name: LuaCheck source folder
 
-# Controls when the workflow will run
+# Controls when the workflow will run (currently set to run manualy)
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   #push:
@@ -26,10 +26,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v5
+        
+      - name: Install LuaRocks
+        uses: leafo/gh-actions-luarocks@v4.0.0
+        
+      - name: Setup dependencies
+        run: |
+          luarocks install luacheck
+          
       - name: luacheck source folder
         uses: nebularg/actions-luacheck@v1
         with:
-          files: source
-          path: ${{ github.workspace }}
-          config: .          
-          annotate: none
+          files: source/
+          config: .luacheckrc
