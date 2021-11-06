@@ -79,7 +79,7 @@ local function DrawShopMenu()
 -- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
 	local gameOver = garrLanders[1].gameOver
 	local isOnLandingPad = Lander.isOnLandingPad(garrLanders[1], enum.basetypeFuel)
-	if (not gameOver) and isOnLandingPad then
+	if not gameOver and isOnLandingPad then
 
 		love.graphics.setNewFont(16)
 
