@@ -26,19 +26,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       
-      - name: Setup Lua
-        uses: leafo/gh-actions-lua@v8.0.0
-        
-      - name: Install LuaRocks
-        uses: leafo/gh-actions-luarocks@v4.0.0
-        
-      - name: Setup dependencies
-        run: |
-          luarocks install luacheck
-          
+#      - name: Setup Lua
+#        uses: leafo/gh-actions-lua@v8.0.0
+#        
+#      - name: Install LuaRocks
+#        uses: leafo/gh-actions-luarocks@v4.0.0
+#        
+#      - name: Setup dependencies
+#        run: |
+#          luarocks install luacheck
+#          
       - name: luacheck source folder
         uses: nebularg/actions-luacheck@v1.1.0
         with:
           files: source/
-          config: .luacheckrc
           annotate: warning
