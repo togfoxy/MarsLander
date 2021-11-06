@@ -37,7 +37,8 @@ jobs:
           luarocks install luacheck
           
       - name: luacheck source folder
-        uses: nebularg/actions-luacheck@v1
+        uses: nebularg/actions-luacheck@v1.1.0
         with:
           files: source/
           config: .luacheckrc
+          annotate: warning
