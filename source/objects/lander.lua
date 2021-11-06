@@ -404,6 +404,7 @@ function Lander.create()
 	-- modules
 	-- this will be strings/names of modules
 	lander.modules = {}
+	
 	return lander
 end
 
@@ -476,7 +477,7 @@ function Lander.update(lander, dt)
 
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
-
+	
 	-- Update ship
     moveShip(lander, dt)
     updateSmoke(dt)
@@ -488,7 +489,7 @@ end
 
 function Lander.draw(worldOffset)
 	-- draw the lander and flame
-	for landerId, lander in ipairs(garrLanders) do
+	for landerId, lander in pairs(garrLanders) do
 		local sx, sy = 1.5, 1.5
 		local drawingX = lander.x - worldOffset
 		local drawingY = lander.y
@@ -500,9 +501,11 @@ function Lander.draw(worldOffset)
 			love.graphics.setColor(1,1,1,0.5)
 		end
 
-		local ox = lander.width / 2
-		local oy = lander.height / 2
+		-- TODO: for some reason ox = lander.width fails because lander.width is sometimes nil.
+		local ox = garrImages[5]:getWidth() / 2
+		local oy = garrImages[5]:getHeight() / 2
 		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+
 
 		--[[
 			TODO:
