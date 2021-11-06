@@ -206,7 +206,7 @@ local function checkForContact(lander, dt)
 			lander.vy = 0
 		end
 
-		if onBase then
+		if onBase and not lander.gameOver then
 			refuelLander(lander, bestBase,dt)
 			payLanderFromBase(lander, bestBase, bestDistance)
 			-- pay the lander on first visit on the base
@@ -218,7 +218,7 @@ local function checkForContact(lander, dt)
 		end
 
 		-- check for game-over conditions
-		if lander.fuel <= 1 then
+		if lander.fuel <= 1 and not onBase then
 			lander.gameOver = true
 		end
 	else
