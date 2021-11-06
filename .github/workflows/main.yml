@@ -30,4 +30,5 @@ jobs:
         uses: nebularg/actions-luacheck@v1.1.0
         with:
           files: source/
-          annotate: 'error'
+          # only show syntax errors
+          args: --only 011
