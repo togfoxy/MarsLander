@@ -61,19 +61,21 @@ gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
-gfltSmokeTimer = enum.constSmokeTimer			-- track how often to capture smoke trail
+gfltSmokeTimer = enum.constSmokeTimer	-- track how often to capture smoke trail
+gfltSocketClientTimer = 0	-- enum.constSocketClientRate
+gfltSocketHostTimer = enum.constSocketHostRate
 
 gstrDefaultPlayerName = 'Player Name'
 gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
-gstrServerIP = nil					-- server's IP address
-gintServerPort = love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gstrServerIP = nil			-- server's IP address
+gintServerPort = 6666		-- love.math.random(6000,6999) // this is the port each client needs to connect to
 gstrClientIP = nil
 gintClientPort = nil
-gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
-gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
-gbolIsConnected = false			-- Will become true when received an acknowledgement from the server
+gbolIsAClient = false		-- defaults to NOT a client until the player chooses to connect to a host
+gbolIsAHost = false			-- Will listen on load but is not a host until someone connects
+gbolIsConnected = false		-- Will become true when received an acknowledgement from the server
 
 gbolDebug = true
 
