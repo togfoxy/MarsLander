@@ -22,49 +22,8 @@ local function initialiseGround()
 		garrGround[i] = gintScreenHeight * 0.80
 	end
 
-	Terrain.getNoise(gintScreenWidth * 2)
+	Terrain.getMoreTerrain(gintScreenWidth * 2)
 
-	-- Place bases
-	local basedistance = cf.round(gintScreenWidth * 1.5,0)
-	for i = 1, 20 do
-		cobjs.CreateObject(enum.basetypeFuel, basedistance)		-- 2 = fuel base
-		basedistance = cf.round(basedistance * 1.3,0)
-		if basedistance > #garrGround then Terrain.getNoise(basedistance * 2) end
-	end
-
-	-- place random buildings
-	for i = 1, 50 do
-		local bolPlacementOkay = false
-		local rndnum
-		repeat
-			rndnum = love.math.random(1, #garrGround)
-			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
-			if disttobase <= 250 and disttobase >= -250 then
-				-- too close to fuel base
-			else
-				bolPlacementOkay = true
-			end
-		until bolPlacementOkay
-		cobjs.CreateObject(enum.basetypeBuilding1, rndnum)
-	end
-
-	-- place random buildings
-	for i = 1, 50 do
-		local bolPlacementOkay = false
-		local rndnum
-		repeat
-			rndnum = love.math.random(1, #garrGround)
-			local disttobase, _ = fun.GetDistanceToClosestBase(rndnum, enum.basetypeFuel)
-			if disttobase <= 250 and disttobase >= -250 then
-				-- too close to fuel base
-			else
-				bolPlacementOkay = true
-			end
-		until bolPlacementOkay
-		cobjs.CreateObject(enum.basetypeBuilding2, rndnum)
-	end
-
-	--! Place spikes
 end
 
 
@@ -79,9 +38,10 @@ end
 
 
 
-function Terrain.getNoise(intAmountToCreate)
+function Terrain.getMoreTerrain(intAmountToCreate)
 -- gets a predictable terrain value (deterministic) base on x
 
+	-- create terrain
 	local groundtablesize = #garrGround
 
 	local gameID = math.pi
@@ -95,7 +55,7 @@ function Terrain.getNoise(intAmountToCreate)
 		terrainoctaves = terrainoctaves + 1
 	until 2 ^ terrainoctaves >= terrainstep
 
-	for i = groundtablesize + 1, groundtablesize + intAmountToCreate do
+	for i = groundtablesize + 1, (groundtablesize + intAmountToCreate) do
 
 		local newgroundaltitude
 		for oct = 1, terrainoctaves do
@@ -105,7 +65,35 @@ function Terrain.getNoise(intAmountToCreate)
 		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
 
 		table.insert(garrGround, newgroundaltitude)
+		
 	end
+	
+	-- create fuel bases if within range of the lander
+	local numOfObjects = #garrObjects
+	local nextBaseX
+	
+	-- create the first base if it doesn't exist
+	if numOfObjects == 0 then
+		nextBaseX = cf.round(gintScreenWidth * 1.5,0)
+		cobjs.CreateObject(enum.basetypeFuel, nextBaseX)		-- 2 = fuel base
+	end
+	-- create as many bases as the current terrain allows
+	repeat
+		numOfObjects = #garrObjects
+		lastbasex = garrObjects[numOfObjects].x
+		nextBaseX =  cf.round(lastbasex * 1.3,0)
+		if nextBaseX <= #garrGround then
+			-- create base
+			cobjs.CreateObject(enum.basetypeFuel, nextBaseX)		-- 2 = fuel base
+		else
+			break
+		end
+	until false == true
+	
+	-- TODO: find a way to remove terrain that is behind the lander and likely never needed
+	
+	
+
 end
 
 
@@ -116,7 +104,7 @@ function Terrain.draw(worldoffset)
 	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (worldoffset + gintScreenWidth) > #garrGround then
-		fun.Terrain.getNoise(gintScreenWidth * 2)
+		Terrain.getMoreTerrain(gintScreenWidth * 2)
 	end
 
 	for i = 1, #garrGround - 1 do

@@ -12,6 +12,7 @@ constSocketHostRate = 0.1
 
 basetypeFuel = 2
 basetypeBuilding1 = 7
+basetypeBuilding2 = 8
 
 baseMaxFuel = 15
 
