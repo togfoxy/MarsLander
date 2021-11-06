@@ -131,9 +131,8 @@ function menus.DrawMainMenu()
 		end
 		Slab.NewLine()
 
-		local exitstatus
 		if Slab.Button("Exit",{W=155}) then
-			love.event.quit(exitstatus)
+			love.event.quit(0)
 		end
 		Slab.NewLine()
 
