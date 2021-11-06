@@ -100,11 +100,18 @@ end
 
 function love.load()
 
+	local screenOptions = {
+		fullscreen = true,
+		display = 1,  -- display = monitor number (1 or 2)
+		resizable = true,
+		borderless = false
+	}
+
     if love.filesystem.isFused( ) then
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=true,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+        void = love.window.setMode(gintScreenWidth, gintScreenHeight,screenOptions)
         gbolDebug = false
     else
-		void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
+		void = love.window.setMode(gintScreenWidth, gintScreenHeight,screenOptions)
     end
 
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
