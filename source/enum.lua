@@ -8,7 +8,7 @@ constSocketClientRate = 0.04		-- how frequently will client send to the host?
 constSocketHostRate = 0.1
 
 
--- enumerators -- 
+-- enumerators --
 
 basetypeFuel = 2
 basetypeBuilding1 = 7

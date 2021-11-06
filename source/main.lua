@@ -35,7 +35,7 @@ lovelyToasts = require("lib.lovelyToasts")
 gintScreenWidth = 1024-- 1920
 gintScreenHeight = 768-- 1080
 
-garrCurrentScreen = {}	
+garrCurrentScreen = {}
 
 Lander = require "objects.lander"
 Terrain = require "terrain"
@@ -49,7 +49,7 @@ menus = require "menus"
 enum = require "enum"
 ss = require "socketstuff"
 
-garrLanders = {}	
+garrLanders = {}
 garrGround = {}				-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
 garrObjects = {}			-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
 garrImages = {}
@@ -65,8 +65,8 @@ gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
 gfltLandervx = 0
 gfltSmokeTimer = enum.constSmokeTimer			-- track how often to capture smoke trail
-gfltSocketClientTimer = 0 -- enum.constSocketClientRate		
-gfltSocketHostTimer = enum.constSocketHostRate		
+gfltSocketClientTimer = 0 -- enum.constSocketClientRate
+gfltSocketHostTimer = enum.constSocketHostRate
 
 gstrDefaultPlayerName = 'Player Name'
 gstrCurrentPlayerName = gstrDefaultPlayerName
@@ -106,7 +106,7 @@ function love.load()
     else
 		void = love.window.setMode(gintScreenWidth, gintScreenHeight,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
     end
-	
+
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
 	-- stills/images
@@ -122,15 +122,15 @@ function love.load()
 	garrImages[7] = newImage(path .. "building1.png")
 	garrImages[8] = newImage(path .. "building2.png")
 	garrImages[9] = newImage(path .. "logo_lander.png")
-	
+
 	-- spritesheets and animations
 	garrSprites[1] = newImage(path .. "landingLights.png")
 	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
-	
+
 	gSmokeSheet = newImage(path .. "smoke.png")
 	gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 30, 30)		-- w/h of each frame
-	
+
 	local newSource = love.audio.newSource
 	local path 		= "assets/sounds/"
 	garrSound[1] = newSource(path .. "wind.ogg", "static")
@@ -142,46 +142,46 @@ function love.load()
 	local path = "assets/music/"
 	garrSound[3] = newSource(path .. "menuTheme.mp3", "stream")
 	garrSound[3]:setVolume(0.25)
-	
+
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
 
 	fun.LoadGameSettings()
 	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
-	
+
 	fun.AddScreen("MainMenu")
 	fun.ResetGame()
-	
+
 	-- capture the 'normal' mass of the lander into a global variable
 	gintDefaultMass = Lander.getMass(garrLanders[1])
 
 	lovelyToasts.options.queueEnabled = true
-	
+
 	Slab.SetINIStatePath(nil)
 	Slab.Initialize(args)
-	
+
 end
 
 function love.draw()
-	
+
 	dobjs.DrawWallPaper()		-- this comes BEFORE the TLfres.beginRendering
 
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
-	
+
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 
 	if strCurrentScreen == "MainMenu" then
 		menus.DrawMainMenu()
 	end
-	
+
 	if strCurrentScreen == "World" then
 		dobjs.DrawWorld()
 	end
-	
+
 	if strCurrentScreen == "Credits" then
 		menus.DrawCredits()
-	end	
-	
+	end
+
 	if strCurrentScreen == "Pause" then
 		dobjs.DrawWorld() -- Still draw the world
 		HUD.DrawPause() -- Display on top of world
@@ -189,7 +189,7 @@ function love.draw()
 
 	if strCurrentScreen == "Settings" then
 		menus.DrawSettingsMenu()
-	end	
+	end
 
 	Slab.Draw()		--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 
@@ -206,21 +206,21 @@ function love.update(dt)
 	end
 
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
-	
+
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" or strCurrentScreen == "Settings" then
 		fun.HandleSockets()
-		Slab.Update(dt)		
+		Slab.Update(dt)
 	end
-	
+
 	if strCurrentScreen == "World" then
 
 		Lander.update(garrLanders[1], dt)
-		
+
 		gLandingLightsAnimation:update(dt)
-		
+
 		fun.HandleSockets(dt)
 	end
-	
+
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 
 end

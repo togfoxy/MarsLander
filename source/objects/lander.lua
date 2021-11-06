@@ -476,7 +476,7 @@ function Lander.update(lander, dt)
 
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
-	
+
 	-- Update ship
     moveShip(lander, dt)
     updateSmoke(dt)

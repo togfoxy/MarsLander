@@ -81,14 +81,14 @@ local function DrawRangefinder(landerObj)
 
 		local mydist, _ = fun.GetDistanceToClosestBase(landerObj.x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
-		
+
 		love.graphics.setNewFont(20)
 
 		-- don't draw if close to base
 		if math.abs(mydist) > 100 then
-		
+
 			if mydist <= 0 then
-				
+
 				-- closest base is to the right (forward)
 				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
 			else
@@ -109,7 +109,7 @@ local function DrawHealthIndicator()
 	local drawingy  = gintScreenHeight * 0.33
 	local width     = 10
 	local height    = indicatorlength
-	
+
 	love.graphics.setNewFont(14)
 
 	love.graphics.print("Health", drawingx - 20, drawingy)
@@ -123,10 +123,10 @@ end
 
 
 local function DrawGameOver()
-    
+
     love.graphics.setNewFont(16)
 
-    local strText 	= "You are out of fuel. Game over. Press R to reset"	
+    local strText 	= "You are out of fuel. Game over. Press R to reset"
     local drawingx 	= (gintScreenWidth / 2) - 150		-- try to get centre of screen
     local drawingy 	= gintScreenHeight * 0.33
     love.graphics.print(strText, drawingx, drawingy)
@@ -136,7 +136,7 @@ end
 
 local function DrawScore()
 -- score is simply the amount of forward distance travelled (lander.x)
-	
+
 	local score = cf.strFormatThousand(tonumber(cf.round(fun.CalculateScore())))
 	local highscore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
@@ -157,7 +157,7 @@ local function DrawDebug(worldoffset)
 	love.graphics.print("Mass = " .. cf.round(Lander.getMass(garrLanders[1]),2), 5, 75)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 90)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)
-	
+
 	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
 end
@@ -171,7 +171,7 @@ local function DrawPortInformation()
 		love.graphics.setColor(1,1,1,0.50)
 
 		love.graphics.setNewFont(12)
-		
+
 		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
 	end
 
@@ -204,11 +204,11 @@ function HUD.draw(worldoffset)
 	DrawWealth()
 	DrawRangefinder(garrLanders[1])
     DrawPortInformation()
-	
+
 	if garrLanders[1].gameOver then
 		DrawGameOver()
 	end
-    
+
 	if gbolDebug then
 		DrawDebug(worldoffset)
 	end

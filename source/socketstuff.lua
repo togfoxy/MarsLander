@@ -12,13 +12,13 @@ Put the following code into love.update so that the host can do host things:
 
 	if gbolIsAHost then
 		ss.HostListenPort()
-		
+
 		-- get just one item from the queue and process it
 		local incoming = ss.GetItemInHostQueue()		-- could be nil
 		if incoming ~= nil then
 			print(inspect(incoming))
 		end
-	
+
 		msg = whatever		-- string, number or table.
 		ss.AddItemToHostOutgoingQueue(msg)
 		ss.SendToClients()
@@ -29,7 +29,7 @@ Put the following code into love.update so that clients can do client things:
 
 	if gbolIsAClient then
 		ss.ClientListenPort()
-		
+
 		-- get just one item from the queue and process it
 		local incoming = ss.GetItemInClientQueue()		-- could be nil
 		if incoming ~= nil then
@@ -37,11 +37,11 @@ Put the following code into love.update so that clients can do client things:
 		end
 
 		msg = whatever 		-- string, number or table.
-		ss.AddItemToClientOutgoingQueue(msg)	-- 
+		ss.AddItemToClientOutgoingQueue(msg)	--
 		ss.SendToHost()
 		msg = {}
 	end
-	
+
 ]]
 
 
@@ -66,18 +66,18 @@ function socketstuff.HostListenPort()
         table.insert(arrHostIncomingQueue,unpackeddata)
     end
     --socket.sleep(0.01)    -- this doesn't seem to do much so I removed it
-	
+
 	local node = {}
     node.ip = ip
     node.port = port
-	
+
 	if port == nil or unpackeddata == nil then
 		-- no message, do nothing
 	else
 		local bolAddClient = true
 		for k,v in pairs(arrClientNodes) do
 			if node.ip == v.ip and node.port == v.port then
-				-- this node is already captured.
+				-- this node is already captured
 				bolAddClient = false
 				break
 			end
@@ -156,7 +156,7 @@ function socketstuff.SendToClients()
 -- sends the whole outgoing queue to all of the clients
 	while #arrHostOutgoingQueue > 0 do
 		if arrHostOutgoingQueue[1] ~= nil then
-		
+
 			local serialdata = bitser.dumps(arrHostOutgoingQueue[1])
 			for k,v in pairs(arrClientNodes) do
 				udphost:sendto(serialdata, v.ip, v.port)

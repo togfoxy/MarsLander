@@ -8,7 +8,7 @@ end
 function functions.RemoveScreen()
 	table.remove(garrCurrentScreen)
 	if #garrCurrentScreen < 1 then
-	
+
 		--if success then
 			love.event.quit()       --! this doesn't dothe same as the EXIT button
 		--end
@@ -31,7 +31,7 @@ function functions.SaveGameSettings()
 	local serialisedString
 	local success, message
 	local savedir = love.filesystem.getSource()
-	
+
     savefile = savedir .. "/" .. "settings.dat"
     serialisedString = bitser.dumps(garrGameSettings)
     success, message = nativefs.write(savefile, serialisedString )
@@ -42,21 +42,21 @@ function functions.LoadGameSettings()
 
     local savedir = love.filesystem.getSource()
     love.filesystem.setIdentity( savedir )
-    
+
     local savefile, contents
 
     savefile = savedir .. "/" .. "settings.dat"
-    contents, _ = nativefs.read(savefile) 
+    contents, _ = nativefs.read(savefile)
 	local success
     success, garrGameSettings = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
-	
+
 	if success == false then
 		garrGameSettings = {}
 	end
-	
+
 	--[[ FIXME:
 	-- This is horrible bugfix and needs refactoring. If a player doesn't have
-	-- a settings.dat already then all the values in garrGameSettings table are 
+	-- a settings.dat already then all the values in garrGameSettings table are
 	-- nil. This sets some reasonable defaults to stop nil value crashes.
 	]]--
 	if garrGameSettings.PlayerName == nil then
@@ -89,21 +89,21 @@ function functions.SaveGame()
     local contents
     local success, message
     local savedir = love.filesystem.getSource()
-    
+
     savefile = savedir .. "/" .. "landers.dat"
     serialisedString = bitser.dumps(garrLanders)
     success, message = nativefs.write(savefile, serialisedString )
-    
+
     savefile = savedir .. "/" .. "ground.dat"
     serialisedString = bitser.dumps(garrGround)
     success, message = nativefs.write(savefile, serialisedString )
-    
+
     savefile = savedir .. "/" .. "objects.dat"
-    serialisedString = bitser.dumps(garrObjects)    -- 
-    success, message = nativefs.write(savefile, serialisedString )   
-	
+    serialisedString = bitser.dumps(garrObjects)
+    success, message = nativefs.write(savefile, serialisedString )
+
 	lovelyToasts.show("Game saved",3, "middle")
-    
+
 end
 
 
@@ -116,22 +116,22 @@ function functions.LoadGame()
     local contents
 
     savefile = savedir .. "/" .. "landers.dat"
-    contents, _ = nativefs.read( savefile) 
-    garrLanders = bitser.loads(contents)    
+    contents, _ = nativefs.read( savefile)
+    garrLanders = bitser.loads(contents)
 
     savefile = savedir .. "/" .. "ground.dat"
-    contents, _ = nativefs.read( savefile) 
-    garrGround = bitser.loads(contents)   
+    contents, _ = nativefs.read( savefile)
+    garrGround = bitser.loads(contents)
 
     savefile = savedir .. "/" .. "objects.dat"
-    contents, _ = nativefs.read(savefile) 
-    garrObjects = bitser.loads(contents)  
+    contents, _ = nativefs.read(savefile)
+    garrObjects = bitser.loads(contents)
 
 end
 
 function functions.CalculateScore()
 	local score = garrLanders[1].x - gintOriginX
-	
+
 	if score > garrGameSettings.HighScore then
 		garrGameSettings.HighScore = score
 		fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
@@ -149,7 +149,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	local closestbase = {}
 	local absdist
 	local dist
-	
+
 	for k,v in pairs(garrObjects) do
 		if v.objecttype == intBaseType then
 			absdist = math.abs(xvalue - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
@@ -160,7 +160,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 			end
 		end
 	end
-	
+
 	-- now we have the closest base, work out the distance to the landing pad for that base
 	local realdist = xvalue - (closestbase.x + 85)			-- the + bit is an offset to calculate the landing pad and not the image
 
@@ -177,15 +177,15 @@ function functions.HandleSockets(dt)
 	msg.angle = garrLanders[1].angle
 	msg.name = garrLanders[1].name
 	-- ** msg is set here and sent below
-	
+
 	if gbolIsAHost then
-	
+
 		--gfltSocketHostTimer = gfltSocketHostTimer - dt
 		--if gfltSocketHostTimer <= 0 then
 		--	gfltSocketHostTimer = enum.constSocketHostRate
-		
+
 			ss.HostListenPort()
-			
+
 			-- get just one item from the queue and process it
 			repeat
 				local incoming = ss.GetItemInHostQueue()		-- could be nil
@@ -201,23 +201,23 @@ function functions.HandleSockets(dt)
 						garrLanders[2].y = incoming.y
 						garrLanders[2].angle = incoming.angle
 						garrLanders[2].name = incoming.name
-						
 
-				
-					end	
+
+
+					end
 				end
 			until incoming == nil
-				
+
 			ss.AddItemToHostOutgoingQueue(msg)
 			ss.SendToClients()
 			msg = {}
 		--end
 	end
-	
+
 	if gbolIsAClient then
 
 		ss.ClientListenPort()
-	
+
 		-- get item from the queue and process it
 		local incoming = ss.GetItemInClientQueue()		-- could be nil
 
@@ -229,14 +229,14 @@ function functions.HandleSockets(dt)
 						fun.SaveGameSettings()
 						fun.AddScreen("World")
 					end
-				else	
+				else
 					garrLanders[2] = {}
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
 					garrLanders[2].name = incoming.name
 
---!print(garrLanders[2].x)	
+--!print(garrLanders[2].x)
 
 				end
 			else
@@ -247,9 +247,9 @@ function functions.HandleSockets(dt)
 		-- this time is needed to stop the client flooding the network
 		local deltatime = love.timer.getDelta()
 		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
-		if gfltSocketClientTimer <= 0 then			
-			gfltSocketClientTimer = enum.constSocketClientRate			
-		
+		if gfltSocketClientTimer <= 0 then
+			gfltSocketClientTimer = enum.constSocketClientRate
+
 			ss.AddItemToClientOutgoingQueue(msg)	-- Lander[1]
 			ss.SendToHost()
 			msg = {}

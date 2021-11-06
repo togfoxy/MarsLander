@@ -111,14 +111,14 @@ end
 
 
 function Terrain.draw(worldoffset)
--- draws the terrain as a bunch of lines that are 1 pixel in length	
+-- draws the terrain as a bunch of lines that are 1 pixel in length
 
 	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (worldoffset + gintScreenWidth) > #garrGround then
 		fun.Terrain.getNoise(gintScreenWidth * 2)
 	end
-	
+
 	for i = 1, #garrGround - 1 do
 		if i < worldoffset - (gintScreenWidth) or i > worldoffset + (gintScreenWidth) then
 			-- don't draw. Do nothing

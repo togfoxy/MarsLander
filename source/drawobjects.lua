@@ -12,10 +12,10 @@ local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
 	for k,v in pairs(garrObjects) do
-	
+
 		local xvalue = v.x
 		local objectvalue = v.objecttype
-		
+
 		-- check if on-screen
 		if xvalue < worldoffset - 100 or xvalue > worldoffset + (gintScreenWidth) then
 			-- don't draw. Do nothing
@@ -34,7 +34,7 @@ local function DrawObjects(worldoffset)
 				-- draw the whole gauge red then overlay the right amount of green
 				love.graphics.setColor(1,0,0,1)
 				love.graphics.rectangle("fill", drawingx + 40,drawingy + 84,5,40)
-				
+
 				-- draw green gauge
 				local gaugeheight = v.totalFuel / enum.baseMaxFuel * 36		-- pixel art gauge is 36 pixels high
 				local gaugebottom = 120
@@ -70,7 +70,7 @@ local function DrawObjects(worldoffset)
 				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(garrImages[8], drawingx, drawingy)
 			end
-			
+
 		end
 	end
 end
@@ -81,7 +81,7 @@ local function DrawShopMenu()
 	if Lander.isOnLandingPad(garrLanders[1], enum.basetypeFuel) then			-- 2 = base type (fuel)
 
 		love.graphics.setNewFont(16)
-		
+
 		local strText = ""
 
 		if not Lander.hasUpgrade(garrLanders[1], enum.moduleNamesThrusters) then
@@ -96,7 +96,7 @@ local function DrawShopMenu()
 		if not Lander.hasUpgrade(garrLanders[1], enum.moduleNamesSideThrusters) then
 			strText = strText .. "4. Buy side-thrusters                 ($" .. enum.moduleCostSideThrusters .. ")" .. "\n"
 		end
-		
+
 		local drawingx = (gintScreenWidth / 2 ) - 125		-- try to get centre of screen
 		local drawingy = gintScreenHeight * 0.33
 		love.graphics.print(strText, drawingx, drawingy)
@@ -110,10 +110,10 @@ function drawobjects.DrawWallPaper()
 	-- this is the physical size of the wallpaper
 	local wpwidth = 1600
 	local wpheight = 1200
-	
+
 	-- this is the size of the window
 	local screenwidth, screenheight = love.graphics.getDimensions( )
-	
+
 	-- stretch or shrink the image to fit the window
 	local scalex = screenwidth / wpwidth
 	local scaley = screenheight / wpheight
@@ -127,15 +127,15 @@ function drawobjects.DrawWorld()
 
 	-- adjust the world so that the lander is centred and the terrain moves under it
 	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
-	
+
 	--DrawWallPaper()
-	
+
 	-- draw the surface
-	Terrain.draw(worldoffset)	
-	
+	Terrain.draw(worldoffset)
+
     -- draw world objects
 	DrawObjects(worldoffset)
-	
+
 	-- draw the lander
     Lander.draw(worldoffset)
 
