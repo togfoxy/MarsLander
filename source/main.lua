@@ -171,6 +171,7 @@ function love.load()
         gbolDebug = false
 
 		-- Play music
+		-- true for "isLooping"
 		Assets.playSound("menuTheme", true)
     else
 		-- display = monitor number (1 or 2)

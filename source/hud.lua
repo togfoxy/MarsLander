@@ -45,7 +45,6 @@ local function drawFuelIndicator(lander)
     love.graphics.setColor(1,1,1,1)
 	-- center line
     love.graphics.line(HUD.fuel.mid, HUD.fuel.y, HUD.fuel.mid, HUD.fuel.btm)
-
 end
 
 
@@ -90,9 +89,7 @@ local function drawRangefinder(lander)
 
 		-- don't draw if close to base
 		if math.abs(mydist) > 100 then
-
 			if mydist <= 0 then
-
 				-- closest base is to the right (forward)
 				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
 			else
@@ -100,14 +97,13 @@ local function drawRangefinder(lander)
 			end
 		end
 	end
-
 end
 
 
 
-local function drawHealthIndicator(lander)
--- lander.health reports health from 0 (dead) to 100 (best health)
 
+local function drawHealthIndicator(lander)
+	-- lander.health reports health from 0 (dead) to 100 (best health)
 	local indicatorlength = lander.health * -1
 	local drawingx  = gintScreenWidth - 30
 	local drawingy  = gintScreenHeight * 0.33
@@ -120,7 +116,6 @@ local function drawHealthIndicator(lander)
 	love.graphics.setColor(1,0,0,1)
 	love.graphics.rectangle("fill", drawingx, drawingy + 120,width,height)
 	love.graphics.setColor(1,1,1,1)
-
 end
 
 
@@ -165,8 +160,7 @@ end
 
 
 local function drawScore()
--- score is simply the amount of forward distance travelled (lander.x)
-
+	-- score is simply the amount of forward distance travelled (lander.x)
 	local score = cf.strFormatThousand(tonumber(cf.round(fun.CalculateScore())))
 	local highscore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
@@ -181,6 +175,7 @@ end
 local function drawDebug()
 	Assets.setFont("font14")
 	local lander = garrLanders[1]
+
 	love.graphics.print("Mass = " .. cf.round(Lander.getMass(lander), 2), 5, 75)
 	love.graphics.print("Fuel = " .. cf.round(lander.fuel, 2), 5, 90)
 	love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 120)
@@ -193,13 +188,11 @@ end
 
 
 local function drawPortInformation()
-
 	if gbolIsAHost then
 		love.graphics.setColor(1,1,1,0.50)
 		Assets.setFont("font14")
 		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
 	end
-
 end
 
 
@@ -210,12 +203,10 @@ end
 
 function HUD.drawPause()
     -- Simple text based pause screen
-
     Assets.setFont("font18")
     love.graphics.setColor(1,1,1,1)
     local strText = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
     love.graphics.print(strText, gintScreenWidth / 2 - 200, gintScreenHeight /2)
-
 end
 
 
