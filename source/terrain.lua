@@ -13,20 +13,6 @@ local Terrain = {}
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
-local function initialiseGround()
--- initialise the ground array to be a flat line
--- add bases to garrObjects
-
-	-- this creates a big flat space at the start of the game
-	for i = 0, (gintScreenWidth * 0.90) do
-		garrGround[i] = gintScreenHeight * 0.80
-	end
-
-	Terrain.generate(gintScreenWidth * 2)
-
-end
-
-
 local function getLastBaseID(baseType)
 -- scans the garrObjects array and returns the index (id) of the last object in the array of type baseType
 -- returns 0 if no base of that type found
@@ -50,7 +36,15 @@ end
 -- ~~~~~~~~~~~~~~~~~
 
 function Terrain.initialize()
-    initialiseGround()
+-- initialise the ground array to be a flat line
+-- add bases to garrObjects
+
+	-- this creates a big flat space at the start of the game
+	for i = 0, (gintScreenWidth * 0.90) do
+		garrGround[i] = gintScreenHeight * 0.80
+	end
+
+	Terrain.generate(gintScreenWidth * 2)
 end
 
 
@@ -58,10 +52,10 @@ end
 function Terrain.generate(intAmountToCreate)
 -- gets a predictable terrain value (deterministic) base on x
 
-
-
 	-- create terrain
-	local groundTableSize = #garrGround
+	
+	-- capture the original array size for use later on
+	local originalGroundTableSize = #garrGround
 	local gameID = math.pi
 
 	local terrainmaxheight = (gintScreenHeight * 0.90)
@@ -73,7 +67,7 @@ function Terrain.generate(intAmountToCreate)
 		terrainoctaves = terrainoctaves + 1
 	until 2 ^ terrainoctaves >= terrainstep
 
-	for i = groundTableSize + 1, (groundTableSize + intAmountToCreate) do
+	for i = originalGroundTableSize + 1, (originalGroundTableSize + intAmountToCreate) do
 
 		local newgroundaltitude
 		for oct = 1, terrainoctaves do
@@ -96,11 +90,15 @@ function Terrain.generate(intAmountToCreate)
 	
 		-- get the index/id of the last building
 		lastBuildingIndex = getLastBaseID(enum.basetypeBuilding)
-		if lastBuildingIndex == 0 then
-			nextBuildingX = gintOriginX + love.math.random(200,2000)
+		
+		if lastBuildingIndex < 1 then
+			nextBuildingX = gintOriginX + love.math.random((gintScreenWidth / 2),gintScreenWidth)
 		else
-			nextBuildingX = garrObjects[lastBuildingIndex].x + love.math.random(200,2000)
+			-- the next building is between one screenwidth and 1.66 away from the last building
+			local nextBuildingDistance = gintScreenWidth + love.math.random((gintScreenWidth * 0.66),gintScreenWidth)
+			nextBuildingX = garrObjects[lastBuildingIndex].x + nextBuildingDistance
 		end	
+		nextBuildingX = cf.round(nextBuildingX,0)
 		if nextBuildingX <= groundTableSize then
 			local newBaseType = love.math.random(7,8)		-- hack
 			cobjs.CreateObject(newBaseType, nextBuildingX)

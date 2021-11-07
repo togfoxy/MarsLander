@@ -56,12 +56,14 @@ local function DrawObjects(worldoffset)
 				gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ), drawingy + garrImages[2]:getHeight())		-- the -10 bit is a small adjustment as the png file is not quite right
 			end
 			if objectvalue == enum.basetypeBuilding1 then
+				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local drawingx = xvalue - worldoffset
-				local drawingy = garrGround[xvalue] - garrImages[7]:getHeight()			
+				local drawingy = garrGround[xvalue] - garrImages[7]:getHeight()
 				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(garrImages[7], drawingx, drawingy)
 			end
 			if objectvalue == enum.basetypeBuilding2 then
+				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local drawingx = xvalue - worldoffset
 				local drawingy = garrGround[xvalue] - garrImages[8]:getHeight()			
 				love.graphics.setColor(1,1,1,1)
