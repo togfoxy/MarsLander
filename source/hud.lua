@@ -1,13 +1,14 @@
+
 -- ~~~~~~~~
--- HUD.lua
+-- hud.lua
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- In-game HUD elements for Mars Lander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 local HUD = {}
-
 HUD.font = love.graphics.newFont(20)
 
+-- TODO: Create variables in a init or create function
 -- Fuel indicator elements
 HUD.fuel = {x=20, y=20, w=gintScreenWidth - 40, h=50, cornerSize=15}
 HUD.fuel.mid = HUD.fuel.x + math.floor(HUD.fuel.w / 2)
@@ -15,6 +16,13 @@ HUD.fuel.btm = HUD.fuel.y + HUD.fuel.h
 HUD.fuel.text = {img=love.graphics.newText(HUD.font, "FUEL")}
 HUD.fuel.text.w, HUD.fuel.text.h = HUD.fuel.text.img:getDimensions()
 HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.fuel.text.h / 2)
+
+
+-- ~~~~~~~~~~~~~
+-- Dependencies
+-- ~~~~~~~~~~~~~
+
+local modules = require "scripts.modules"
 
 
 
@@ -76,8 +84,8 @@ end
 
 local function DrawRangefinder(landerObj)
 -- determine distance to nearest base and draw indicator
-
-	if Lander.hasUpgrade(landerObj, enum.moduleNamesRangeFinder) then
+	local module = modules.rangefinder
+	if Lander.hasUpgrade(landerObj, module) then
 
 		local mydist, _ = fun.GetDistanceToClosestBase(landerObj.x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
