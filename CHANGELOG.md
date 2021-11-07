@@ -20,7 +20,9 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - fixed saved player name not being displayed correctly in-game
 - fixed regression introduced in v0.10 causing the rangefinder indicator not being displayed correctly
 - fixed the lag when running co-op. Can run two windows on localhost really well now (but only one at a time can receive keyboard input :( )
+- fixed a bizarre drawing bug when in co-op mode (work around appled)
 - fuel bases are now determined on demand and not up front. Big performance boost.
+
 
 ## v0.10
 ### Added
