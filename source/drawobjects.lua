@@ -41,9 +41,9 @@ local function DrawObjects(worldoffset)
 				-- set colour based on ACTIVE status
 				love.graphics.setColor(1,1,1,1)
 				if v.active then
-					love.graphics.draw(garrImages[2], drawingx, drawingy)
+					love.graphics.draw(garrImages[enum.imageGasTankNotEmpty], drawingx, drawingy)
 				else
-					love.graphics.draw(garrImages[6], drawingx, drawingy)
+					love.graphics.draw(garrImages[enum.imageGasTankEmpty], drawingx, drawingy)
 				end
 
 				-- draw landing lights

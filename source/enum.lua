@@ -19,6 +19,8 @@ baseMaxFuel = 15
 
 -- sprites and images -- 
 
+imageGasTankEmpty = 1
+imageGasTankNotEmpty = 2
 imageFlameSprite = 5
 imageShip = 6
 
