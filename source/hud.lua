@@ -61,13 +61,11 @@ local function drawOffscreenIndicator(lander)
     local magnifier = 1.5
     local x, y = lander.x - gintWorldOffset, ship.height + indicatorY
     if lander.y < 0 then
-		local shipW, shipH = ship.width / 2, ship.height / 2
-        love.graphics.draw(ship.image, x, y, math.rad(lander.angle), magnifier, magnifier, shipW, shipH)
+        love.graphics.draw(ship.image, x, y, math.rad(lander.angle), magnifier, magnifier, ship.width/2, ship.height/2)
         love.graphics.circle("line", x, y, ship.height + 5)
         love.graphics.polygon("fill", x, lander.y, x - 10, indicatorY - 5, x + 10, indicatorY - 5)
         if lander.engineOn then
-			local flameW, flameH = flame.width/2, flame.height/2
-            love.graphics.draw(flame.image, x, y, math.rad(lander.angle), magnifier, magnifier, flameW, flameH)
+            love.graphics.draw(flame.image, x, y, math.rad(lander.angle), magnifier, magnifier, flame.width/2, flame.height/2)
         end
     end
 	-- restore line thickness
