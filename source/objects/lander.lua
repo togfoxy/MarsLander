@@ -354,6 +354,7 @@ function Lander.create()
 	-- modules
 	-- this will be strings/names of modules
 	lander.modules = {}
+	
 	return lander
 end
 
@@ -426,7 +427,7 @@ function Lander.update(lander, dt)
 
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
-
+	
 	-- Update ship
     moveShip(lander, dt)
     updateSmoke(dt)
@@ -455,6 +456,7 @@ function Lander.draw(worldOffset)
 		local oy = lander.height / 2
 		
 		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+
 
 		--[[
 			TODO:

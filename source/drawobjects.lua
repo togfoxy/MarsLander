@@ -12,10 +12,10 @@ local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
 	for k,v in pairs(garrObjects) do
-
+	
 		local xvalue = v.x
 		local objectvalue = v.objecttype
-
+		
 		-- check if on-screen
 		if xvalue < worldoffset - 100 or xvalue > worldoffset + (gintScreenWidth) then
 			-- don't draw. Do nothing
@@ -31,7 +31,7 @@ local function DrawObjects(worldoffset)
 				-- draw the whole gauge red then overlay the right amount of green
 				love.graphics.setColor(1,0,0,1)
 				love.graphics.rectangle("fill", drawingx + 40,drawingy + 84,5,40)
-
+				
 				-- draw green gauge
 				local gaugeheight = v.totalFuel / enum.baseMaxFuel * 36		-- pixel art gauge is 36 pixels high
 				local gaugebottom = 120
@@ -67,10 +67,11 @@ local function DrawObjects(worldoffset)
 				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(garrImages[8], drawingx, drawingy)
 			end
-
+			
 		end
 	end
 end
+
 
 local function DrawShopMenu()
 -- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
@@ -79,6 +80,7 @@ local function DrawShopMenu()
 	if not gameOver and isOnLandingPad then
 
 		love.graphics.setNewFont(16)
+
 		-- Create List of available modules
 		for _, module in pairs(modules) do
 			local string = "%s. Buy '%s' - %s $\n"
@@ -97,16 +99,17 @@ local function DrawShopMenu()
 	end
 end
 
+
 function drawobjects.DrawWallPaper()
 -- scale the wallpaper to be full screen
 
 	-- this is the physical size of the wallpaper
 	local wpwidth = 1600
 	local wpheight = 1200
-
+	
 	-- this is the size of the window
 	local screenwidth, screenheight = love.graphics.getDimensions( )
-
+	
 	-- stretch or shrink the image to fit the window
 	local scalex = screenwidth / wpwidth
 	local scaley = screenheight / wpheight
@@ -115,20 +118,21 @@ function drawobjects.DrawWallPaper()
 	love.graphics.draw(garrImages[3],0,0,0,scalex,scaley)
 end
 
+
 function drawobjects.DrawWorld()
 -- draw the spaceship and flame and other bits
 
 	-- adjust the world so that the lander is centred and the terrain moves under it
 	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
-
+	
 	--DrawWallPaper()
-
+	
 	-- draw the surface
-	Terrain.draw(worldoffset)
-
+	Terrain.draw(worldoffset)	
+	
     -- draw world objects
 	DrawObjects(worldoffset)
-
+	
 	-- draw the lander
     Lander.draw(worldoffset)
 

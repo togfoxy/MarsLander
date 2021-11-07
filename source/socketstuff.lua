@@ -11,183 +11,189 @@ gbolIsAHost = false                					-- defaults to NOT a host until the play
 Put the following code into love.update so that the host can do host things:
 
 	if gbolIsAHost then
-		ss.HostListenPort()
-
+		ss.hostListenPort()
+		
 		-- get just one item from the queue and process it
-		local incoming = ss.GetItemInHostQueue()		-- could be nil
+		local incoming = ss.getItemInHostQueue()		-- could be nil
 		if incoming ~= nil then
 			print(inspect(incoming))
 		end
-
+	
 		msg = whatever		-- string, number or table.
-		ss.AddItemToHostOutgoingQueue(msg)
-		ss.SendToClients()
+		ss.addItemToHostOutgoingQueue(msg)
+		ss.sendToClients()
 		msg = {}
 	end
 
 Put the following code into love.update so that clients can do client things:
 
 	if gbolIsAClient then
-		ss.ClientListenPort()
-
+		ss.clientListenPort()
+		
 		-- get just one item from the queue and process it
-		local incoming = ss.GetItemInClientQueue()		-- could be nil
+		local incoming = ss.getItemInClientQueue()		-- could be nil
 		if incoming ~= nil then
 			print(inspect(msg))
 		end
 
 		msg = whatever 		-- string, number or table.
-		ss.AddItemToClientOutgoingQueue(msg)	--
-		ss.SendToHost()
+		ss.addItemToClientOutgoingQueue(msg)	-- 
+		ss.sendToHost()
 		msg = {}
 	end
-
+	
 ]]
 
 
 
 local socketstuff = {}
 
-local arrHostIncomingQueue = {}
-local arrClientIncomingQueue = {}
-local arrHostOutgoingQueue = {}
-local arrClientOutgoingQueue = {}
-local arrClientNodes = {}
+local hostIncomingQueue = {}
+local clientIncomingQueue = {}
+local hostOutgoingQueue = {}
+local clientOutgoingQueue = {}
+local clientNodes = {}
 
-udpclient = nil
-udphost = nil
+local udpClient = nil
+local udpHost = nil
 
-function socketstuff.HostListenPort()
+function socketstuff.hostListenPort()
 -- listens for a message and adds it to the queue
-    local data, ip, port = udphost:receivefrom()
-	local unpackeddata
+    local data, ip, port = udpHost:receivefrom()
+	local unpackedData
     if data then
-		unpackeddata = bitser.loads(data)
-        table.insert(arrHostIncomingQueue,unpackeddata)
+		unpackedData = bitser.loads(data)
+        table.insert(hostIncomingQueue,unpackedData)
     end
-    --socket.sleep(0.01)    -- this doesn't seem to do much so I removed it
-
+    -- socket.sleep(0.01)    -- this doesn't seem to do much so I removed it
+	
 	local node = {}
     node.ip = ip
     node.port = port
-
-	if port == nil or unpackeddata == nil then
+	
+	if port == nil or unpackedData == nil then
 		-- no message, do nothing
 	else
-		local bolAddClient = true
-		for k,v in pairs(arrClientNodes) do
+		-- need to cycle through the list of known clients and see if this one is already captured
+		local isNewClient = true
+		for k,v in pairs(clientNodes) do
 			if node.ip == v.ip and node.port == v.port then
 				-- this node is already captured
-				bolAddClient = false
-				break
+				isNewClient = false
+				break	-- abort the loop early
 			end
 		end
-		if bolAddClient then
-			table.insert(arrClientNodes,node)
+		-- it is determined this is a new client so record it in clientNodes table
+		if isNewClient then
+			table.insert(clientNodes,node)
 		end
 	end
-
 end
 
-function socketstuff.ClientListenPort()
-    local data, msg = udpclient:receive()
+
+function socketstuff.clientListenPort()
+    local data, msg = udpClient:receive()
 
 	if data then
-		local unpackeddata = bitser.loads(data)
-        table.insert(arrClientIncomingQueue,unpackeddata)
+		local unpackedData = bitser.loads(data)
+        table.insert(clientIncomingQueue,unpackedData)
     end
 end
 
-function socketstuff.GetItemInHostQueue()
+
+function socketstuff.getItemInHostQueue()
 -- returns the first/oldest item in the message queue
 
-	local retval
-	if #arrHostIncomingQueue > 0 then
-		retvalue = arrHostIncomingQueue[1]
-		table.remove(arrHostIncomingQueue,1)
-	else
-		return nil
+	local oldestMessage
+	if #hostIncomingQueue > 0 then
+		oldestMessage = hostIncomingQueue[1]
+		table.remove(hostIncomingQueue,1)
 	end
-	return retvalue
+	return oldestMessage
 end
 
-function socketstuff.GetItemInClientQueue()
+
+function socketstuff.getItemInClientQueue()
 -- returns the first/oldest item in the message queue and deletes that item from the queue
 
-	local retval
-	if #arrClientIncomingQueue > 0 then
-		retvalue = arrClientIncomingQueue[1]
-		table.remove(arrClientIncomingQueue,1)
-	else
-		return nil
+	local oldestMessage
+	if #clientIncomingQueue > 0 then
+		oldestMessage = clientIncomingQueue[1]
+		table.remove(clientIncomingQueue,1)
 	end
-	return retvalue
+	return oldestMessage	-- might be nil
 end
 
-function socketstuff.AddItemToClientOutgoingQueue(message)
+
+function socketstuff.addItemToClientOutgoingQueue(message)
 -- adds item to the array for later sending
 
 	if message ~= nil then
-		table.insert(arrClientOutgoingQueue, message)
+		table.insert(clientOutgoingQueue, message)
 	end
 end
 
-function socketstuff.AddItemToHostOutgoingQueue(message)
+
+function socketstuff.addItemToHostOutgoingQueue(message)
 -- adds item to the array for later sending
 
 	if message ~= nil then
-		table.insert(arrHostOutgoingQueue, message)
+		table.insert(hostOutgoingQueue, message)
 	end
 end
 
-function socketstuff.SendToHost()
+
+function socketstuff.sendToHost()
 -- send the whole outgoing queue to the host
 
-	while #arrClientOutgoingQueue > 0 do
-		if arrClientOutgoingQueue[1] ~= nil then
-			local serialdata = bitser.dumps(arrClientOutgoingQueue[1])
-			udpclient:send(serialdata)
+	while #clientOutgoingQueue > 0 do
+		if clientOutgoingQueue[1] ~= nil then
+			local serialData = bitser.dumps(clientOutgoingQueue[1])
+			udpClient:send(serialData)
 		end
-		table.remove(arrClientOutgoingQueue,1)
+		table.remove(clientOutgoingQueue,1)
 	end
 end
 
-function socketstuff.SendToClients()
--- sends the whole outgoing queue to all of the clients
-	while #arrHostOutgoingQueue > 0 do
-		if arrHostOutgoingQueue[1] ~= nil then
 
-			local serialdata = bitser.dumps(arrHostOutgoingQueue[1])
-			for k,v in pairs(arrClientNodes) do
-				udphost:sendto(serialdata, v.ip, v.port)
-print(#arrClientNodes)
+function socketstuff.sendToClients()
+-- sends the whole outgoing queue to all of the clients
+	while #hostOutgoingQueue > 0 do
+		if hostOutgoingQueue[1] ~= nil then
+			local serialData = bitser.dumps(hostOutgoingQueue[1])
+			for k,v in pairs(clientNodes) do
+				udpHost:sendto(serialData, v.ip, v.port)
 			end
 		end
-		table.remove(arrHostOutgoingQueue,1)
+		table.remove(hostOutgoingQueue,1)
 	end
 end
 
-function socketstuff.ConnectToHost(IPAddress, IPPort)
+
+function socketstuff.connectToHost(IPAddress, port)
 -- Client has decided to connect to host
---! IPAddress is not used and probably should be
+-- TODO: implement IPAddress
 
     -- set up a client connect
-    local address, port = "localhost", IPPort
+	-- TODO: implement IPAddress
+    local address = "localhost"
 
-    udpclient = socket.udp()
-    udpclient:settimeout(0)
-    udpclient:setpeername(address, port)
+    udpClient = socket.udp()
+    udpClient:settimeout(0)
+    udpClient:setpeername(address, port)
     gbolIsAClient = true
     gbolIsAHost = false
 end
 
-function socketstuff.StartHosting(myServerPort)
+
+function socketstuff.startHosting(myServerPort)
     -- set up a server to listen
-    udphost = socket.udp()
-    udphost:settimeout(0)
-    udphost:setsockname('*', myServerPort)
+    udpHost = socket.udp()
+    udpHost:settimeout(0)
+    udpHost:setsockname('*', myServerPort)
     print("Server started on port " .. myServerPort)
 
 end
+
 
 return socketstuff
