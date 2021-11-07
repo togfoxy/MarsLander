@@ -1,6 +1,6 @@
 # This is a basic workflow to check any incoming changes to the repository
 
-name: LuaCheck source folder
+name: LuaCheck for errors
 
 # Controls when the workflow will run
 on:
@@ -30,4 +30,5 @@ jobs:
         uses: nebularg/actions-luacheck@v1.1.0
         with:
           files: source/
-          annotate: 'error'
+          # only show errors
+          args: --only 0

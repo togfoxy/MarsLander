@@ -25,6 +25,7 @@ socket = require "socket"
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
 -- http://w3.impa.br/~diego/software/luasocket/reference.html
 -- https://aiq0.github.io/luasocket/reference.html
+-- https://github.com/camchenry/sock.lua
 
 lovelyToasts = require("lib.lovelyToasts")
 -- https://github.com/Loucee/Lovely-Toasts
@@ -117,8 +118,8 @@ function love.load()
 	garrImages[2] = newImage(path .. "gastank1.png")
 	garrImages[3] = newImage(path .. "background1.png")
 	garrImages[4] = newImage(path .. "flame.png")
-	garrImages[5] = newImage(path .. "ship.png")
-	garrImages[6] = newImage(path .. "gastank1_off.png")
+	garrImages[enum.imageFlameSprite] = newImage(path .. "flame.png")
+	garrImages[enum.imageShip] = newImage(path .. "ship.png")
 	garrImages[7] = newImage(path .. "building1.png")
 	garrImages[8] = newImage(path .. "building2.png")
 	garrImages[9] = newImage(path .. "logo_lander.png")
@@ -208,7 +209,7 @@ function love.update(dt)
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" or strCurrentScreen == "Settings" then
-		fun.HandleSockets()
+		
 		Slab.Update(dt)
 	end
 
@@ -218,9 +219,9 @@ function love.update(dt)
 
 		gLandingLightsAnimation:update(dt)
 
-		fun.HandleSockets(dt)
 	end
-
+	
+	fun.HandleSockets()
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 
 end
