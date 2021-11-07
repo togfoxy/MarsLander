@@ -145,9 +145,8 @@ function Terrain.draw(worldoffset)
 	end
 
 	for i = 1, #garrGround - 1 do
-		if i < worldoffset - (gintScreenWidth) or i > worldoffset + (gintScreenWidth) then
-			-- don't draw. Do nothing
-		else
+		if i >= worldoffset - (gintScreenWidth) and i <= worldoffset + (gintScreenWidth) then
+			-- only draw what is visible on the screen
 			love.graphics.line(i - worldoffset, garrGround[i], i + 1 - worldoffset, garrGround[i+1])
 			-- draw a vertical line straight down to reflect solid terra firma
 			-- love.graphics.setColor(115/255,115/255,115/255,1)
