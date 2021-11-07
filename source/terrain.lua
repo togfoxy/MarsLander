@@ -65,13 +65,13 @@ function Terrain.generate(intAmountToCreate)
 		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
 
 		table.insert(garrGround, newgroundaltitude)
-		
+
 	end
-	
+
 	-- create fuel bases if within range of the lander
 	local numOfObjects = #garrObjects
 	local nextBaseX
-	
+
 	-- create the first base if it doesn't exist
 	if numOfObjects == 0 then
 		nextBaseX = cf.round(gintScreenWidth * 1.5,0)
@@ -89,10 +89,10 @@ function Terrain.generate(intAmountToCreate)
 			break
 		end
 	until false == true
-	
+
 	-- TODO: find a way to remove terrain that is behind the lander and likely never needed
-	
-	
+
+
 
 end
 
@@ -108,9 +108,8 @@ function Terrain.draw(worldoffset)
 	end
 
 	for i = 1, #garrGround - 1 do
-		if i < worldoffset - (gintScreenWidth) or i > worldoffset + (gintScreenWidth) then
-			-- don't draw. Do nothing
-		else
+		if i >= worldoffset - (gintScreenWidth) and i <= worldoffset + (gintScreenWidth) then
+			-- only draw what is visible on the screen
 			love.graphics.line(i - worldoffset, garrGround[i], i + 1 - worldoffset, garrGround[i+1])
 			-- draw a vertical line straight down to reflect solid terra firma
 			-- love.graphics.setColor(115/255,115/255,115/255,1)
