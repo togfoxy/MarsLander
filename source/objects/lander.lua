@@ -506,16 +506,16 @@ end
 
 
 function Lander.keypressed(key, scancode, isrepeat)
-	-- Let the player buy upgrades when landed on a fuel base
+
 	local lander = garrLanders[1]
 	-- 2 = base type (fuel)
 	if Lander.isOnLandingPad(lander, 2) then
-		-- Iterate all available modules
 		for _, module in pairs(modules) do
-			-- Press key assigned to the module by its id
+
 			if key == tostring(module.id) then
 				buyModule(module, lander)
 			end
+
 		end
 	end
 end
