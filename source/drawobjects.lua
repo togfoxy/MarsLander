@@ -43,7 +43,7 @@ local function DrawObjects(worldoffset)
 				if v.active then
 					love.graphics.draw(garrImages[2], drawingx, drawingy)
 				else
-					love.graphics.draw(garrImages[6], drawingx, drawingy)
+					love.graphics.draw(garrImages[1], drawingx, drawingy)
 				end
 
 				-- draw landing lights

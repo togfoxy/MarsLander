@@ -7,6 +7,8 @@ constGravity = 0.6
 constSocketClientRate = 0.04		-- how frequently will client send to the host?
 constSocketHostRate = 0.1
 
+rangefinderMaximumDistance = 4000	-- the forward/backwards range of the rangefinder
+
 
 -- enumerators --
 

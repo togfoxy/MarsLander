@@ -114,7 +114,7 @@ function love.load()
 	--! should make these numbers enums one day
 	local newImage	= love.graphics.newImage
 	local path 		= "assets/images/"
-	garrImages[1] = newImage(path .. "tower.png")
+	garrImages[1] = newImage(path .. "gastank1_off.png")
 	garrImages[2] = newImage(path .. "gastank1.png")
 	garrImages[3] = newImage(path .. "background1.png")
 	garrImages[4] = newImage(path .. "flame.png")

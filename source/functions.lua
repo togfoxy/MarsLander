@@ -144,7 +144,6 @@ end
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
--- if there are no bases (impossible) then the distance value returned will be -1
 -- note: if distance is a negative value then the Lander has not yet passed the base
 
 	local closestdistance = 0
@@ -152,7 +151,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	local absdist
 	local dist
 	
-	for k,v in pairs(garrObjects) do
+	for _,v in pairs(garrObjects) do
 		if v.objecttype == intBaseType then
 			absdist = math.abs(xvalue - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
 			dist = (xvalue - (v.x + 85))						-- same but without the math.abs
@@ -254,6 +253,7 @@ function functions.ResetGame()
 	garrGround = {}
 	garrObjects = {}
 
+	-- TODO: move this out of ResetGame as it only needs to be called once during love.load
 	-- ensure Terrain.initalize appears before Lander.create as Lander.create needs the terrain to already exist
 	Terrain.initialize()
 	

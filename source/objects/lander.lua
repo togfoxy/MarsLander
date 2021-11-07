@@ -46,6 +46,8 @@ local function doThrust(lander, dt)
 		lander.engineOn = true
 		forceX = forceX * massRatio
 		forceY = forceY * massRatio
+		
+		-- noting here that the fastest possible vx is ~35 m/s after upgrades
 		lander.vx = lander.vx + forceX
 		lander.vy = lander.vy + forceY
 
@@ -57,7 +59,7 @@ local function doThrust(lander, dt)
 		end
 	else
 		-- no fuel to thrust
-		--! probably need to make a serious alert here
+		-- TODO: make a serious alert here
 	end
 end
 

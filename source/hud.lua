@@ -89,6 +89,13 @@ local function DrawRangefinder(landerObj)
 
 		local mydist, _ = fun.GetDistanceToClosestBase(landerObj.x, enum.basetypeFuel)
 		mydist = cf.round(mydist,0)
+		
+		if mydist < enum.rangefinderMaximumDistance * -1 then
+			mydist = enum.rangefinderMaximumDistance * -1
+		end
+		if mydist > enum.rangefinderMaximumDistance then
+			mydist = enum.rangefinderMaximumDistance
+		end
 
 		love.graphics.setNewFont(20)
 
@@ -166,7 +173,9 @@ local function DrawDebug(worldoffset)
 	love.graphics.print("Fuel = " .. cf.round(garrLanders[1].fuel,2), 5, 90)
 	love.graphics.print("Mass ratio: " .. cf.round(garrMassRatio,2), 125,75)
 
-	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
+	-- print x/y info
+	local strText = "X " .. cf.round(garrLanders[1].x,0) .. " : Y " .. cf.round(garrLanders[1].y,0) .. " : vx " .. cf.round(garrLanders[1].vx,3)   .. " : vy " .. cf.round(garrLanders[1].vy,3)
+	love.graphics.print(strText, garrLanders[1].x - worldoffset, garrLanders[1].y + 25)
 
 end
 
