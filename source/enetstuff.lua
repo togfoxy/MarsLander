@@ -5,8 +5,11 @@ local EnetHander = {}
 local server
 local client
 
-local timerHostSendInterval = 2
+local timerHostSendInterval = 0.2
 local timerHostSendTimer = timerHostSendInterval
+
+local timerClientSendInterval = 0.2
+local timerClientSendTimer = timerClientSendInterval
 
 function EnetHander.CreateHost()
 -- called by menu
@@ -16,21 +19,25 @@ function EnetHander.CreateHost()
     server:on("connect", function(data, client)
         -- Send a message of type "welcome" back to the connected client
 		client:send("welcome", client:getConnectId())
-		-- client:send("clientcount", server:getClientCount())
 		
 		newLander = Lander.create()
 		newLander.connectionID = client:getConnectId()
 		table.insert(garrLanders, newLander)
 	end)
 	
-end
-
-function EnetHander.addItemToHostOutgoingQueue(message)
--- adds item to the array for later sending
-
-	if message ~= nil then
-		table.insert(hostOutgoingQueue, message)
-	end
+	server:on("clientdata", function(landerObject, clientInfo)
+		-- match the incoming lander object
+		for k,v in pairs(garrLanders) do
+-- print(v.connectionID, landerObject.connectionID)
+			if v.connectionID == landerObject.connectionID then
+				v.x = landerObject.x
+				v.y = landerObject.y
+				v.angle = landerObject.angle
+				v.name = landerObject.name
+				break
+			end
+		end
+	end)
 end
 
 function EnetHander.CreateClient()
@@ -91,7 +98,6 @@ function EnetHander.update(dt)
 		timerHostSendTimer = timerHostSendTimer - dt
 		if timerHostSendTimer <= 0 then
 			timerHostSendTimer = timerHostSendInterval
-	
 			for _, lander in pairs(garrLanders) do
 				server:sendToAll("peerupdate",lander)
 			end
@@ -101,6 +107,12 @@ function EnetHander.update(dt)
 	end
 	
 	if gbolIsAClient then
+		timerClientSendTimer = timerClientSendTimer - dt
+		if timerClientSendTimer <= 0 then
+			timerClientSendTimer = timerClientSendInterval
+			client:send("clientdata", garrLanders[1])
+		end
+	
 		client:update()
 	end
 
