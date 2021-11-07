@@ -52,7 +52,7 @@ local hostIncomingQueue = {}
 local clientIncomingQueue = {}
 local hostOutgoingQueue = {}
 local clientOutgoingQueue = {}
-local cilentNodes = {}
+local clientNodes = {}
 
 local udpClient = nil
 local udpHost = nil
@@ -60,10 +60,10 @@ local udpHost = nil
 function socketstuff.hostListenPort()
 -- listens for a message and adds it to the queue
     local data, ip, port = udpHost:receivefrom()
-	local unpackeddata
+	local unpackedData
     if data then
-		unpackeddata = bitser.loads(data)
-        table.insert(hostIncomingQueue,unpackeddata)
+		unpackedData = bitser.loads(data)
+        table.insert(hostIncomingQueue,unpackedData)
     end
     -- socket.sleep(0.01)    -- this doesn't seem to do much so I removed it
 	
@@ -71,22 +71,23 @@ function socketstuff.hostListenPort()
     node.ip = ip
     node.port = port
 	
-	if port == nil or unpackeddata == nil then
+	if port == nil or unpackedData == nil then
 		-- no message, do nothing
 	else
-		local bolAddClient = true
-		for k,v in pairs(cilentNodes) do
+		-- need to cycle through the list of known clients and see if this one is already captured
+		local isNewClient = true
+		for k,v in pairs(clientNodes) do
 			if node.ip == v.ip and node.port == v.port then
 				-- this node is already captured
-				bolAddClient = false
-				break
+				isNewClient = false
+				break	-- abort the loop early
 			end
 		end
-		if bolAddClient then
-			table.insert(cilentNodes,node)
+		-- it is determined this is a new client so record it in clientNodes table
+		if isNewClient then
+			table.insert(clientNodes,node)
 		end
 	end
-
 end
 
 
@@ -94,8 +95,8 @@ function socketstuff.clientListenPort()
     local data, msg = udpClient:receive()
 
 	if data then
-		local unpackeddata = bitser.loads(data)
-        table.insert(clientIncomingQueue,unpackeddata)
+		local unpackedData = bitser.loads(data)
+        table.insert(clientIncomingQueue,unpackedData)
     end
 end
 
@@ -103,28 +104,24 @@ end
 function socketstuff.getItemInHostQueue()
 -- returns the first/oldest item in the message queue
 
-	local retval
+	local oldestMessage
 	if #hostIncomingQueue > 0 then
-		retvalue = hostIncomingQueue[1]
+		oldestMessage = hostIncomingQueue[1]
 		table.remove(hostIncomingQueue,1)
-	else
-		return nil
 	end
-	return retvalue
+	return oldestMessage
 end
 
 
 function socketstuff.getItemInClientQueue()
 -- returns the first/oldest item in the message queue and deletes that item from the queue
 
-	local retval
+	local oldestMessage
 	if #clientIncomingQueue > 0 then
-		retvalue = clientIncomingQueue[1]
+		oldestMessage = clientIncomingQueue[1]
 		table.remove(clientIncomingQueue,1)
-	else
-		return nil
 	end
-	return retvalue
+	return oldestMessage	-- might be nil
 end
 
 
@@ -151,8 +148,8 @@ function socketstuff.sendToHost()
 
 	while #clientOutgoingQueue > 0 do
 		if clientOutgoingQueue[1] ~= nil then
-			local serialdata = bitser.dumps(clientOutgoingQueue[1])
-			udpClient:send(serialdata)
+			local serialData = bitser.dumps(clientOutgoingQueue[1])
+			udpClient:send(serialData)
 		end
 		table.remove(clientOutgoingQueue,1)
 	end
@@ -163,10 +160,9 @@ function socketstuff.sendToClients()
 -- sends the whole outgoing queue to all of the clients
 	while #hostOutgoingQueue > 0 do
 		if hostOutgoingQueue[1] ~= nil then
-		
-			local serialdata = bitser.dumps(hostOutgoingQueue[1])
-			for k,v in pairs(cilentNodes) do
-				udpHost:sendto(serialdata, v.ip, v.port)
+			local serialData = bitser.dumps(hostOutgoingQueue[1])
+			for k,v in pairs(clientNodes) do
+				udpHost:sendto(serialData, v.ip, v.port)
 			end
 		end
 		table.remove(hostOutgoingQueue,1)
@@ -174,12 +170,13 @@ function socketstuff.sendToClients()
 end
 
 
-function socketstuff.connectToHost(IPAddress, IPPort)
+function socketstuff.connectToHost(IPAddress, port)
 -- Client has decided to connect to host
 -- TODO: implement IPAddress
 
     -- set up a client connect
-    local address, port = "localhost", IPPort
+	-- TODO: implement IPAddress
+    local address = "localhost"
 
     udpClient = socket.udp()
     udpClient:settimeout(0)
