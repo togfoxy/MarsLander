@@ -188,24 +188,17 @@ function functions.HandleSockets(dt)
 		-- get just one item from the queue and process it
 		repeat
 			local incoming = ss.getItemInHostQueue()		-- could be nil
-			
-print(inspect(incoming))
-
 			if incoming ~= nil then
 				if incoming.name == "ConnectionRequest" then
 					gbolIsConnected = true
 					msg = {}
 					msg.name = "ConnectionAccepted"
-
 				else
 					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
 					garrLanders[2].name = incoming.name
-					
-
-			
 				end	
 			end
 		until incoming == nil

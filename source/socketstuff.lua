@@ -151,10 +151,6 @@ function socketstuff.sendToHost()
 		if clientOutgoingQueue[1] ~= nil then
 			local serialData = bitser.dumps(clientOutgoingQueue[1])
 			local myerr, mymsg = udpClient:send(serialData)
-			
-print(inspect(clientOutgoingQueue[1]), myerr,mymsg)
-print("~~")
-
 		end
 		table.remove(clientOutgoingQueue,1)
 	end
