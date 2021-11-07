@@ -66,7 +66,7 @@ function functions.LoadGameSettings()
 		garrGameSettings.HostIP = "localhost"
 	end
 	if garrGameSettings.HostPort == nil then
-		garrGameSettings.HostPort = "6000"
+		garrGameSettings.HostPort = "22122"
 	end
 	if garrGameSettings.FullScreen == nil then
 		garrGameSettings.FullScreen = false

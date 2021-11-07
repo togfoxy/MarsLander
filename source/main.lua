@@ -77,7 +77,7 @@ gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
 gstrServerIP = nil					-- server's IP address
-gintServerPort = 6000 -- love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gintServerPort = 22122 
 gstrClientIP = nil
 gintClientPort = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
@@ -117,6 +117,8 @@ function love.load()
 	local sock = require 'socket'
 	hostIPAddress = sock.dns.toip(sock.dns.gethostname())
 	sock = nil	
+	
+	garrGameSettings.HostPort = "22122"
 
 	-- stills/images
 	--! should make these numbers enums one day

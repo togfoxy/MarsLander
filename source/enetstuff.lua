@@ -5,15 +5,16 @@ local EnetHander = {}
 local server
 local client
 
-local timerHostSendInterval = 0.2
+local timerHostSendInterval = 0.05
 local timerHostSendTimer = timerHostSendInterval
 
-local timerClientSendInterval = 0.2
+local timerClientSendInterval = 0.05
 local timerClientSendTimer = timerClientSendInterval
 
 function EnetHander.CreateHost()
 -- called by menu
-	server = sock.newServer("localhost", 22122)
+
+	server = sock.newServer(hostIPAddress, 22122)
 	
     -- Called when receiving a message of type "connect"
     server:on("connect", function(data, client)
@@ -28,7 +29,6 @@ function EnetHander.CreateHost()
 	server:on("clientdata", function(landerObject, clientInfo)
 		-- match the incoming lander object
 		for k,v in pairs(garrLanders) do
--- print(v.connectionID, landerObject.connectionID)
 			if v.connectionID == landerObject.connectionID then
 				v.x = landerObject.x
 				v.y = landerObject.y
@@ -43,7 +43,7 @@ end
 function EnetHander.CreateClient()
 -- called by menu
 
-	client = sock.newClient("localhost", 22122)
+	client = sock.newClient(garrGameSettings.HostIP, 22122)
 	
 	-- these are all the types of messages the client could receive from the host
 	
@@ -61,10 +61,6 @@ function EnetHander.CreateClient()
 			fun.AddScreen("World")
 			enetIsConnected = true
 		end
-	end)
-	
-	client:on("clientcount", function(neededNumOfLanders)
-
 	end)
 	
 	client:on("peerupdate", function(peerLander)

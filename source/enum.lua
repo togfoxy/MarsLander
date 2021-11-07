@@ -5,7 +5,7 @@ constSmokeTimer = 0.5
 constVYThreshold = 0.60
 constGravity = 0.6
 constSocketClientRate = 0.04		-- how frequently will client send to the host?
-constSocketHostRate = 0.1
+timerHostSendInterval = 0.1
 
 
 -- enumerators --
@@ -19,8 +19,8 @@ baseMaxFuel = 15
 
 -- sprites and images -- 
 
-imageFlameSprite = 4
-imageShip = 5
+imageFlameSprite = 5
+imageShip = 6
 
 
 

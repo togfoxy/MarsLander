@@ -69,6 +69,7 @@ function menus.DrawMainMenu()
 			if Slab.Button("Host game",{W=155}) then
 				gbolIsAClient = false
 				gbolIsAHost = true
+				garrLanders[1].connectionID = 111
 				fun.SaveGameSettings()
 				
 				EnetHander.CreateHost()
@@ -79,7 +80,7 @@ function menus.DrawMainMenu()
 		end
 		
 		if gbolIsAHost then
-			Slab.Text("Hosting on port: " .. gintServerPort)
+			Slab.Text("Hosting on port: " .. garrGameSettings.HostPort)
 			Slab.NewLine()
 		end
 
@@ -103,28 +104,30 @@ function menus.DrawMainMenu()
 				Text=garrGameSettings.HostPort,
 				NumbersOnly=true,
 				NoDrag=true,
-				MinNumber=6000,
-				MaxNumber=6999
+				MinNumber=22100,
+				MaxNumber=22199
 			}
 			if Slab.Input('HostPort', joinPortOptions) then
-				garrGameSettings.HostPort = Slab.GetInputText() or 6000
+				garrGameSettings.HostPort = Slab.GetInputText() or "22122"
 			end
 			
-			if Slab.Button("Join game",{W=155}) then
-				gbolIsAHost = false
-				gbolIsAClient = true
-				fun.SaveGameSettings()
+			if not enetIsConnected then
+				if Slab.Button("Join game",{W=155}) then
+					gbolIsAHost = false
+					gbolIsAClient = true
+					fun.SaveGameSettings()
 
-				EnetHander.CreateClient()
-				
+					EnetHander.CreateClient()
+					
 
-				-- send a test message to the host. The host will return the client's IP and port
-				local msg = {}
-				msg.name = "ConnectionRequest"
-	
-				-- ss.addItemToClientOutgoingQueue(msg)
-				-- ss.sendToHost()
-				-- table.insert(garrLanders, Lander.create())
+					-- send a test message to the host. The host will return the client's IP and port
+					local msg = {}
+					msg.name = "ConnectionRequest"
+		
+					-- ss.addItemToClientOutgoingQueue(msg)
+					-- ss.sendToHost()
+					-- table.insert(garrLanders, Lander.create())
+				end
 			end
 			Slab.NewLine()		
 		end
