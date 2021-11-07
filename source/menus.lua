@@ -112,6 +112,7 @@ function menus.DrawMainMenu()
 			if Slab.Button("Join game",{W=155}) then
 				gbolIsAHost = false
 				gbolIsAClient = true
+				fun.SaveGameSettings()
 
 				ss.connectToHost(garrGameSettings.HostIP, garrGameSettings.HostPort)
 

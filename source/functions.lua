@@ -63,7 +63,7 @@ function functions.LoadGameSettings()
 		garrGameSettings.PlayerName = gstrDefaultPlayerName
 	end
 	if garrGameSettings.HostIP == nil then
-		garrGameSettings.HostIP = "127.0.0.1"
+		garrGameSettings.HostIP = "localhost"
 	end
 	if garrGameSettings.HostPort == nil then
 		garrGameSettings.HostPort = "6000"
@@ -172,6 +172,7 @@ end
 
 
 function functions.HandleSockets(dt)
+
 	-- add lander info to the outgoing queue
 	local msg = {}
 	msg.x = garrLanders[1].x
@@ -188,7 +189,6 @@ function functions.HandleSockets(dt)
 		repeat
 			local incoming = ss.getItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
-        
 				if incoming.name == "ConnectionRequest" then
 					gbolIsConnected = true
 					msg = {}
@@ -200,9 +200,9 @@ function functions.HandleSockets(dt)
 					garrLanders[2].angle = incoming.angle
 					garrLanders[2].name = incoming.name
 				end	
-        
 			end
 		until incoming == nil
+			
 		ss.addItemToHostOutgoingQueue(msg)
 		ss.sendToClients()
 		msg = {}
