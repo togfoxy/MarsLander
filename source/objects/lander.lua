@@ -313,7 +313,8 @@ end
 function Lander.create()
 	-- create a lander and return it to the calling sub
 	local lander = {}
-	lander.x = gintOriginX
+	lander.connectionID = nil	-- used by enet
+	lander.x = gintOriginX + love.math.random (-50, 50)
 	lander.y = garrGround[lander.x] - 8
 	--lander.sprite = garrImages[5]
 	--lander.width = lander.sprite:getWidth()
@@ -455,7 +456,7 @@ function Lander.draw(worldOffset)
 		local ox = lander.width / 2
 		local oy = lander.height / 2
 		
-		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+		love.graphics.draw(garrImages[enum.imageShip], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
 
 
 		--[[
