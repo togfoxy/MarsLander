@@ -22,10 +22,7 @@ local function DrawObjects(worldoffset)
 		else
 
 			-- draw image based on object type
-			if objectvalue == 1 then
-				love.graphics.draw(garrImages[1], xvalue - worldoffset, garrGround[xvalue] - garrImages[1]:getHeight())
-			end
-			if objectvalue == 2 then
+			if objectvalue == enum.basetypeFuel then
 				local drawingx = xvalue - worldoffset
 				local drawingy = garrGround[xvalue] - garrImages[2]:getHeight()
 

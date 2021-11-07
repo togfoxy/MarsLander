@@ -129,6 +129,8 @@ function functions.LoadGame()
 
 end
 
+
+
 function functions.CalculateScore()
 	local score = garrLanders[1].x - gintOriginX
 
@@ -139,6 +141,8 @@ function functions.CalculateScore()
 
 	return score
 end
+
+
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
@@ -168,6 +172,8 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 
 end
 
+
+
 function functions.HandleSockets(dt)
 
 	-- add lander info to the outgoing queue
@@ -196,7 +202,7 @@ function functions.HandleSockets(dt)
 						msg.name = "ConnectionAccepted"
 
 					else
-						garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
+						garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2].
 						garrLanders[2].x = incoming.x
 						garrLanders[2].y = incoming.y
 						garrLanders[2].angle = incoming.angle
@@ -256,6 +262,8 @@ function functions.HandleSockets(dt)
 		end
 	end
 end
+
+
 
 function functions.ResetGame()
 
