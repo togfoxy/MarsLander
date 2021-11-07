@@ -95,7 +95,7 @@ local function drawRangefinder(lander)
 		-- don't draw if close to base
 		if distance > 100 then
 			local halfScreenW = gintScreenWidth / 2
-			if distance <= 0 then
+			if rawDistance <= 0 then
 				-- closest base is to the right (forward)
 				love.graphics.print("--> " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
 			else
