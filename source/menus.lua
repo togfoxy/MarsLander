@@ -27,7 +27,7 @@ function menus.DrawMainMenu()
 	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
 		
 		Slab.SetLayoutColumn(1)
-		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
+		Slab.Image('MyImage', {Image = Assets.getImage("clipartLander"), Scale=0.4})
 		
 		Slab.SetLayoutColumn(2)
 		

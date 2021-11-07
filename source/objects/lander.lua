@@ -8,19 +8,21 @@
 local Lander = {}
 
 
--- ~~~~~~~~~~~~~
--- Dependencies
--- ~~~~~~~~~~~~~
-
-local modules = require "scripts.modules"
-
-
 
 -- ~~~~~~~~~~~~~~~~
 -- Local Variables
 -- ~~~~~~~~~~~~~~~~
 
 local keyDown = love.keyboard.isDown
+
+-- TODO: Create the spriteData with width and height automatically (except for animations)
+local ship = Assets.getImageSet("ship")
+local flame = Assets.getImageSet("flame")
+
+local landingSound = Assets.getSound("landingSuccess")
+local failSound = Assets.getSound("wrong")
+local lowFuelSound = Assets.getSound("lowFuel")
+local engineSound = Assets.getSound("engine")
 
 
 
@@ -29,7 +31,7 @@ local keyDown = love.keyboard.isDown
 -- ~~~~~~~~~~~~~~~~
 
 local function doThrust(lander, dt)
-	local hasThrusterUpgrade = Lander.hasUpgrade(lander, modules.thrusters)
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Modules.thrusters)
 	if lander.fuel - dt >= 0 or (hasThrusterUpgrade and lander.fuel - (dt * 0.80) >= 0) then
 		local angleRadian = math.rad(lander.angle)
 		local forceX = math.cos(angleRadian) * dt
@@ -64,7 +66,7 @@ end
 
 
 local function thrustLeft(lander, dt)
-	if Lander.hasUpgrade(lander, modules.sideThrusters) then
+	if Lander.hasUpgrade(lander, Modules.sideThrusters) then
 		local forceX = 0.5 * dt		--!
 		lander.vx = lander.vx - forceX
 		-- opposite engine is on
@@ -76,7 +78,7 @@ end
 
 
 local function thrustRight(lander, dt)
-	if Lander.hasUpgrade(lander, modules.sideThrusters) then
+	if Lander.hasUpgrade(lander, Modules.sideThrusters) then
 		local forceX = 0.5 * dt		--!
 		lander.vx	= lander.vx + forceX
 		lander.fuel = lander.fuel - forceX
@@ -104,24 +106,6 @@ local function moveShip(lander, dt)
 		gfltLandervy = lander.vy
 		gfltLandervx = lander.vx
 	end
-
-	-- TODO: Smoke related stuff should be in it's own local function
-	-- capture a new smoke location every x seconds
-	gfltSmokeTimer = gfltSmokeTimer - dt
-
-	if gfltSmokeTimer <= 0 then
-		-- only produce smoke when the engines are firing
-		if (lander.engineOn or lander.leftEngineOn or lander.rightEngineOn) then
-			local smoke = {}
-			smoke.x = lander.x
-			smoke.y = lander.y
-			-- a new 'puff' is added when this timer expires (and above conditions are met)
-			gfltSmokeTimer = enum.constSmokeTimer
-			-- this timer will count up and determine which sprite to display
-			smoke.dt = 0
-			table.insert(garrSmokeSprites, smoke)
-		end
-	end
 end
 
 
@@ -144,7 +128,7 @@ local function payLanderFromBase(lander, base, baseDistance)
 	local distance = math.abs(baseDistance)
 	if not base.paid then
 		lander.money = cf.round(lander.money + (100 - distance),0)
-		garrSound[2]:play()
+		landingSound:play()
 	end
 end
 
@@ -162,7 +146,6 @@ end
 
 
 local function checkForDamage(lander)
-	-- FIXME: Health isn't calculated. Possibly caused by removing airborne variable.
 	-- apply damage if vertical speed is too higher
 	if lander.vy > enum.constVYThreshold then
 		local excessSpeed = lander.vy - enum.constVYThreshold
@@ -206,19 +189,22 @@ local function checkForContact(lander, dt)
 			lander.vy = 0
 		end
 
+		-- TODO: Move some of the fuel base logic to objects/base.lua
 		if onBase and not lander.gameOver then
 			refuelLander(lander, bestBase,dt)
 			payLanderFromBase(lander, bestBase, bestDistance)
 			-- pay the lander on first visit on the base
+			-- this is the first landing on this base so pay money based on vertical and horizontal speed
 			if not bestBase.paid then
-				-- this is the first landing on this base so pay money based on vertical and horizontal speed
 				payLanderForControl(lander, bestBase)
 				bestBase.paid = true
+			-- check for game-over conditions
+			elseif not bestBase.active and lander.fuel <= 1 then
+				lander.gameOver = true
 			end
 		end
-
 		-- check for game-over conditions
-		if lander.fuel <= 1 and not onBase then
+		if not onBase and lander.fuel <= 1 then
 			lander.gameOver = true
 		end
 	else
@@ -230,15 +216,15 @@ end
 
 local function playSoundEffects(lander)
 	if lander.engineOn then
-		garrSound[1]:play()
+		engineSound:play()
 	else
-		garrSound[1]:stop()
+		engineSound:stop()
 	end
 
 	local fuelPercent = lander.fuel / lander.fuelCapacity
 	-- play alert if fuel is low (but not empty because that's just annoying)
 	if fuelPercent <= 0.33 and fuelPercent > 0.01 then
-		garrSound[5]:play()
+		lowFuelSound:play()
 	end
 end
 
@@ -286,21 +272,7 @@ local function buyModule(module, lander)
 		gintDefaultMass = recalcDefaultMass(lander)
 	else
 		-- play 'failed' sound
-		garrSound[6]:play()
-	end
-end
-
-
-
-local function updateSmoke(dt)
-	-- each entry in the smoke table tracks it's own life (dt) so it knows when to expire
-	for key, smoke in pairs(garrSmokeSprites) do
-		-- 6 seems to give a good effect
-		smoke.dt = smoke.dt + (dt * 6)
-		-- the sprite sheet has 8 images
-		if smoke.dt > 8 then
-			table.remove(garrSmokeSprites,key)
-		end
+		failSound:play()
 	end
 end
 
@@ -310,19 +282,11 @@ end
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
 
-function Lander.create()
+function Lander.createLander(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
 	lander.x = gintOriginX
 	lander.y = garrGround[lander.x] - 8
-	--lander.sprite = garrImages[5]
-	--lander.width = lander.sprite:getWidth()
-	--lander.height = lander.sprite:getHeight()
-	
-	lander.spriteenum = enum.imageShip
-	lander.width = garrImages[lander.spriteenum]:getWidth()
-	lander.height = garrImages[lander.spriteenum]:getHeight()
-
 	-- 270 = up
 	lander.angle = 270
 	lander.vx = 0
@@ -336,7 +300,7 @@ function Lander.create()
 	lander.money = 0
 	lander.gameOver = false
 	lander.score = lander.x - gintOriginX
-	lander.name = gstrCurrentPlayerName
+	lander.name = name or gstrCurrentPlayerName
 
 	-- mass
 	lander.mass = {}
@@ -354,7 +318,7 @@ function Lander.create()
 	-- modules
 	-- this will be strings/names of modules
 	lander.modules = {}
-	
+
 	return lander
 end
 
@@ -419,29 +383,24 @@ function Lander.update(lander, dt)
         thrustRight(lander, dt)
     end
 
-    if keyDown("p") then
-        fun.AddScreen("Pause")
-	elseif keyDown("o") then
-        fun.AddScreen("Settings")
-    end
-
+	-- TODO: Calculate the offset so that doesn't need to be global
+	-- Calculate worldOffset for everyone based on lander x position
+	gintWorldOffset = lander.x - gintOriginX
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
-	
 	-- Update ship
     moveShip(lander, dt)
-    updateSmoke(dt)
     playSoundEffects(lander)
     checkForContact(lander, dt)
 end
 
 
 
-function Lander.draw(worldOffset)
+function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(garrLanders) do
 		local sx, sy = 1.5, 1.5
-		local drawingX = lander.x - worldOffset
+		local drawingX = lander.x - gintWorldOffset
 		local drawingY = lander.y
 
 		-- fade other landers in multiplayer mode
@@ -451,57 +410,28 @@ function Lander.draw(worldOffset)
 			love.graphics.setColor(1,1,1,0.5)
 		end
 
-		-- TODO: work out why lander.width doesn't work in mplayer mode
-		local ox = lander.width / 2
-		local oy = lander.height / 2
-		
-		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+		-- TODO: work out why ship.width doesn't work in mplayer mode
+		local ox = ship.width / 2
+		local oy = ship.height / 2
+		love.graphics.draw(ship.image, drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
 
-
-		--[[
-			TODO:
-			It would be better to avoid creating variables every tick. This will likely
-			resolve itself with more code improvements.
-			As a quick & dirty solution we could create the variables at the top of this
-			file and just use them here without the local keyword.
-		--]]
 		-- draw flames
-		local flameSprite	= garrImages[enum.imageFlameSprite]
-		local flameWidth	= flameSprite:getWidth()
-		local flameHeight	= flameSprite:getHeight()
-		local ox 			= flameWidth / 2
-		local oy 			= flameHeight / 2
-
+		local ox = flame.width / 2
+		local oy = flame.height / 2
 		if lander.engineOn then
 			local angle = math.rad(lander.angle)
-			love.graphics.draw(flameSprite, drawingX, drawingY, angle, sx, sy, ox, oy)
+			love.graphics.draw(flame.image, drawingX, drawingY, angle, sx, sy, ox, oy)
 			lander.engineOn = false
 		end
 		if lander.leftEngineOn then
 			local angle = math.rad(lander.angle + 90)
-			love.graphics.draw(flameSprite, drawingX, drawingY, angle, sx, sy, ox, oy)
+			love.graphics.draw(flame.image, drawingX, drawingY, angle, sx, sy, ox, oy)
 			lander.leftEngineOn = false
 		end
 		if lander.rightEngineOn then
 			local angle = math.rad(lander.angle - 90)
-			love.graphics.draw(flameSprite, drawingX, drawingY, angle, sx, sy, ox, oy)
+			love.graphics.draw(flame.image, drawingX, drawingY, angle, sx, sy, ox, oy)
 			lander.rightEngineOn = false
-		end
-
-		-- draw smoke trail
-		for _, smoke in pairs(garrSmokeSprites) do
-			-- TODO: Smoke related stuff should be in it's own local function
-			local drawingX = smoke.x - worldOffset
-			local drawingY = smoke.y
-			local spriteId = cf.round(smoke.dt)
-			if spriteId < 1 then spriteId = 1 end
-			--[[ TODO: currently the sprite rotates around it's top left corner and kinda works visually because of the way
-				 the frames of the animation are drawn in the actual image file.
-				 It would be better to rotate around a center point of the frame and then adjust the position of the
-				 sprite to be fixed at a certain location. Some adjustments to the sprite itself might be nessecary.
-			--]]
-			-- not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
-			love.graphics.draw(gSmokeSheet,gSmokeImages[spriteId], drawingX, drawingY, math.rad(lander.angle + 135))
 		end
 
 		-- draw label
@@ -520,7 +450,7 @@ function Lander.keypressed(key, scancode, isrepeat)
 	-- 2 = base type (fuel)
 	if Lander.isOnLandingPad(lander, 2) then
 		-- Iterate all available modules
-		for _, module in pairs(modules) do
+		for _, module in pairs(Modules) do
 			-- Press key assigned to the module by its id
 			if key == tostring(module.id) then
 				buyModule(module, lander)
