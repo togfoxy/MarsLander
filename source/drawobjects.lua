@@ -11,16 +11,13 @@ local drawobjects = {}
 local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
 
-	for k,v in pairs(garrObjects) do
+	for _,v in pairs(garrObjects) do
 
 		local xvalue = v.x
 		local objectvalue = v.objecttype
 
 		-- check if on-screen
-		if xvalue < worldoffset - 100 or xvalue > worldoffset + (gintScreenWidth) then
-			-- don't draw. Do nothing
-		else
-
+		if xvalue >= worldoffset - 100 and xvalue <= worldoffset + (gintScreenWidth) then
 			-- draw image based on object type
 			if objectvalue == enum.basetypeFuel then
 				local drawingx = xvalue - worldoffset
@@ -53,17 +50,18 @@ local function DrawObjects(worldoffset)
 				else
 					love.graphics.setColor(0,1,0,1)
 				end
-				gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ), drawingy + garrImages[2]:getHeight())		-- the -10 bit is a small adjustment as the png file is not quite right
+				gLandingLightsAnimation:draw(garrSprites[1], drawingx + (garrImages[2]:getWidth() - 10 ),
+					drawingy + garrImages[2]:getHeight()) -- the -10 bit is a small adjustment as the png file is not quite right
 			end
 			if objectvalue == enum.basetypeBuilding1 then
 				local drawingx = xvalue - worldoffset
-				local drawingy = garrGround[xvalue] - garrImages[7]:getHeight()			
+				local drawingy = garrGround[xvalue] - garrImages[7]:getHeight()
 				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(garrImages[7], drawingx, drawingy)
 			end
 			if objectvalue == enum.basetypeBuilding2 then
 				local drawingx = xvalue - worldoffset
-				local drawingy = garrGround[xvalue] - garrImages[8]:getHeight()			
+				local drawingy = garrGround[xvalue] - garrImages[8]:getHeight()
 				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(garrImages[8], drawingx, drawingy)
 			end
@@ -124,7 +122,8 @@ function drawobjects.DrawWorld()
 -- draw the spaceship and flame and other bits
 
 	-- adjust the world so that the lander is centred and the terrain moves under it
-	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)	-- how many pixels we have moved away from the initial spawn point (X axis)
+	-- how many pixels we have moved away from the initial spawn point (X axis)
+	local worldoffset = cf.round(garrLanders[1].x - gintOriginX,0)
 
 	--DrawWallPaper()
 
