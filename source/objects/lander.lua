@@ -400,8 +400,10 @@ function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(garrLanders) do
 		local sx, sy = 1.5, 1.5
-		local drawingX = lander.x - gintWorldOffset
-		local drawingY = lander.y
+		local x = lander.x - gintWorldOffset
+		local y = lander.y
+		local ox = ship.width / 2
+		local oy = ship.height / 2
 
 		-- fade other landers in multiplayer mode
 		if landerId == 1 then
@@ -411,33 +413,30 @@ function Lander.draw()
 		end
 
 		-- TODO: work out why ship.width doesn't work in mplayer mode
-		local ox = ship.width / 2
-		local oy = ship.height / 2
-		love.graphics.draw(ship.image, drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+		love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
 
 		-- draw flames
 		local ox = flame.width / 2
 		local oy = flame.height / 2
 		if lander.engineOn then
 			local angle = math.rad(lander.angle)
-			love.graphics.draw(flame.image, drawingX, drawingY, angle, sx, sy, ox, oy)
+			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 			lander.engineOn = false
 		end
 		if lander.leftEngineOn then
 			local angle = math.rad(lander.angle + 90)
-			love.graphics.draw(flame.image, drawingX, drawingY, angle, sx, sy, ox, oy)
+			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 			lander.leftEngineOn = false
 		end
 		if lander.rightEngineOn then
 			local angle = math.rad(lander.angle - 90)
-			love.graphics.draw(flame.image, drawingX, drawingY, angle, sx, sy, ox, oy)
+			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 			lander.rightEngineOn = false
 		end
 
 		-- draw label
 		love.graphics.setNewFont(10)
-		local offsetX, offsetY = 14, 10
-		love.graphics.print(lander.name, drawingX + offsetX, drawingY - offsetY)
+		love.graphics.print(lander.name, x + 14, y - 10)
 		love.graphics.setColor(1,1,1,1)
 	end
 end
