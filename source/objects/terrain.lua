@@ -22,7 +22,7 @@ local function getLastBaseID(baseType)
 	for i = 1, #garrObjects do
 		-- if the object type == base type then capture ID
 		-- if the baseType is any building then test for building1 or building2
-		if (garrObjects[i].objecttype == baseType) or 
+		if (garrObjects[i].objecttype == baseType) or
 			(baseType == enum.basetypeBuilding and (garrObjects[i].objecttype == enum.basetypeBuilding1 or garrObjects[i].objecttype == enum.basetypeBuilding2)) then
 			lastBaseID = i
 		end
@@ -126,7 +126,7 @@ function Terrain.generate(intAmountToCreate)
 			cobjs.CreateObject(enum.basetypeFuel, nextBaseX)
 		else
 			break
-		end		
+		end
 	until not true	-- infinite loop using a break statement
 
 	-- TODO: find a way to remove terrain that is behind the lander and likely never needed

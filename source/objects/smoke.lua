@@ -41,10 +41,9 @@ end
 
 
 function Smoke.update(dt)
-	-- Spawn smoke particles
 	-- TODO: Don't hardcode the lander into smoke particle creation
 	local lander = garrLanders[1]
-
+	-- Spawn smoke particles
 	local engineFiring = lander.engineOn or lander.leftEngineOn or lander.rightEngineOn
 	if Smoke.timer <= 0 and engineFiring then
 		Smoke.createParticle(lander.x, lander.y, lander.angle)
