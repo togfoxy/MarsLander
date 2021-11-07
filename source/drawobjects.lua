@@ -5,6 +5,8 @@ drawobjects module: put all your screen draws into this module
 local drawobjects = {}
 -- put all the drawing routines in here
 
+local modules = require "scripts.modules"
+
 
 local function DrawObjects(worldoffset)
 -- query garrObjects table and draw them in the world
@@ -20,10 +22,7 @@ local function DrawObjects(worldoffset)
 		else
 
 			-- draw image based on object type
-			if objectvalue == 1 then
-				love.graphics.draw(garrImages[1], xvalue - worldoffset, garrGround[xvalue] - garrImages[1]:getHeight())
-			end
-			if objectvalue == 2 then
+			if objectvalue == enum.basetypeFuel then
 				local drawingx = xvalue - worldoffset
 				local drawingy = garrGround[xvalue] - garrImages[2]:getHeight()
 
@@ -76,29 +75,26 @@ end
 
 local function DrawShopMenu()
 -- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
-
-	if Lander.isOnLandingPad(garrLanders[1], enum.basetypeFuel) then			-- 2 = base type (fuel)
+	local gameOver = garrLanders[1].gameOver
+	local isOnLandingPad = Lander.isOnLandingPad(garrLanders[1], enum.basetypeFuel)
+	if not gameOver and isOnLandingPad then
 
 		love.graphics.setNewFont(16)
-		
-		local strText = ""
 
-		if not Lander.hasUpgrade(garrLanders[1], enum.moduleNamesThrusters) then
-			strText = strText .. "1. Buy fuel efficient thrusters  ($" .. enum.moduleCostsThrusters .. ")" .. "\n"
+		-- Create List of available modules
+		for _, module in pairs(modules) do
+			local string = "%s. Buy '%s' - %s $\n"
+			itemListString = string.format(string, module.id, module.name, module.cost)
+			-- Draw list of modules
+			local color = {1, 1, 1, 1}
+			local y = gintScreenHeight * 0.33
+			if Lander.hasUpgrade(garrLanders[1], module) then
+				color = {.8, .1, .1, .5}
+			end
+			love.graphics.setColor(color)
+			love.graphics.printf(itemListString, 0, y + (20*module.id), gintScreenWidth, "center")
+			love.graphics.setColor(1, 1, 1, 1)
 		end
-		if not Lander.hasUpgrade(garrLanders[1], enum.moduleNamesLargeTank) then
-			strText = strText .. "2. Buy a larger fuel tanks         ($" .. enum.moduleCostsLargeTank .. ")" .. "\n"
-		end
-		if not Lander.hasUpgrade(garrLanders[1], enum.moduleNamesRangeFinder) then
-			strText = strText .. "3. Buy a rangefinder                 ($" .. enum.moduleCostsRangeFinder .. ")" .. "\n"
-		end
-		if not Lander.hasUpgrade(garrLanders[1], enum.moduleNamesSideThrusters) then
-			strText = strText .. "4. Buy side-thrusters                 ($" .. enum.moduleCostSideThrusters .. ")" .. "\n"
-		end
-		
-		local drawingx = (gintScreenWidth / 2 ) - 125		-- try to get centre of screen
-		local drawingy = gintScreenHeight * 0.33
-		love.graphics.print(strText, drawingx, drawingy)
 
 	end
 end

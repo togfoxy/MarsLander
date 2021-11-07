@@ -1,12 +1,24 @@
 
 -- ~~~~~~~~~~~~
--- Lander.lua
+-- lander.lua
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- Lander object for Mars Lander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 local Lander = {}
 
+
+-- ~~~~~~~~~~~~~
+-- Dependencies
+-- ~~~~~~~~~~~~~
+
+local modules = require "scripts.modules"
+
+
+
+-- ~~~~~~~~~~~~~~~~
+-- Local Variables
+-- ~~~~~~~~~~~~~~~~
 
 local keyDown = love.keyboard.isDown
 
@@ -17,7 +29,7 @@ local keyDown = love.keyboard.isDown
 -- ~~~~~~~~~~~~~~~~
 
 local function doThrust(lander, dt)
-	local hasThrusterUpgrade = Lander.hasUpgrade(lander, enum.moduleNamesThrusters)
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, modules.thrusters)
 	if lander.fuel - dt >= 0 or (hasThrusterUpgrade and lander.fuel - (dt * 0.80) >= 0) then
 		local angleRadian = math.rad(lander.angle)
 		local forceX = math.cos(angleRadian) * dt
@@ -37,7 +49,7 @@ local function doThrust(lander, dt)
 		lander.vx = lander.vx + forceX
 		lander.vy = lander.vy + forceY
 
-		if Lander.hasUpgrade(lander, enum.moduleNamesThrusters) then
+		if hasThrusterUpgrade then
 			-- efficient thrusters use 80% fuel compared to normal thrusters
 			lander.fuel = lander.fuel - (dt * 0.80)
 		else
@@ -52,7 +64,7 @@ end
 
 
 local function thrustLeft(lander, dt)
-	if Lander.hasUpgrade(lander, enum.moduleNamesSideThrusters) then
+	if Lander.hasUpgrade(lander, modules.sideThrusters) then
 		local forceX = 0.5 * dt		--!
 		lander.vx = lander.vx - forceX
 		-- opposite engine is on
@@ -64,7 +76,7 @@ end
 
 
 local function thrustRight(lander, dt)
-	if Lander.hasUpgrade(lander, enum.moduleNamesSideThrusters) then
+	if Lander.hasUpgrade(lander, modules.sideThrusters) then
 		local forceX = 0.5 * dt		--!
 		lander.vx	= lander.vx + forceX
 		lander.fuel = lander.fuel - forceX
@@ -80,9 +92,9 @@ local function moveShip(lander, dt)
 	lander.y = lander.y + lander.vy
 
 	-- Set left boundary
-	if lander.x < gintOriginX then
+	if lander.x < gintOriginX - (gintScreenWidth / 2) then
 		lander.vx = 0
-		lander.x = gintOriginX
+		lander.x =  gintOriginX - (gintScreenWidth / 2)
 	end
 
 	if not lander.onGround then
@@ -194,7 +206,7 @@ local function checkForContact(lander, dt)
 			lander.vy = 0
 		end
 
-		if onBase then
+		if onBase and not lander.gameOver then
 			refuelLander(lander, bestBase,dt)
 			payLanderFromBase(lander, bestBase, bestDistance)
 			-- pay the lander on first visit on the base
@@ -206,7 +218,7 @@ local function checkForContact(lander, dt)
 		end
 
 		-- check for game-over conditions
-		if lander.fuel <= 1 then
+		if lander.fuel <= 1 and not onBase then
 			lander.gameOver = true
 		end
 	else
@@ -244,101 +256,34 @@ end
 
 
 
-local function buyThrusters(lander)
-	-- add fuel efficient thrusters to the lander
-	if lander.money >= enum.moduleCostsThrusters then
+local function buyModule(module, lander)
+	-- Enough money to purchase the module ?
+	if lander.money >= module.cost then
 		for i = 1, #lander.modules do
-			if lander.modules[i] == enum.moduleNamesThrusters then
+			if lander.modules[i] == module then
 				-- this module is already purchased. Abort
 				--! make a 'wrong' sound
 				return
 			end
 		end
 
-		-- can purchase thrusters
-
-		table.insert(lander.modules, enum.moduleNamesThrusters)
-		lander.money = lander.money - enum.moduleCostsThrusters
-
-		lander.mass[1] = 115
-
-		-- need to recalc the default mass
-		gintDefaultMass = recalcDefaultMass(lander)
-	else
-		-- play 'failed' sound
-		garrSound[6]:play()
-	end
-end
-
-
-
-local function buyLargeTank(lander)
-	-- add a larger tank to carry more totalFuel
-	if lander.money >= enum.moduleCostsLargeTank then
-		for i = 1, #lander.modules do
-			if lander.modules[i] == enum.moduleNamesLargeTank then
-				-- this module is already purchased. Abort.
-				--! make a 'wrong' sound
+		-- TODO: Switch this temporary solution to something more dynamic
+		if module.fuelCapacity then
+			if module.fuelCapacity > lander.fuelCapacity then
+				lander.fuelCapacity = module.fuelCapacity
+			else
+				-- Downgrading wouldn't be that fun
 				return
 			end
 		end
 
-		-- can purchase item
-
-		table.insert(lander.modules, enum.moduleNamesLargeTank)
-		lander.money = lander.money - enum.moduleCostsLargeTank
-
-		-- an increase from the default (25)
-		lander.fuelCapacity = 32
-		lander.mass[2] = 23
-
-		-- need to recalc the default mass
+		-- can purchase this module
+		table.insert(lander.modules, module)
+		-- pay for it
+		lander.money = lander.money - module.cost
+		-- add and calculate new mass
+		lander.mass[#lander.mass+1] = module.mass
 		gintDefaultMass = recalcDefaultMass(lander)
-	else
-		-- play 'failed' sound
-		garrSound[6]:play()
-	end
-end
-
-
-
-local function buyRangefinder(lander)
-	-- the rangefinder points to the nearest base
-	if lander.money >= enum.moduleCostsRangeFinder then
-		for i = 1, #lander.modules do
-			if lander.modules[i] == enum.moduleNamesRangeFinder then
-				-- this module is already purchased. Abort.
-				--! make a 'wrong' sound
-				return
-			end
-		end
-
-		-- can purchase item
-
-		table.insert(lander.modules, enum.moduleNamesRangeFinder)
-		lander.money = lander.money - enum.moduleCostsRangeFinder
-		-- this is the mass of the rangefinder
-		lander.mass[3] = 2
-		-- need to recalc the default mass
-		gintDefaultMass = recalcDefaultMass(lander)
-	else
-		-- play 'failed' sound
-		garrSound[6]:play()
-	end
-end
-
-
-
-local function buySideThrusters(lander)
-	if lander.money >= enum.moduleCostSideThrusters then
-		if not Lander.hasUpgrade(lander, enum.moduleNamesSideThrusters) then
-			table.insert(lander.modules, enum.moduleNamesSideThrusters)
-			lander.money = lander.money - enum.moduleCostSideThrusters
-			-- this is the mass of the side thrusters
-			lander.mass[4] = enum.moduleMassSideThrusters
-			-- need to recalc the default mass
-			gintDefaultMass = recalcDefaultMass(lander)
-		end
 	else
 		-- play 'failed' sound
 		garrSound[6]:play()
@@ -439,9 +384,9 @@ end
 
 
 
-function Lander.hasUpgrade(lander, moduleName)
+function Lander.hasUpgrade(lander, module)
 	for i = 1, #lander.modules do
-		if lander.modules[i] == moduleName then
+		if lander.modules[i] == module then
 			return true
 		end
 	end
@@ -564,17 +509,16 @@ end
 
 
 function Lander.keypressed(key, scancode, isrepeat)
+	-- Let the player buy upgrades when landed on a fuel base
 	local lander = garrLanders[1]
 	-- 2 = base type (fuel)
 	if Lander.isOnLandingPad(lander, 2) then
-		if key == "1" then
-			buyThrusters(lander)
-		elseif key == "2" then
-			buyLargeTank(lander)
-		elseif key == "3" then
-			buyRangefinder(lander)
-		elseif key == "4" then
-			buySideThrusters(lander)
+		-- Iterate all available modules
+		for _, module in pairs(modules) do
+			-- Press key assigned to the module by its id
+			if key == tostring(module.id) then
+				buyModule(module, lander)
+			end
 		end
 	end
 end

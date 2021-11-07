@@ -172,7 +172,6 @@ end
 
 
 function functions.HandleSockets(dt)
-
 	-- add lander info to the outgoing queue
 	local msg = {}
 	msg.x = garrLanders[1].x
@@ -189,24 +188,21 @@ function functions.HandleSockets(dt)
 		repeat
 			local incoming = ss.getItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
+        
 				if incoming.name == "ConnectionRequest" then
 					gbolIsConnected = true
 					msg = {}
 					msg.name = "ConnectionAccepted"
-
 				else
 					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
 					garrLanders[2].name = incoming.name
-					
-
-			
 				end	
+        
 			end
 		until incoming == nil
-			
 		ss.addItemToHostOutgoingQueue(msg)
 		ss.sendToClients()
 		msg = {}
