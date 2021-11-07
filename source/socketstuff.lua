@@ -63,6 +63,7 @@ function socketstuff.hostListenPort()
 	local unpackedData
     if data then
 		unpackedData = bitser.loads(data)
+		
         table.insert(hostIncomingQueue,unpackedData)
     end
     -- socket.sleep(0.01)    -- this doesn't seem to do much so I removed it
@@ -149,7 +150,11 @@ function socketstuff.sendToHost()
 	while #clientOutgoingQueue > 0 do
 		if clientOutgoingQueue[1] ~= nil then
 			local serialData = bitser.dumps(clientOutgoingQueue[1])
-			udpClient:send(serialData)
+			local myerr, mymsg = udpClient:send(serialData)
+			
+print(inspect(clientOutgoingQueue[1]), myerr,mymsg)
+print("~~")
+
 		end
 		table.remove(clientOutgoingQueue,1)
 	end
@@ -161,7 +166,7 @@ function socketstuff.sendToClients()
 	while #hostOutgoingQueue > 0 do
 		if hostOutgoingQueue[1] ~= nil then
 			local serialData = bitser.dumps(hostOutgoingQueue[1])
-			for k,v in pairs(clientNodes) do
+			for _,v in pairs(clientNodes) do
 				udpHost:sendto(serialData, v.ip, v.port)
 			end
 		end
@@ -174,13 +179,13 @@ function socketstuff.connectToHost(IPAddress, port)
 -- Client has decided to connect to host
 -- TODO: implement IPAddress
 
-    -- set up a client connect
-	-- TODO: implement IPAddress
-    local address = "localhost"
-
+    -- set up a client connection
+	
     udpClient = socket.udp()
     udpClient:settimeout(0)
-    udpClient:setpeername(address, port)
+	
+    myerr, mymsg = udpClient:setpeername(IPAddress, port)
+	
     gbolIsAClient = true
     gbolIsAHost = false
 end
@@ -191,7 +196,8 @@ function socketstuff.startHosting(myServerPort)
     udpHost = socket.udp()
     udpHost:settimeout(0)
     udpHost:setsockname('*', myServerPort)
-    print("Server started on port " .. myServerPort)
+	local sockname = udpHost:getsockname()
+    print("Server started on port " .. sockname, myServerPort)
 
 end
 
