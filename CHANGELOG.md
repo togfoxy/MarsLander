@@ -11,8 +11,12 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 
 ### Changed
-- removed the generation of buildings for now. Intend to put them back in soon.
+
+- removed the generation of buildings for now. Intend to put them back in soon
+- buildings are now being generated again
+- buildings and fuel bases are determined on demand and not up-front
 - removed the images/sprites out of the lander table
+
 
 
 

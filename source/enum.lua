@@ -11,6 +11,7 @@ constSocketHostRate = 0.1
 -- enumerators --
 
 basetypeFuel = 2
+basetypeBuilding = 6		-- this is when we don't care about building1 or building2 i.e. any building (but not fuel)
 basetypeBuilding1 = 7
 basetypeBuilding2 = 8
 

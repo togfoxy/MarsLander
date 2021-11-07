@@ -74,7 +74,7 @@ gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
 gstrServerIP = nil					-- server's IP address
-gintServerPort = 6666 -- love.math.random(6000,6999)		-- this is the port each client needs to connect to
+gintServerPort = 6000 -- love.math.random(6000,6999)		-- this is the port each client needs to connect to
 gstrClientIP = nil
 gintClientPort = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
