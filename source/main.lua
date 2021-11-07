@@ -82,7 +82,7 @@ gstrClientIP = nil
 gintClientPort = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
-gbolIsConnected = false			-- Will become true when received an acknowledgement from the server
+enetIsConnected = false			-- Will become true when received an acknowledgement from the server
 
 gbolDebug = true
 

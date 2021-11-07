@@ -67,14 +67,12 @@ function menus.DrawMainMenu()
 		
 		if not gbolIsAClient and not gbolIsAHost then
 			if Slab.Button("Host game",{W=155}) then
-				-- ss.startHosting(gintServerPort)
 				gbolIsAClient = false
 				gbolIsAHost = true
 				fun.SaveGameSettings()
 				
 				EnetHander.CreateHost()
 				
-				table.insert(garrLanders, Lander.create())
 				fun.AddScreen("World")
 			end
 			Slab.NewLine()
@@ -117,7 +115,8 @@ function menus.DrawMainMenu()
 				gbolIsAClient = true
 				fun.SaveGameSettings()
 
-				-- ss.connectToHost(garrGameSettings.HostIP, garrGameSettings.HostPort)
+				EnetHander.CreateClient()
+				
 
 				-- send a test message to the host. The host will return the client's IP and port
 				local msg = {}
@@ -125,7 +124,7 @@ function menus.DrawMainMenu()
 	
 				-- ss.addItemToClientOutgoingQueue(msg)
 				-- ss.sendToHost()
-				table.insert(garrLanders, Lander.create())
+				-- table.insert(garrLanders, Lander.create())
 			end
 			Slab.NewLine()		
 		end
