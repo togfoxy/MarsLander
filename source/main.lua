@@ -42,7 +42,7 @@ garrCurrentScreen = {}
 
 Lander = require "objects.lander"
 Terrain = require "terrain"
-EnetHander = require "enetstuff"
+EnetHandler = require "enetstuff"
 
 HUD = require "hud"
 cobjs = require "createobjects"
@@ -227,6 +227,6 @@ function love.update(dt)
 		gLandingLightsAnimation:update(dt)
 	end
 	
-	EnetHander.update(dt)
+	EnetHandler.update(dt)
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 end

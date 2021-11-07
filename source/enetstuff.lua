@@ -1,6 +1,6 @@
 
 
-local EnetHander = {}
+local EnetHandler = {}
 
 local server
 local client
@@ -11,7 +11,7 @@ local timerHostSendTimer = timerHostSendInterval
 local timerClientSendInterval = 0.05
 local timerClientSendTimer = timerClientSendInterval
 
-function EnetHander.createHost()
+function EnetHandler.createHost()
 -- called by menu
 
 	server = sock.newServer(hostIPAddress, 22122)
@@ -26,21 +26,21 @@ function EnetHander.createHost()
 		table.insert(garrLanders, newLander)
 	end)
 	
-	server:on("clientdata", function(landerObject, clientInfo)
+	server:on("clientdata", function(lander, clientInfo)
 		-- match the incoming lander object
 		for k,v in pairs(garrLanders) do
 			if v.connectionID == landerObject.connectionID then
-				v.x = landerObject.x
-				v.y = landerObject.y
-				v.angle = landerObject.angle
-				v.name = landerObject.name
+				v.x = lander.x
+				v.y = lander.y
+				v.angle = lander.angle
+				v.name = lander.name
 				break
 			end
 		end
 	end)
 end
 
-function EnetHander.createClient()
+function EnetHandler.createClient()
 -- called by menu
 
 	client = sock.newClient(garrGameSettings.HostIP, 22122)
@@ -67,16 +67,16 @@ function EnetHander.createClient()
 		if garrLanders[1].connectionID == peerLander.connectionID then
 			-- nothing to do
 		else
-			local bolIsLanderFound = false
+			local isLanderFound = false
 			local myindex
 			for k,v in pairs(garrLanders) do
 				myindex = k
 				if v.connectionID == peerLander.connectionID then
-					bolIsLanderFound = true
+					isLanderFound = true
 					break
 				end
 			end
-			if bolIsLanderFound == false then
+			if isLanderFound == false then
 				table.insert(garrLanders, peerLander)
 			else
 				garrLanders[myindex] = peerLander
@@ -87,7 +87,7 @@ function EnetHander.createClient()
 	client:connect()
 end
 
-function EnetHander.update(dt)
+function EnetHandler.update(dt)
 
 	if gbolIsAHost then
 		timerHostSendTimer = timerHostSendTimer - dt
@@ -114,4 +114,4 @@ function EnetHander.update(dt)
 end
 
 
-return EnetHander
+return EnetHandler
