@@ -10,17 +10,17 @@ HUD.font = love.graphics.newFont(20)
 
 -- TODO: Create variables in a init or create function
 -- Fuel indicator elements
-HUD.fuel = {x=20, y=20, w=gintScreenWidth - 40, h=50, cornerSize=15}
-HUD.fuel.mid = HUD.fuel.x + math.floor(HUD.fuel.w / 2)
-HUD.fuel.btm = HUD.fuel.y + HUD.fuel.h
-HUD.fuel.text = {img=love.graphics.newText(HUD.font, "FUEL")}
-HUD.fuel.text.w, HUD.fuel.text.h = HUD.fuel.text.img:getDimensions()
-HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.fuel.text.h / 2)
+HUD.fuel = {x = 20, y = 20, width = gintScreenWidth - 40, height = 50, cornerSize = 15}
+HUD.fuel.middle = HUD.fuel.x + math.floor(HUD.fuel.width / 2)
+HUD.fuel.bottom = HUD.fuel.y + HUD.fuel.height
+HUD.fuel.text = {image=love.graphics.newText(HUD.font, "FUEL")}
+HUD.fuel.text.width, HUD.fuel.text.height = HUD.fuel.text.image:getDimensions()
+HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.fuel.text.height / 2)
 
 
-local tower		= Assets.getImageSet("tower")
-local ship		= Assets.getImageSet("ship")
-local flame		= Assets.getImageSet("flame")
+local tower = Assets.getImageSet("tower")
+local ship = Assets.getImageSet("ship")
+local flame = Assets.getImageSet("flame")
 
 
 
@@ -36,15 +36,19 @@ local function drawFuelIndicator(lander)
     -- Fuel indicator
     local grad = lander.fuel / lander.fuelCapacity
     local color = {1, grad, grad}
+	local x, y = HUD.fuel.x, HUD.fuel.y
+	local width, height = HUD.fuel.width, HUD.fuel.height
+	local cornerSize = HUD.fuel.cornerSize
+
 	love.graphics.setColor(1,1,1,1)
-    love.graphics.rectangle("fill", HUD.fuel.x, HUD.fuel.y, HUD.fuel.w, HUD.fuel.h, HUD.fuel.cornerSize, HUD.fuel.cornerSize)
+    love.graphics.rectangle("fill", x, y, width, height, cornerSize, cornerSize)
     love.graphics.setColor(color)
-    love.graphics.rectangle("fill", HUD.fuel.x, HUD.fuel.y, HUD.fuel.w * grad, HUD.fuel.h, HUD.fuel.cornerSize, HUD.fuel.cornerSize)
+    love.graphics.rectangle("fill", x, y, width * grad, height, cornerSize, cornerSize)
     love.graphics.setColor(0,0.5,1,1)
-    love.graphics.draw(HUD.fuel.text.img, HUD.fuel.text.x, HUD.fuel.text.y)
+    love.graphics.draw(HUD.fuel.text.image, HUD.fuel.text.x, HUD.fuel.text.y)
     love.graphics.setColor(1,1,1,1)
 	-- center line
-    love.graphics.line(HUD.fuel.mid, HUD.fuel.y, HUD.fuel.mid, HUD.fuel.btm)
+    love.graphics.line(HUD.fuel.middle, y, HUD.fuel.middle, HUD.fuel.bottom)
 end
 
 
@@ -57,11 +61,13 @@ local function drawOffscreenIndicator(lander)
     local magnifier = 1.5
     local x, y = lander.x - gintWorldOffset, ship.height + indicatorY
     if lander.y < 0 then
-        love.graphics.draw(ship.image, x, y, math.rad(lander.angle), magnifier, magnifier, ship.width/2, ship.height/2)
+		local shipW, shipH = ship.width / 2, ship.height / 2
+        love.graphics.draw(ship.image, x, y, math.rad(lander.angle), magnifier, magnifier, shipW, shipH)
         love.graphics.circle("line", x, y, ship.height + 5)
         love.graphics.polygon("fill", x, lander.y, x - 10, indicatorY - 5, x + 10, indicatorY - 5)
         if lander.engineOn then
-            love.graphics.draw(flame.image, x, y, math.rad(lander.angle), magnifier, magnifier, flame.width/2, flame.height/2)
+			local flameW, flameH = flame.width/2, flame.height/2
+            love.graphics.draw(flame.image, x, y, math.rad(lander.angle), magnifier, magnifier, flameW, flameH)
         end
     end
 	-- restore line thickness
@@ -82,18 +88,18 @@ local function drawRangefinder(lander)
 	local module = Modules.rangefinder
 	if Lander.hasUpgrade(lander, module) then
 
-		local mydist, _ = fun.GetDistanceToClosestBase(lander.x, enum.basetypeFuel)
-		mydist = cf.round(mydist,0)
-
+		local rawDistance = fun.GetDistanceToClosestBase(lander.x, enum.basetypeFuel)
+		local distance = math.abs(cf.round(rawDistance, 0))
 		Assets.setFont("font20")
 
 		-- don't draw if close to base
-		if math.abs(mydist) > 100 then
-			if mydist <= 0 then
+		if distance > 100 then
+			local halfScreenW = gintScreenWidth / 2
+			if distance <= 0 then
 				-- closest base is to the right (forward)
-				love.graphics.print("--> " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
+				love.graphics.print("--> " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
 			else
-				love.graphics.print("<-- " .. math.abs(mydist), (gintScreenWidth / 2) - 75, gintScreenHeight * 0.90)
+				love.graphics.print("<-- " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
 			end
 		end
 	end
@@ -104,17 +110,17 @@ end
 
 local function drawHealthIndicator(lander)
 	-- lander.health reports health from 0 (dead) to 100 (best health)
-	local indicatorlength = lander.health * -1
-	local drawingx  = gintScreenWidth - 30
-	local drawingy  = gintScreenHeight * 0.33
-	local width     = 10
-	local height    = indicatorlength
+	local indicatorLength = lander.health * -1
+	local x  = gintScreenWidth - 30
+	local y  = gintScreenHeight * 0.33
+	local width = 10
+	local height = indicatorLength
 
 	Assets.setFont("font14")
-	love.graphics.print("Health", drawingx - 20, drawingy)
-
+	love.graphics.print("Health", x - 20, y)
+	-- Draw rectangle
 	love.graphics.setColor(1,0,0,1)
-	love.graphics.rectangle("fill", drawingx, drawingy + 120,width,height)
+	love.graphics.rectangle("fill", x, y + 120, width, height)
 	love.graphics.setColor(1,1,1,1)
 end
 
@@ -148,26 +154,27 @@ end
 
 
 local function drawGameOver()
-
     Assets.setFont("font16")
+    local text = "You are out of fuel. Game over. Press R to reset"
 
-    local strText 	= "You are out of fuel. Game over. Press R to reset"
-    local drawingx 	= (gintScreenWidth / 2) - 150		-- try to get centre of screen
-    local drawingy 	= gintScreenHeight * 0.33
-    love.graphics.print(strText, drawingx, drawingy)
+	-- try to get centre of screen
+    local x = (gintScreenWidth / 2) - 150
+    local y = gintScreenHeight * 0.33
+    love.graphics.print(text, x, y)
 end
 
 
 
 local function drawScore()
 	-- score is simply the amount of forward distance travelled (lander.x)
-	local score = cf.strFormatThousand(tonumber(cf.round(fun.CalculateScore())))
-	local highscore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
+	local roundedScore = cf.round(fun.CalculateScore())
+	local score = cf.strFormatThousand(roundedScore)
+	local highScore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
 	Assets.setFont("font14")
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.printf("Score: " .. score, 0, 75, gintScreenWidth, "center")
-	love.graphics.printf("High Score: " .. highscore, 0, 90, gintScreenWidth, "center")
+	love.graphics.printf("High Score: " .. highScore, 0, 90, gintScreenWidth, "center")
 end
 
 
