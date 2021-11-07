@@ -5,19 +5,19 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-gstrGameVersion = "0.10"
+gstrGameVersion = "0.11"
 
 love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
 io.stdout:setvbuf("no")
 
 
--- Do debug stuff like display values etc
+-- Do debug stuff like display info text etc
 gbolDebug = true
 
 -- Global screen dimensions
-gintScreenWidth = 1024-- 1920
-gintScreenHeight = 768-- 1080
+gintScreenWidth = 1024 -- 1920
+gintScreenHeight = 768 -- 1080
 
 
 
@@ -149,7 +149,7 @@ local background = Assets.getImageSet("background1")
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
-function drawWallpaper()
+local function drawWallpaper()
 	-- stretch or shrink the image to fit the window
 	local sx = gintScreenWidth / background.width
 	local sy = gintScreenHeight / background.height
@@ -157,6 +157,23 @@ function drawWallpaper()
 	love.graphics.draw(background.image, 0, 0, 0, sx, sy)
 end
 
+
+
+-- TODO: Add some sort of gamestate manager
+-- Used to be able to draw in pause AND world screen
+local function drawWorld()
+	-- draw the surface
+	Terrain.draw()
+	-- draw world objects
+	Building.draw()
+	Base.draw()
+	-- draw the lander
+	Lander.draw()
+	-- Draw smoke particles
+	Smoke.draw()
+	-- draw HUD elements
+	HUD.draw()
+end
 
 
 -- ~~~~~~~~~~~~~~~
@@ -241,17 +258,7 @@ function love.draw()
 	end
 
 	if strCurrentScreen == "World" then
-		-- draw the surface
-		Terrain.draw()
-		-- draw world objects
-		Building.draw()
-		Base.draw()
-		-- draw the lander
-		Lander.draw()
-		-- Draw smoke particles
-		Smoke.draw()
-		-- draw HUD elements
-		HUD.draw()
+		drawWorld()
 	end
 
 	if strCurrentScreen == "Credits" then
@@ -259,6 +266,7 @@ function love.draw()
 	end
 
 	if strCurrentScreen == "Pause" then
+		drawWorld()
 		HUD.drawPause() -- Display on top of world
 	end
 
