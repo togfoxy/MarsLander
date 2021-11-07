@@ -107,11 +107,10 @@ function love.load(args)
 		borderless = false
 	}
 
-    if love.filesystem.isFused( ) then
-        void = love.window.setMode(gintScreenWidth, gintScreenHeight,screenOptions)
+	love.window.setMode(gintScreenWidth, gintScreenHeight,screenOptions)
+
+	if love.filesystem.isFused( ) then
         gbolDebug = false
-    else
-		void = love.window.setMode(gintScreenWidth, gintScreenHeight,screenOptions)
     end
 
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
