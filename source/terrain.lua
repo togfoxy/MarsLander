@@ -22,7 +22,7 @@ local function initialiseGround()
 		garrGround[i] = gintScreenHeight * 0.80
 	end
 
-	Terrain.getMoreTerrain(gintScreenWidth * 2)
+	Terrain.generate(gintScreenWidth * 2)
 
 end
 
@@ -38,7 +38,7 @@ end
 
 
 
-function Terrain.getMoreTerrain(intAmountToCreate)
+function Terrain.generate(intAmountToCreate)
 -- gets a predictable terrain value (deterministic) base on x
 
 	-- create terrain
@@ -104,7 +104,7 @@ function Terrain.draw(worldoffset)
 	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (worldoffset + gintScreenWidth) > #garrGround then
-		Terrain.getMoreTerrain(gintScreenWidth * 2)
+		Terrain.generate(gintScreenWidth * 2)
 	end
 
 	for i = 1, #garrGround - 1 do
