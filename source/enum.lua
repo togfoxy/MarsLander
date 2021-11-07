@@ -16,3 +16,11 @@ basetypeBuilding1 = 7
 basetypeBuilding2 = 8
 
 baseMaxFuel = 15
+
+-- sprites and images -- 
+
+imageFlameSprite = 4
+imageShip = 5
+
+
+

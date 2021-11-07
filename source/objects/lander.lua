@@ -315,9 +315,14 @@ function Lander.create()
 	local lander = {}
 	lander.x = gintOriginX
 	lander.y = garrGround[lander.x] - 8
-	lander.sprite = garrImages[5]
-	lander.width = lander.sprite:getWidth()
-	lander.height = lander.sprite:getHeight()
+	--lander.sprite = garrImages[5]
+	--lander.width = lander.sprite:getWidth()
+	--lander.height = lander.sprite:getHeight()
+	
+	lander.spriteenum = enum.imageShip
+	lander.width = garrImages[lander.spriteenum]:getWidth()
+	lander.height = garrImages[lander.spriteenum]:getHeight()
+
 	-- 270 = up
 	lander.angle = 270
 	lander.vx = 0
@@ -349,6 +354,7 @@ function Lander.create()
 	-- modules
 	-- this will be strings/names of modules
 	lander.modules = {}
+	
 	return lander
 end
 
@@ -421,7 +427,7 @@ function Lander.update(lander, dt)
 
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
-
+	
 	-- Update ship
     moveShip(lander, dt)
     updateSmoke(dt)
@@ -433,7 +439,7 @@ end
 
 function Lander.draw(worldOffset)
 	-- draw the lander and flame
-	for landerId, lander in ipairs(garrLanders) do
+	for landerId, lander in pairs(garrLanders) do
 		local sx, sy = 1.5, 1.5
 		local drawingX = lander.x - worldOffset
 		local drawingY = lander.y
@@ -445,9 +451,12 @@ function Lander.draw(worldOffset)
 			love.graphics.setColor(1,1,1,0.5)
 		end
 
+		-- TODO: work out why lander.width doesn't work in mplayer mode
 		local ox = lander.width / 2
 		local oy = lander.height / 2
+		
 		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+
 
 		--[[
 			TODO:
@@ -457,7 +466,7 @@ function Lander.draw(worldOffset)
 			file and just use them here without the local keyword.
 		--]]
 		-- draw flames
-		local flameSprite	= garrImages[4]
+		local flameSprite	= garrImages[enum.imageFlameSprite]
 		local flameWidth	= flameSprite:getWidth()
 		local flameHeight	= flameSprite:getHeight()
 		local ox 			= flameWidth / 2
