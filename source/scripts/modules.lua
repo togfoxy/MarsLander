@@ -5,7 +5,7 @@
 -- Modules script containing ship modules for Mars Lander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-local Modules = {
+local Modules =  {
     thrusters = {
         id = 1,
         name = "Efficent Thrusters",
