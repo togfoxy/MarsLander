@@ -8,7 +8,7 @@ end
 function functions.RemoveScreen()
 	table.remove(garrCurrentScreen)
 	if #garrCurrentScreen < 1 then
-	
+
 		--if success then
 			love.event.quit()       --! this doesn't dothe same as the EXIT button
 		--end
@@ -37,7 +37,7 @@ function functions.SaveGameSettings()
 	local serialisedString
 	local success, message
 	local savedir = love.filesystem.getSource()
-	
+
     savefile = savedir .. "/" .. "settings.dat"
     serialisedString = bitser.dumps(garrGameSettings)
     success, message = nativefs.write(savefile, serialisedString )
@@ -48,18 +48,18 @@ function functions.LoadGameSettings()
 
     local savedir = love.filesystem.getSource()
     love.filesystem.setIdentity( savedir )
-    
+
     local savefile, contents
 
     savefile = savedir .. "/" .. "settings.dat"
     contents, _ = nativefs.read(savefile) 
 	local success
     success, garrGameSettings = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
-	
+
 	if success == false then
 		garrGameSettings = {}
 	end
-	
+
 	--[[ FIXME:
 	-- This is horrible bugfix and needs refactoring. If a player doesn't have
 	-- a settings.dat already then all the values in garrGameSettings table are 
@@ -95,21 +95,21 @@ function functions.SaveGame()
     local contents
     local success, message
     local savedir = love.filesystem.getSource()
-    
+
     savefile = savedir .. "/" .. "landers.dat"
     serialisedString = bitser.dumps(garrLanders)
     success, message = nativefs.write(savefile, serialisedString )
-    
+
     savefile = savedir .. "/" .. "ground.dat"
     serialisedString = bitser.dumps(garrGround)
     success, message = nativefs.write(savefile, serialisedString )
-    
+
     savefile = savedir .. "/" .. "objects.dat"
-    serialisedString = bitser.dumps(garrObjects)    -- 
-    success, message = nativefs.write(savefile, serialisedString )   
-	
+    serialisedString = bitser.dumps(garrObjects)
+    success, message = nativefs.write(savefile, serialisedString )
+
 	lovelyToasts.show("Game saved",3, "middle")
-    
+
 end
 
 
@@ -122,23 +122,23 @@ function functions.LoadGame()
     local contents
 
     savefile = savedir .. "/" .. "landers.dat"
-    contents, _ = nativefs.read( savefile) 
-    garrLanders = bitser.loads(contents)    
+    contents, _ = nativefs.read( savefile)
+    garrLanders = bitser.loads(contents)
 
     savefile = savedir .. "/" .. "ground.dat"
-    contents, _ = nativefs.read( savefile) 
-    garrGround = bitser.loads(contents)   
+    contents, _ = nativefs.read( savefile)
+    garrGround = bitser.loads(contents)
 
     savefile = savedir .. "/" .. "objects.dat"
-    contents, _ = nativefs.read(savefile) 
-    garrObjects = bitser.loads(contents)  
+    contents, _ = nativefs.read(savefile)
+    garrObjects = bitser.loads(contents)
 
 end
 
 
 function functions.CalculateScore()
 	local score = garrLanders[1].x - gintOriginX
-	
+
 	if score > garrGameSettings.HighScore then
 		garrGameSettings.HighScore = score
 		fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
@@ -186,11 +186,11 @@ function functions.HandleSockets(dt)
 	msg.angle = garrLanders[1].angle
 	msg.name = garrLanders[1].name
 	-- ** msg is set here and sent across UDP below
-	
+
 	if gbolIsAHost then
-	
+
 		ss.hostListenPort()
-		
+
 		-- get just one item from the queue and process it
 		repeat
 			local incoming = ss.getItemInHostQueue()		-- could be nil
@@ -200,7 +200,7 @@ function functions.HandleSockets(dt)
 					msg = {}
 					msg.name = "ConnectionAccepted"
 				else
-					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]. 
+					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
@@ -208,16 +208,16 @@ function functions.HandleSockets(dt)
 				end	
 			end
 		until incoming == nil
-			
+
 		ss.addItemToHostOutgoingQueue(msg)
 		ss.sendToClients()
 		msg = {}
 	end
-	
+
 	if gbolIsAClient then
 
 		ss.clientListenPort()
-	
+
 		-- get item from the queue and process it
 		local incoming = ss.getItemInClientQueue()		-- could be nil
 
@@ -229,7 +229,7 @@ function functions.HandleSockets(dt)
 						fun.SaveGameSettings()
 						fun.AddScreen("World")
 					end
-				else	
+				else
 					garrLanders[2] = {}
 					garrLanders[2].x = incoming.x
 					garrLanders[2].y = incoming.y
@@ -246,7 +246,7 @@ function functions.HandleSockets(dt)
 		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
 		if gfltSocketClientTimer <= 0 then			
 			gfltSocketClientTimer = enum.constSocketClientRate			
-		
+
 			ss.addItemToClientOutgoingQueue(msg)	-- Lander[1]
 			ss.sendToHost()
 			msg = {}
@@ -260,13 +260,12 @@ function functions.ResetGame()
 	garrGround = {}
 	garrObjects = {}
 
-	-- ensure Terrain.initalize appears before Lander.create as Lander.create needs the terrain to already exist
+	-- ensure Terrain.init appears before Lander.createLander
 	Terrain.init()
-	
+
 	garrLanders = {}
 	table.insert(garrLanders, Lander.createLander())
-	
-	
+
 end
 
 return functions
