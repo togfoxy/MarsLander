@@ -50,8 +50,8 @@ enum = require "enum"
 ss = require "socketstuff"
 
 garrLanders = {}
-garrGround = {}				-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
-garrObjects = {}			-- stores an object that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
+garrGround = {}	 -- y values for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
+garrObjects = {}  -- objects that needs to be drawn so that garrObjects[xvalue] = an object to be drawn on the ground
 garrImages = {}
 garrSprites = {}			-- spritesheets for landing lights
 garrSound = {}
@@ -59,7 +59,7 @@ garrMassRatio = 0			-- for debugging only. Records current mass/default mass rat
 garrSmokeSprites = {}		-- used to track and draw smoke animations
 garrGameSettings = {}		-- track game settings
 
-gintOriginX = cf.round(gintScreenWidth / 2,0)	-- this is the start of the world and the origin that we track as we scroll the terrain left and right
+gintOriginX = cf.round(gintScreenWidth / 2,0)  -- start of the world and the origin that we track
 gintDefaultMass = 220		-- this is the mass the lander starts with hence the mass the noob engines are tuned to
 
 gfltLandervy = 0			-- track the vertical speed of lander to detect crashes etc
@@ -132,7 +132,7 @@ function love.load()
 
 	-- spritesheets and animations
 	garrSprites[1] = newImage(path .. "landingLights.png")
-	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())     -- frame width, frame height
+	gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())
 	gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 
 	gSmokeSheet = newImage(path .. "smoke.png")
