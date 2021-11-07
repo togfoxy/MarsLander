@@ -132,7 +132,9 @@ function love.load(args)
 
 		-- spritesheets and animations
 		garrSprites[1] = newImage(path .. "landingLights.png")
-		gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())
+
+		local frameWidth, frameHeight = 64, 8
+		gGridLandingLights = anim8.newGrid(frameWidth, frameHeight, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())
 		gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
 
 		gSmokeSheet = newImage(path .. "smoke.png")
