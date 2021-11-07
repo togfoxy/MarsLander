@@ -1,4 +1,4 @@
-gstrGameVersion = "0.10"
+gstrGameVersion = "0.11"
 
 io.stdout:setvbuf("no")
 
@@ -83,6 +83,7 @@ gintClientPort = nil
 gbolIsAClient = false            	-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false                -- Will listen on load but is not a host until someone connects
 enetIsConnected = false			-- Will become true when received an acknowledgement from the server
+hostIPAddress = ""
 
 gbolDebug = true
 
@@ -112,6 +113,10 @@ function love.load()
     end
 
 	love.window.setTitle("Mars Lander " .. gstrGameVersion)
+	
+	local sock = require 'socket'
+	hostIPAddress = sock.dns.toip(sock.dns.gethostname())
+	sock = nil	
 
 	-- stills/images
 	--! should make these numbers enums one day

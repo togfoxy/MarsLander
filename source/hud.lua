@@ -176,11 +176,13 @@ local function DrawPortInformation()
 
 	if gbolIsAHost then
 
-		love.graphics.setColor(1,1,1,0.50)
+		love.graphics.setColor(1,1,1,0.75)
 
 		love.graphics.setNewFont(12)
 
-		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
+		-- love.graphics.print("Hosting on port: " .. hostIPAddress .. ":" .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
+		local txt = "Hosting on port: " .. hostIPAddress .. ":" .. gintServerPort
+		love.graphics.printf(txt, 0, 5, gintScreenWidth, "center")
 	end
 
 end
