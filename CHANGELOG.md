@@ -12,6 +12,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ### Changed
 - removed the generation of buildings for now. Intend to put them back in soon.
+- removed the images/sprites out of the lander table
 
 
 
@@ -22,6 +23,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - fixed the lag when running co-op. Can run two windows on localhost really well now (but only one at a time can receive keyboard input :( )
 - fixed a bizarre drawing bug when in co-op mode (work around appled)
 - fuel bases are now determined on demand and not up front. Big performance boost.
+- save game bug
 
 
 ## v0.10
