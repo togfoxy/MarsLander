@@ -318,7 +318,7 @@ function Lander.create()
 	--lander.sprite = garrImages[5]
 	--lander.width = lander.sprite:getWidth()
 	--lander.height = lander.sprite:getHeight()
-	
+
 	lander.spriteenum = enum.imageShip
 	lander.width = garrImages[lander.spriteenum]:getWidth()
 	lander.height = garrImages[lander.spriteenum]:getHeight()
@@ -354,6 +354,7 @@ function Lander.create()
 	-- modules
 	-- this will be strings/names of modules
 	lander.modules = {}
+
 	return lander
 end
 
@@ -453,8 +454,9 @@ function Lander.draw(worldOffset)
 		-- TODO: work out why lander.width doesn't work in mplayer mode
 		local ox = lander.width / 2
 		local oy = lander.height / 2
-		
+
 		love.graphics.draw(garrImages[5], drawingX,drawingY, math.rad(lander.angle), sx, sy, ox, oy)
+
 
 		--[[
 			TODO:
