@@ -117,6 +117,7 @@ function love.load(args)
 
 	-- stills/images
 	--! should make these numbers enums one day
+<<<<<<< HEAD
 	local newImage	= love.graphics.newImage
 	local path 		= "assets/images/"
 	garrImages[1] = newImage(path .. "tower.png")
@@ -151,6 +152,47 @@ function love.load(args)
 
 	-- fonts
 	font20 = love.graphics.newFont(20) -- the number denotes the font size
+=======
+	do
+		local newImage	= love.graphics.newImage
+		local path 		= "assets/images/"
+		garrImages[1] = newImage(path .. "tower.png")
+		garrImages[2] = newImage(path .. "gastank1.png")
+		garrImages[3] = newImage(path .. "background1.png")
+		garrImages[4] = newImage(path .. "flame.png")
+		garrImages[5] = newImage(path .. "ship.png")
+		garrImages[6] = newImage(path .. "gastank1_off.png")
+		garrImages[7] = newImage(path .. "building1.png")
+		garrImages[8] = newImage(path .. "building2.png")
+		garrImages[9] = newImage(path .. "logo_lander.png")
+
+		-- spritesheets and animations
+		garrSprites[1] = newImage(path .. "landingLights.png")
+		gGridLandingLights = anim8.newGrid(64, 8, garrSprites[1]:getWidth(), garrSprites[1]:getHeight())
+		gLandingLightsAnimation = anim8.newAnimation(gGridLandingLights(1,'1-4'), 0.5)		-- column 1, rows 1 -> 4
+
+		gSmokeSheet = newImage(path .. "smoke.png")
+		gSmokeImages = cf.fromImageToQuads(gSmokeSheet, 30, 30)		-- w/h of each frame
+
+	end
+
+	do
+		local newSource = love.audio.newSource
+		local path 		= "assets/sounds/"
+		garrSound[1] = newSource(path .. "wind.ogg", "static")
+		garrSound[2] = newSource(path .. "landingSuccess.ogg", "static")
+		garrSound[5] = newSource(path .. "lowFuel.ogg", "static")
+		garrSound[5]:setVolume(0.25)
+		garrSound[6] = newSource(path .. "wrong.ogg", "static")
+	end
+
+	do
+		local newSource = love.audio.newSource
+		local path = "assets/music/"
+		garrSound[3] = newSource(path .. "menuTheme.mp3", "stream")
+		garrSound[3]:setVolume(0.25)
+	end
+>>>>>>> 7cd873b (refactor love.load to fix warnings)
 
 	fun.LoadGameSettings()
 	love.window.setFullscreen(garrGameSettings.FullScreen) -- Restore full screen setting
