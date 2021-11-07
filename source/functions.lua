@@ -183,11 +183,11 @@ function functions.HandleSockets(dt)
 	
 	if gbolIsAHost then
 	
-		ss.hostListenPort()
+		-- ss.hostListenPort()
 		
 		-- get just one item from the queue and process it
 		repeat
-			local incoming = ss.getItemInHostQueue()		-- could be nil
+			-- local incoming = ss.getItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
 				if incoming.name == "ConnectionRequest" then
 					gbolIsConnected = true
@@ -203,17 +203,17 @@ function functions.HandleSockets(dt)
 			end
 		until incoming == nil
 			
-		ss.addItemToHostOutgoingQueue(msg)
-		ss.sendToClients()
+		-- ss.addItemToHostOutgoingQueue(msg)
+		-- ss.sendToClients()
 		msg = {}
 	end
 	
 	if gbolIsAClient then
 
-		ss.clientListenPort()
+		-- ss.clientListenPort()
 	
 		-- get item from the queue and process it
-		local incoming = ss.getItemInClientQueue()		-- could be nil
+		-- local incoming = ss.getItemInClientQueue()		-- could be nil
 
 		repeat
 			if incoming ~= nil then
@@ -232,7 +232,7 @@ function functions.HandleSockets(dt)
 				end
 			else
 			end
-			incoming = ss.getItemInClientQueue()		-- could be nil
+			-- incoming = ss.getItemInClientQueue()		-- could be nil
 		until incoming == nil
 
 		-- this time is needed to stop the client flooding the network
@@ -241,8 +241,8 @@ function functions.HandleSockets(dt)
 		if gfltSocketClientTimer <= 0 then			
 			gfltSocketClientTimer = enum.constSocketClientRate			
 		
-			ss.addItemToClientOutgoingQueue(msg)	-- Lander[1]
-			ss.sendToHost()
+			-- ss.addItemToClientOutgoingQueue(msg)	-- Lander[1]
+			-- ss.sendToHost()
 			msg = {}
 		end
 	end

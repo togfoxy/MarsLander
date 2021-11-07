@@ -14,18 +14,20 @@ Slab = require 'lib.Slab.Slab'
 bitser = require 'lib.bitser'
 -- https://github.com/gvx/bitser
 
-nativefs = require("lib.nativefs")
+nativefs = require 'lib.nativefs'
 -- https://github.com/megagrump/nativefs
 
 anim8 = require 'lib.anim8'
 -- https://github.com/kikito/anim8
 
 -- socket it native to LOVE2D
-socket = require "socket"
+-- socket = require "socket"
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
 -- http://w3.impa.br/~diego/software/luasocket/reference.html
 -- https://aiq0.github.io/luasocket/reference.html
 -- https://github.com/camchenry/sock.lua
+
+sock = require 'lib.sock'
 
 lovelyToasts = require("lib.lovelyToasts")
 -- https://github.com/Loucee/Lovely-Toasts
@@ -40,6 +42,7 @@ garrCurrentScreen = {}
 
 Lander = require "objects.lander"
 Terrain = require "terrain"
+EnetHander = require "enetstuff"
 
 HUD = require "hud"
 cobjs = require "createobjects"
@@ -48,7 +51,7 @@ fun = require "functions"
 cf = require "lib.commonfunctions"
 menus = require "menus"
 enum = require "enum"
-ss = require "socketstuff"
+-- ss = require "socketstuff"
 
 garrLanders = {}
 garrGround = {}				-- stores the y value for the ground so that garrGround[Lander.x] = a value from 0 -> gintScreenHeight
@@ -221,7 +224,8 @@ function love.update(dt)
 
 	end
 	
-	fun.HandleSockets()
+	-- fun.HandleSockets()
+	EnetHander.update(dt)
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
 
 end
