@@ -219,20 +219,14 @@ function love.update(dt)
 	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
 
 	if strCurrentScreen == "MainMenu" or strCurrentScreen == "Credits" or strCurrentScreen == "Settings" then
-		
 		Slab.Update(dt)
 	end
 
 	if strCurrentScreen == "World" then
-
 		Lander.update(garrLanders[1], dt)
-
 		gLandingLightsAnimation:update(dt)
-
 	end
 	
-	-- fun.HandleSockets()
 	EnetHander.update(dt)
 	lovelyToasts.update(dt)		-- can potentially move this with the Slab.Update as it is only used on the main menu
-
 end

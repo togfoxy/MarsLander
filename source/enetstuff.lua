@@ -11,7 +11,7 @@ local timerHostSendTimer = timerHostSendInterval
 local timerClientSendInterval = 0.05
 local timerClientSendTimer = timerClientSendInterval
 
-function EnetHander.CreateHost()
+function EnetHander.createHost()
 -- called by menu
 
 	server = sock.newServer(hostIPAddress, 22122)
@@ -40,7 +40,7 @@ function EnetHander.CreateHost()
 	end)
 end
 
-function EnetHander.CreateClient()
+function EnetHander.createClient()
 -- called by menu
 
 	client = sock.newClient(garrGameSettings.HostIP, 22122)
@@ -88,7 +88,6 @@ function EnetHander.CreateClient()
 end
 
 function EnetHander.update(dt)
-
 
 	if gbolIsAHost then
 		timerHostSendTimer = timerHostSendTimer - dt

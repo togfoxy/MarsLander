@@ -69,11 +69,9 @@ function menus.DrawMainMenu()
 			if Slab.Button("Host game",{W=155}) then
 				gbolIsAClient = false
 				gbolIsAHost = true
-				garrLanders[1].connectionID = 111
+				garrLanders[1].connectionID = 111	-- random ID. Can be any number (not nil)
 				fun.SaveGameSettings()
-				
-				EnetHander.CreateHost()
-				
+				EnetHander.createHost()
 				fun.AddScreen("World")
 			end
 			Slab.NewLine()
@@ -116,17 +114,7 @@ function menus.DrawMainMenu()
 					gbolIsAHost = false
 					gbolIsAClient = true
 					fun.SaveGameSettings()
-
-					EnetHander.CreateClient()
-					
-
-					-- send a test message to the host. The host will return the client's IP and port
-					local msg = {}
-					msg.name = "ConnectionRequest"
-		
-					-- ss.addItemToClientOutgoingQueue(msg)
-					-- ss.sendToHost()
-					-- table.insert(garrLanders, Lander.create())
+					EnetHander.createClient()
 				end
 			end
 			Slab.NewLine()		
