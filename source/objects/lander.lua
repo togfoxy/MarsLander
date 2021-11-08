@@ -282,7 +282,7 @@ end
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
 
-function Lander.createLander(name)
+function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
 	lander.x = gintOriginX
@@ -383,9 +383,9 @@ function Lander.update(lander, dt)
         thrustRight(lander, dt)
     end
 
-	-- TODO: Calculate the offset so that doesn't need to be global
+	-- TODO: Calculate the offset so that it doesn't need to be global
 	-- Calculate worldOffset for everyone based on lander x position
-	gintWorldOffset = lander.x - gintOriginX
+	gintWorldOffset = cf.round(lander.x) - gintOriginX
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
 	-- Update ship

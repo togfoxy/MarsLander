@@ -187,6 +187,7 @@ local function drawDebug()
 	love.graphics.print("MEM: " .. cf.round(collectgarbage("count")), 10, 140)
 	love.graphics.print("Ground: " .. #garrGround, 10, 160)
 	love.graphics.print("Objects: " .. #garrObjects, 10, 180)
+	love.graphics.print("WorldOffsetX: " .. gintWorldOffset, 10, 200)
 	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - gintWorldOffset, garrLanders[1].y + 25)
 end
 
