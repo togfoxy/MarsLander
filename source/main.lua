@@ -28,7 +28,7 @@ inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
 
 -- https://love2d.org/wiki/TLfres
-TLfres = require "lib.tlfres"
+TLfres = require 'lib.tlfres'
 
 -- https://github.com/coding-jackalope/Slab/wiki
 Slab = require 'lib.Slab.Slab'
@@ -37,23 +37,23 @@ Slab = require 'lib.Slab.Slab'
 bitser = require 'lib.bitser'
 
 -- https://github.com/megagrump/nativefs
-nativefs = require "lib.nativefs"
+nativefs = require 'lib.nativefs'
 
 -- socket it native to LOVE2D
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
 -- http://w3.impa.br/~diego/software/luasocket/reference.html
 -- https://aiq0.github.io/luasocket/reference.html
 -- https://github.com/camchenry/sock.lua
-socket = require "socket"
+socket = require 'socket'
 
 -- https://github.com/Loucee/Lovely-Toasts
-lovelyToasts = require "lib.lovelyToasts"
+lovelyToasts = require 'lib.lovelyToasts'
 
 -- Common functions
-cf = require "lib.commonfunctions"
+cf = require 'lib.commonfunctions'
 
 -- Our asset-loader
-Assets = require "lib.assetloader"
+Assets = require 'lib.assetloader'
 
 
 
