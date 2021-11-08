@@ -184,7 +184,7 @@ end
 function love.load()
     if love.filesystem.isFused() then
 		-- display = monitor number (1 or 2)
-		local flags = {fullscreen=true,display=1,resizable=true, borderless=false}
+		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
         love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
         gbolDebug = false
 
@@ -193,7 +193,7 @@ function love.load()
 		Assets.playSound("menuTheme", true)
     else
 		-- display = monitor number (1 or 2)
-		local flags = {fullscreen=false,display=1,resizable=true, borderless=false}
+		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
 		love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
     end
 
