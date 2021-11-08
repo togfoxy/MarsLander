@@ -81,20 +81,20 @@ Assets.newFont(20)
 
 -- TODO: Turn global modules / objects to local ones
 -- Scripts
-Modules		= require "scripts.modules"		-- Lander modules
-enum		= require "scripts.enum"
+Modules		= require 'scripts.modules'		-- Lander modules
+enum		= require 'scripts.enum'
 -- Objects
-Smoke 		= require "objects.smoke"		-- Smoke particles for objects
-Lander 		= require "objects.lander"
-Base 		= require "objects.base"
-Building	= require "objects.building"
-Terrain 	= require "objects.terrain"
+Smoke 		= require 'objects.smoke'		-- Smoke particles for objects
+Lander 		= require 'objects.lander'
+Base 		= require 'objects.base'
+Building	= require 'objects.building'
+Terrain 	= require 'objects.terrain'
 -- Other
-HUD			= require "hud"
-cobjs		= require "createobjects"
-fun			= require "functions"
-menus		= require "menus"
-ss			= require "socketstuff"
+HUD			= require 'hud'
+cobjs		= require 'createobjects'
+fun			= require 'functions'
+menus		= require 'menus'
+ss			= require 'socketstuff'
 
 
 
