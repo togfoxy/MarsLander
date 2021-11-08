@@ -211,7 +211,7 @@ function HUD.drawPause()
     -- Simple text based pause screen
     Assets.setFont("font18")
     love.graphics.setColor(1,1,1,1)
-    local test = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
+    local text = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
     love.graphics.print(text, gintScreenWidth / 2 - 200, gintScreenHeight /2)
 end
 
