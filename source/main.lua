@@ -155,6 +155,7 @@ local function drawWallpaper()
 	local sy = gintScreenHeight / background.height
 	love.graphics.setColor(1, 1, 1, 0.25)
 	love.graphics.draw(background.image, 0, 0, 0, sx, sy)
+	love.graphics.setColor(1, 1, 1, 0.25)
 end
 
 

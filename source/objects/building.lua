@@ -44,7 +44,6 @@ function Building.draw()
 				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local x = xvalue - gintWorldOffset
 				local y = garrGround[xvalue] - building1.height
-				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(building1.image, x, y)
 			end
 			-- Draw building type 2
@@ -52,7 +51,6 @@ function Building.draw()
 				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local x = xvalue - gintWorldOffset
 				local y = garrGround[xvalue] - building2.height
-				love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(building2.image, x, y)
 			end
         end

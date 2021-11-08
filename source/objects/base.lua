@@ -51,7 +51,7 @@ function Base.draw()
                 -- draw gas tank
                 -- draw the 'fuel level' before drawing the tank over it
                 -- draw the whole gauge red then overlay the right amount of green
-                love.graphics.setColor(1,0,0,1)
+                love.graphics.setColor(1, 0, 0, 1)
                 love.graphics.rectangle("fill", baseX + 40, baseY + 84, 5, 40)
 
                 -- draw green gauge
@@ -79,6 +79,7 @@ function Base.draw()
                 local x = baseX + baseOn.width - 10
                 local y = baseY + baseOn.height
                 landingLights.animation:draw(x, y)
+                love.graphics.setColor(1, 1, 1, 1)
             end
         end
     end

@@ -137,7 +137,6 @@ end
 -- TODO: Draw all lines to a canvas once in a while to save drawcalls
 -- draws the terrain as a bunch of lines that are 1 pixel in length
 function Terrain.draw()
-	love.graphics.setColor(1,1,1,1)
 	-- ensure we have enough terrain
 	if (gintWorldOffset + gintScreenWidth) > #garrGround then
 		Terrain.generate(gintScreenWidth * 2)
@@ -148,10 +147,9 @@ function Terrain.draw()
 			-- only draw what is visible on the screen
 			love.graphics.line(i - gintWorldOffset, garrGround[i], i + 1 - gintWorldOffset, garrGround[i+1])
 			-- draw a vertical line straight down to reflect solid terra firma
-			-- love.graphics.setColor(115/255,115/255,115/255,1)
-			love.graphics.setColor(205/255,92/255,92/255,1)
+			love.graphics.setColor(0.8, 0.35, 0.35,1)
 			love.graphics.line(i - gintWorldOffset, garrGround[i],i - gintWorldOffset, gintScreenHeight)
-			love.graphics.setColor(1,1,1,1)
+			love.graphics.setColor(1, 1, 1, 1)
 		end
 	end
 end

@@ -170,7 +170,6 @@ local function drawScore()
 	local highScore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
 
 	Assets.setFont("font14")
-	love.graphics.setColor(1,1,1,1)
 	love.graphics.printf("Score: " .. score, 0, 75, gintScreenWidth, "center")
 	love.graphics.printf("High Score: " .. highScore, 0, 90, gintScreenWidth, "center")
 end
@@ -198,6 +197,7 @@ local function drawPortInformation()
 		love.graphics.setColor(1,1,1,0.50)
 		Assets.setFont("font14")
 		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
+		love.graphics.setColor(1, 1, 1, 1)
 	end
 end
 
@@ -211,8 +211,8 @@ function HUD.drawPause()
     -- Simple text based pause screen
     Assets.setFont("font18")
     love.graphics.setColor(1,1,1,1)
-    local strText = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
-    love.graphics.print(strText, gintScreenWidth / 2 - 200, gintScreenHeight /2)
+    local test = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
+    love.graphics.print(text, gintScreenWidth / 2 - 200, gintScreenHeight /2)
 end
 
 
