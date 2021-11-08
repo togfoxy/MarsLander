@@ -6,11 +6,10 @@
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 gstrGameVersion = "0.11"
-
 love.window.setTitle("Mars Lander " .. gstrGameVersion)
 
+-- Directly release messages generated with e.g print for instant feedback
 io.stdout:setvbuf("no")
-
 
 -- Do debug stuff like display info text etc
 gbolDebug = true
@@ -38,7 +37,7 @@ Slab = require 'lib.Slab.Slab'
 bitser = require 'lib.bitser'
 
 -- https://github.com/megagrump/nativefs
-nativefs = require("lib.nativefs")
+nativefs = require "lib.nativefs"
 
 -- socket it native to LOVE2D
 -- https://love2d.org/wiki/Tutorial:Networking_with_UDP
@@ -48,18 +47,19 @@ nativefs = require("lib.nativefs")
 socket = require "socket"
 
 -- https://github.com/Loucee/Lovely-Toasts
-lovelyToasts = require("lib.lovelyToasts")
+lovelyToasts = require "lib.lovelyToasts"
 
 -- Common functions
 cf = require "lib.commonfunctions"
+
+-- Our asset-loader
+Assets = require "lib.assetloader"
 
 
 
 -- ~~~~~~~~
 -- Assets
 -- ~~~~~~~~~
-
-Assets	= require "assetloader"
 
 -- Load assets
 -- FIXME: assetloader doesn't check if the file to load is actually an image/sound file
@@ -111,7 +111,7 @@ garrMassRatio = 0		-- for debugging only. Records current mass/default mass rati
 garrGameSettings = {}	-- track game settings
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
-gintOriginX = cf.round(gintScreenWidth / 2,0)
+gintOriginX = cf.round(gintScreenWidth / 2, 0)
 -- this is the mass the lander starts with hence the mass the noob engines are tuned to
 gintDefaultMass = 220
 

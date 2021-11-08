@@ -7,7 +7,7 @@
 
 local Assets = {}
 Assets.imageSets    = {}
-Assets.images      = {}
+Assets.images       = {}
 Assets.sounds       = {}
 Assets.fonts        = {}
 Assets.animations   = {}

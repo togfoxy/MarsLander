@@ -260,11 +260,11 @@ function functions.ResetGame()
 	garrGround = {}
 	garrObjects = {}
 
-	-- ensure Terrain.init appears before Lander.createLander
+	-- ensure Terrain.init appears before Lander.create
 	Terrain.init()
 
 	garrLanders = {}
-	table.insert(garrLanders, Lander.createLander())
+	table.insert(garrLanders, Lander.create())
 
 end
 
