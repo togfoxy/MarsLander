@@ -147,7 +147,7 @@ function Terrain.draw()
 			-- only draw what is visible on the screen
 			love.graphics.line(i - gintWorldOffset, garrGround[i], i + 1 - gintWorldOffset, garrGround[i+1])
 			-- draw a vertical line straight down to reflect solid terra firma
-			love.graphics.setColor(0.8, 0.35, 0.35,1)
+			love.graphics.setColor(0.8, 0.35, 0.35, 1)
 			love.graphics.line(i - gintWorldOffset, garrGround[i],i - gintWorldOffset, gintScreenHeight)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
