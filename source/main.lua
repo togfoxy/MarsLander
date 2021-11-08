@@ -89,6 +89,14 @@ function love.keypressed(key, scancode, isrepeat)
 		fun.RemoveScreen()
 	end
 
+	if key == "p" then
+		if fun.CurrentScreenName() == "World" then
+			fun.AddScreen("Pause")
+		elseif fun.CurrentScreenName() == "Pause" then
+			fun.RemoveScreen()
+		end
+	end
+
 	Lander.keypressed(key, scancode, isrepeat)
 
 	if key == "r" then
@@ -169,7 +177,7 @@ function love.draw()
 
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
 
-	local strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
+	local strCurrentScreen = fun.CurrentScreenName()
 
 	if strCurrentScreen == "MainMenu" then
 		menus.DrawMainMenu()

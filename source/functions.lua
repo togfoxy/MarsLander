@@ -16,6 +16,12 @@ function functions.RemoveScreen()
 end
 
 
+function functions.CurrentScreenName()
+-- returns the current active screen
+	return garrCurrentScreen[#garrCurrentScreen]
+end
+
+
 function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.

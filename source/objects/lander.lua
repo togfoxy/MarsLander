@@ -419,9 +419,7 @@ function Lander.update(lander, dt)
         thrustRight(lander, dt)
     end
 
-    if keyDown("p") then
-        fun.AddScreen("Pause")
-	elseif keyDown("o") then
+	if keyDown("o") then
         fun.AddScreen("Settings")
     end
 

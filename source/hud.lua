@@ -196,7 +196,7 @@ function HUD.DrawPause()
 
     love.graphics.setNewFont(18)
     love.graphics.setColor(1,1,1,1)
-    local strText = "GAME PAUSED: PRESS <ESC> TO RESUME"
+    local strText = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
     love.graphics.print(strText, gintScreenWidth / 2 - 200, gintScreenHeight /2)
 
 end
