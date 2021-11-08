@@ -71,7 +71,7 @@ function menus.DrawMainMenu()
 				gbolIsAHost = true
 				garrLanders[1].connectionID = 111	-- random ID. Can be any number (not nil)
 				fun.SaveGameSettings()
-				EnetHander.createHost()
+				EnetHandler.createHost()
 				fun.AddScreen("World")
 			end
 			Slab.NewLine()
@@ -114,7 +114,7 @@ function menus.DrawMainMenu()
 					gbolIsAHost = false
 					gbolIsAClient = true
 					fun.SaveGameSettings()
-					EnetHander.createClient()
+					EnetHandler.createClient()
 				end
 			end
 			Slab.NewLine()		
