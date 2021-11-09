@@ -66,7 +66,7 @@ end
 
 function Smoke.draw()
 	-- draw smoke trail
-	for key, particle in ipairs(Smoke.particles) do
+	for key, _ in ipairs(Smoke.particles) do
         local particle = Smoke.particles[key]
 		--[[ TODO: currently the sprite rotates around it's top left corner and kinda works visually because of the way
 				the frames of the animation are drawn in the actual image file.
