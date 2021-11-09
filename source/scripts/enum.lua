@@ -7,7 +7,7 @@ return {
 
     -- how frequently will client send to the host?
     constSocketClientRate = 0.04,
-    timerHostSendInterval = 0.1,
+    timerHostSendInterval = 0.04,
 
     -- enumerators
     basetypeFuel = 2,
