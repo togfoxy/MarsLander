@@ -21,7 +21,7 @@ function EnetHandler.createHost()
         -- Send a message of type "welcome" back to the connected client
 		client:send("welcome", client:getConnectId())
 		
-		newLander = Lander.create()
+		local newLander = Lander.create()
 		newLander.connectionID = client:getConnectId()
 		table.insert(garrLanders, newLander)
 	end)
@@ -29,7 +29,7 @@ function EnetHandler.createHost()
 	server:on("clientdata", function(lander, clientInfo)
 		-- match the incoming lander object
 		for k,v in pairs(garrLanders) do
-			if v.connectionID == landerObject.connectionID then
+			if v.connectionID == lander.connectionID then
 				v.x = lander.x
 				v.y = lander.y
 				v.angle = lander.angle
@@ -43,7 +43,7 @@ end
 function EnetHandler.createClient()
 -- called by menu
 
-	client = sock.newClient(garrGameSettings.HostIP, 22122)
+	client = sock.newClient(garrGameSettings.hostIP, 22122)
 	
 	-- these are all the types of messages the client could receive from the host
 	
@@ -55,11 +55,11 @@ function EnetHandler.createClient()
         print("My connection ID is " .. msg)
 		assert(msg == client:getConnectId())
 		
-		garrLanders[1].connectionID = msg
+		garrLanders[1].connectionID = msgo
 		
-		if not enetIsConnected then
+		if not ENET_IS_CONNECTED then
 			fun.AddScreen("World")
-			enetIsConnected = true
+			ENET_IS_CONNECTED = true
 		end
 	end)
 	

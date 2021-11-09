@@ -62,8 +62,8 @@ function functions.LoadGameSettings()
 	if garrGameSettings.PlayerName == nil then
 		garrGameSettings.PlayerName = gstrDefaultPlayerName
 	end
-	if garrGameSettings.HostIP == nil then
-		garrGameSettings.HostIP = "localhost"
+	if garrGameSettings.hostIP == nil then
+		garrGameSettings.hostIP = "localhost"
 	end
 	if garrGameSettings.HostPort == nil then
 		garrGameSettings.HostPort = "22122"

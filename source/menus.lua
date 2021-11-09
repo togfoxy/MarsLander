@@ -87,12 +87,12 @@ function menus.DrawMainMenu()
 			local joinIPOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=garrGameSettings.HostIP,
+				Text=garrGameSettings.hostIP,
 				NumbersOnly=false,
 				NoDrag=true,
 			}			
-			if Slab.Input('HostIP', joinIPOptions) then
-				garrGameSettings.HostIP = Slab.GetInputText()
+			if Slab.Input('hostIP', joinIPOptions) then
+				garrGameSettings.hostIP = Slab.GetInputText()
 			end		
 		
 			Slab.Text("Join on port:" )
@@ -109,7 +109,7 @@ function menus.DrawMainMenu()
 				garrGameSettings.HostPort = Slab.GetInputText() or "22122"
 			end
 			
-			if not enetIsConnected then
+			if not ENET_IS_CONNECTED then
 				if Slab.Button("Join game",{W=155}) then
 					gbolIsAHost = false
 					gbolIsAClient = true
