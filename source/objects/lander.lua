@@ -417,8 +417,6 @@ function Lander.draw()
 		love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
 
 		-- draw flames
-		local ox = flame.width / 2
-		local oy = flame.height / 2
 		if lander.engineOn then
 			local angle = math.rad(lander.angle)
 			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
