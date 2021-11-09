@@ -196,7 +196,8 @@ local function drawPortInformation()
 	if gbolIsAHost then
 		love.graphics.setColor(1,1,1,0.50)
 		Assets.setFont("font14")
-		love.graphics.print("Hosting on port: " .. gintServerPort, (gintScreenWidth / 2) - 60, 5)
+		local txt = "Hosting on port: " .. HOST_IP_ADDRESS .. ":" .. garrGameSettings.hostPort
+		love.graphics.printf(txt, 0, 5, gintScreenWidth, "center")
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 end
