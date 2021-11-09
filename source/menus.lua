@@ -2,11 +2,11 @@ local menus = {}
 
 
 function menus.DrawMainMenu()
-	
+
 	local intSlabWidth = 700 -- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 550 	-- the height of the main menu slab
-	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
-	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
+	local fltSlabWindowX = gintScreenWidth / 2 - intSlabWidth / 2
+	local fltSlabWindowY = gintScreenHeight / 2 - intSlabHeight / 2
 
 	-- try to centre the Slab window
 	-- note: Border is the border between the window and the layout
@@ -25,12 +25,12 @@ function menus.DrawMainMenu()
 
 	Slab.BeginWindow('MainMenu', mainMenuOptions)
 	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
-		
+
 		Slab.SetLayoutColumn(1)
-		Slab.Image('MyImage', {Image = garrImages[9], Scale=0.4})
-		
+		Slab.Image('MyImage', {Image = Assets.getImage("clipartLander"), Scale=0.4})
+
 		Slab.SetLayoutColumn(2)
-		
+
 		Slab.NewLine()
 		Slab.Text("Name: " .. garrGameSettings.PlayerName)
 
@@ -41,7 +41,7 @@ function menus.DrawMainMenu()
 			fun.AddScreen("World")
  		end
 		Slab.NewLine()
- 
+
 		if Slab.Button("Resume game",{W=155}) then
 			fun.SaveGameSettings()
 			fun.AddScreen("World")
@@ -64,7 +64,7 @@ function menus.DrawMainMenu()
 			fun.AddScreen("Settings")
 		end
 		Slab.NewLine()
-		
+
 		if not gbolIsAClient and not gbolIsAHost then
 			if Slab.Button("Host game",{W=155}) then
 				ss.startHosting(gintServerPort)
@@ -76,7 +76,7 @@ function menus.DrawMainMenu()
 			end
 			Slab.NewLine()
 		end
-		
+
 		if gbolIsAHost then
 			Slab.Text("Hosting on port: " .. gintServerPort)
 			Slab.NewLine()
@@ -94,7 +94,7 @@ function menus.DrawMainMenu()
 			if Slab.Input('HostIP', joinIPOptions) then
 				garrGameSettings.HostIP = Slab.GetInputText()
 			end		
-		
+
 			Slab.Text("Join on port:" )
 			local joinPortOptions = {
 				ReturnOnText=true,
@@ -108,7 +108,7 @@ function menus.DrawMainMenu()
 			if Slab.Input('HostPort', joinPortOptions) then
 				garrGameSettings.HostPort = Slab.GetInputText() or 6000
 			end
-			
+
 			if Slab.Button("Join game",{W=155}) then
 				gbolIsAHost = false
 				gbolIsAClient = true
@@ -119,7 +119,7 @@ function menus.DrawMainMenu()
 				-- send a test message to the host. The host will return the client's IP and port
 				local msg = {}
 				msg.name = "ConnectionRequest"
-	
+
 				ss.addItemToClientOutgoingQueue(msg)
 				ss.sendToHost()
 				table.insert(garrLanders, Lander.create())
@@ -131,7 +131,7 @@ function menus.DrawMainMenu()
 			fun.AddScreen("Credits")		--!
 		end
 		Slab.NewLine()
-  
+
 		if Slab.Button("Exit",{W=155}) then
 			love.event.quit(0)
 		end
@@ -143,18 +143,18 @@ function menus.DrawMainMenu()
 		-- Slab.NewLine()
 		-- if Slab.Button("Hidden",{Invisible=true}) then
 		-- end
-		
+
 	Slab.EndLayout()
 	Slab.EndWindow()
-	
+
 end
 
 function menus.DrawCredits()
 
 	local intSlabWidth = 550	-- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 500 	-- the height of the main menu slab
-	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
-	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
+	local fltSlabWindowX = gintScreenWidth / 2 - intSlabWidth / 2
+	local fltSlabWindowY = gintScreenHeight / 2 - intSlabHeight / 2
 
 	local creditBoxOptions = {
 		Title ='About',
@@ -187,7 +187,7 @@ function menus.DrawCredits()
 		Slab.EndLayout()
 
 		Slab.BeginLayout('credits-middle', {AlignX = 'center', AlignY = 'top', AlignRowY='center', Columns = 2})
-			
+
 		Slab.SetLayoutColumn(1)
 			Slab.Text("Contributors:")
 			Slab.NewLine()
@@ -196,8 +196,8 @@ function menus.DrawCredits()
 			Slab.Text("Gunroar:Cannon()")
 			Slab.Text("Philbywhizz")
 			Slab.Text("MadByte")
-			Slab.NewLine()		
-		
+			Slab.NewLine()
+
 			Slab.Text("Thanks to beta testers:",{Align = 'center'})
 			Slab.NewLine()
         	Slab.Textf("Boatman",{Align = 'right'})
@@ -218,14 +218,14 @@ function menus.DrawCredits()
 			Slab.Text("nativefs", URLOptions("https://github.com/megagrump/nativefs"))
 			Slab.Text("anim8", URLOptions("https://github.com/kikito/anim8"))
 			Slab.Text("Lovely-Toasts", URLOptions("https://github.com/Loucee/Lovely-Toasts"))
-		
+
 			Slab.Text("Galactic Pole Position by Eric Matyas. ", URLOptions("www.soundimage.org"))
 
 			--Slab.Text("Dark Fantasy Studio", URLOptions("http://darkfantasystudio.com/"))
 
 			Slab.EndLayout()
-			
-			
+
+
 		Slab.BeginLayout('credits-bottom', {AlignX = 'center', AlignY = 'top'})
 			Slab.Separator()
 			Slab.NewLine()
@@ -240,7 +240,7 @@ function menus.DrawCredits()
 				fun.RemoveScreen()
 			end	
 		Slab.EndLayout()
-		
+
 	Slab.EndLayout()
 	Slab.EndWindow()
 end
@@ -248,8 +248,8 @@ end
 function menus.DrawSettingsMenu()
 	local intSlabWidth = 400	-- the width of the settings window slab.
 	local intSlabHeight = 250 	-- the height of the windowslab
-	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
-	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
+	local fltSlabWindowX = gintScreenWidth / 2 - intSlabWidth / 2
+	local fltSlabWindowY = gintScreenHeight / 2 - intSlabHeight / 2
 
 	local settingsWindowOptions = {
 		Title ='Game Settings',
@@ -258,10 +258,10 @@ function menus.DrawSettingsMenu()
 		W = intSlabWidth,
 		H = intSlabHeight,
 		Border = 0,
-		AutoSizeWindow=false,
-		AllowMove=false,
-		AllowResize=false,
-		NoSavedSettings=true
+		AutoSizeWindow = false,
+		AllowMove = false,
+		AllowResize = false,
+		NoSavedSettings = true,
 		}
 
 	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
@@ -302,7 +302,7 @@ function menus.DrawSettingsMenu()
 		if Slab.Button("OK") then
 			-- return to the previous game state
 			fun.RemoveScreen()
-		end	
+		end
 
 		Slab.EndLayout() -- layout-settings
 	Slab.EndWindow()
