@@ -5,18 +5,18 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-gstrGameVersion = "0.11"
-love.window.setTitle("Mars Lander " .. gstrGameVersion)
+GAME_VERSION = "0.11"
+love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
 io.stdout:setvbuf("no")
 
 -- Do debug stuff like display info text etc
-gbolDebug = true
+DEBUG = true
 
 -- Global screen dimensions
-gintScreenWidth = 1024 -- 1920
-gintScreenHeight = 768 -- 1080
+SCREEN_WIDTH = 1024 -- 1920
+SCREEN_HEIGHT = 768 -- 1080
 
 
 
@@ -98,32 +98,32 @@ EnetHandler = require 'enetstuff'
 -- Global variables
 -- ~~~~~~~~~~~~~~~~~
 
-garrCurrentScreen = {}	-- Current screen / state the user is in
+CURRENT_SCREEN = {}	-- Current screen / state the user is in
 
-garrLanders = {}
-garrGround = {}			-- stores the y value for the ground
-garrObjects = {}		-- stores objects that need to be drawn
-garrMassRatio = 0		-- for debugging only. Records current mass/default mass ratio
-garrGameSettings = {}	-- track game settings
+LANDERS = {}
+GROUND = {}			-- stores the y value for the ground
+OBJECTS = {}		-- stores objects that need to be drawn
+MASS_RATIO = 0		-- for debugging only. Records current mass/default mass ratio
+GAME_SETTINGS = {}	-- track game settings
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
-gintOriginX = cf.round(gintScreenWidth / 2, 0)
-gintWorldOffset = gintOriginX
+ORIGIN_X = cf.round(SCREEN_WIDTH / 2, 0)
+WORLD_OFFSET = ORIGIN_X
 
 -- this is the mass the lander starts with hence the mass the noob engines are tuned to
-gintDefaultMass = 220
+DEFAULT_MASS = 220
 
 -- track speed of the lander to detect crashes etc
-gfltLandervy = 0
-gfltLandervx = 0
+LANDER_VX = 0
+LANDER_VY = 0
 
 -- Default Player values
-gstrDefaultPlayerName = 'Player Name'
-gstrCurrentPlayerName = gstrDefaultPlayerName
+DEFAULT_PLAYER_NAME = 'Player Name'
+CURRENT_PLAYER_NAME = DEFAULT_PLAYER_NAME
 
 -- socket stuff
-gbolIsAClient = false		-- defaults to NOT a client until the player chooses to connect to a host
-gbolIsAHost = false			-- Will listen on load but is not a host until someone connects
+IS_A_CLIENT = false		-- defaults to NOT a client until the player chooses to connect to a host
+IS_A_HOST = false			-- Will listen on load but is not a host until someone connects
 ENET_IS_CONNECTED = false	-- Will become true when received an acknowledgement from the server
 HOST_IP_ADDRESS = ""
 
@@ -144,8 +144,8 @@ local background = Assets.getImageSet("background1")
 
 local function drawWallpaper()
 	-- stretch or shrink the image to fit the window
-	local sx = gintScreenWidth / background.width
-	local sy = gintScreenHeight / background.height
+	local sx = SCREEN_WIDTH / background.width
+	local sy = SCREEN_HEIGHT / background.height
 	love.graphics.setColor(1, 1, 1, 0.25)
 	love.graphics.draw(background.image, 0, 0, 0, sx, sy)
 	love.graphics.setColor(1, 1, 1, 1)
@@ -178,8 +178,8 @@ function love.load()
     if love.filesystem.isFused() then
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
-        love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
-        gbolDebug = false
+        love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
+        DEBUG = false
 
 		-- Play music
 		-- true for "isLooping"
@@ -187,26 +187,26 @@ function love.load()
     else
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
-		love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
+		love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
     end
 	
 	local sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = sock.dns.toip(sock.dns.gethostname())
 	sock = nil	
 
-	garrGameSettings.hostPort = "22122"
+	GAME_SETTINGS.hostPort = "22122"
 
 	-- Load settings
 	fun.LoadGameSettings()
 	-- Restore full screen setting
-	love.window.setFullscreen(garrGameSettings.FullScreen)
+	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
 
 	-- First screen / entry point
 	fun.AddScreen("MainMenu")
 	fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
-	gintDefaultMass = Lander.getMass(garrLanders[1])
+	DEFAULT_MASS = Lander.getMass(LANDERS[1])
 
 	lovelyToasts.options.queueEnabled = true
 
@@ -219,7 +219,7 @@ end
 
 function love.update(dt)
 
-	strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
 
 	if strCurrentScreen == "MainMenu"
 	or strCurrentScreen == "Credits"
@@ -228,7 +228,7 @@ function love.update(dt)
 	end
 
 	if strCurrentScreen == "World" then
-		Lander.update(garrLanders[1], dt)
+		Lander.update(LANDERS[1], dt)
 		Smoke.update(dt)
 		Base.update(dt)
 		Building.update(dt)
@@ -247,7 +247,7 @@ function love.draw()
 	drawWallpaper()
 
 	local strCurrentScreen = fun.CurrentScreenName()
-	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
+	TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
 
 	local strCurrentScreen = fun.CurrentScreenName()
 
@@ -291,7 +291,7 @@ function love.keypressed(key, scancode, isrepeat)
 	elseif strCurrentScreen == "World" then
 		-- Restart the game
 		if key == "r" then
-			if garrLanders[1].gameOver then
+			if LANDERS[1].gameOver then
 				fun.ResetGame()
 			end
 		-- Pause the game

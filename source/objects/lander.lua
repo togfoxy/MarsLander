@@ -39,10 +39,10 @@ local function doThrust(lander, dt)
 
 		-- adjust the thrust based on ship mass
 		-- less mass = higher ratio = more thrust = less fuel needed to move
-		local massRatio = gintDefaultMass / Lander.getMass(lander)
+		local massRatio = DEFAULT_MASS / Lander.getMass(lander)
 		-- for debugging only
-		if gbolDebug then
-			garrMassRatio = massRatio
+		if DEBUG then
+			MASS_RATIO = massRatio
 		end
 
 		lander.engineOn = true
@@ -94,17 +94,17 @@ local function moveShip(lander, dt)
 	lander.y = lander.y + lander.vy
 
 	-- Set left boundary
-	if lander.x < gintOriginX - (gintScreenWidth / 2) then
+	if lander.x < ORIGIN_X - (SCREEN_WIDTH / 2) then
 		lander.vx = 0
-		lander.x =  gintOriginX - (gintScreenWidth / 2)
+		lander.x =  ORIGIN_X - (SCREEN_WIDTH / 2)
 	end
 
 	if not lander.onGround then
 		-- apply gravity
 		lander.vy = lander.vy + (enum.constGravity * dt)
 		-- used to determine speed right before touchdown
-		gfltLandervy = lander.vy
-		gfltLandervx = lander.vx
+		LANDER_VY = lander.vy
+		LANDER_VX = lander.vx
 	end
 end
 
@@ -112,7 +112,7 @@ end
 
 local function refuelLander(lander, base, dt)
 	-- drain fuel from the base and add it to the lander
-	-- base is an object/table item from garrObjects
+	-- base is an object/table item from OBJECTS
 	local refuelAmount = math.min(base.totalFuel, (lander.fuelCapacity - lander.fuel), dt)
 	base.totalFuel	= base.totalFuel - refuelAmount
 	lander.fuel		= lander.fuel + refuelAmount
@@ -124,7 +124,7 @@ end
 
 local function payLanderFromBase(lander, base, baseDistance)
 	-- pay some money based on distance to the base
-	-- base is an object/table item from garrObjects
+	-- base is an object/table item from OBJECTS
 	local distance = math.abs(baseDistance)
 	if not base.paid then
 		lander.money = cf.round(lander.money + (100 - distance),0)
@@ -137,9 +137,9 @@ end
 local function payLanderForControl(lander, base)
 	if base.paid == false then
 		-- pay for a good vertical speed
-		lander.money = cf.round(lander.money + ((1 - gfltLandervy) * 100),0)
+		lander.money = cf.round(lander.money + ((1 - LANDER_VY) * 100),0)
 		-- pay for a good horizontal speed
-		lander.money = cf.round(lander.money + (0.60 - gfltLandervx * 100),0)
+		lander.money = cf.round(lander.money + (0.60 - LANDER_VX * 100),0)
 	end
 end
 
@@ -174,7 +174,7 @@ local function checkForContact(lander, dt)
 	end
 
 	-- get the height of the terrain under the lander
-	roundedGroundY = cf.round(garrGround[roundedLanderX],0)
+	roundedGroundY = cf.round(GROUND[roundedLanderX],0)
 
 	-- check if lander is at or below the terrain
 	-- the offset is the size of the lander image
@@ -269,7 +269,7 @@ local function buyModule(module, lander)
 		lander.money = lander.money - module.cost
 		-- add and calculate new mass
 		lander.mass[#lander.mass+1] = module.mass
-		gintDefaultMass = recalcDefaultMass(lander)
+		DEFAULT_MASS = recalcDefaultMass(lander)
 	else
 		-- play 'failed' sound
 		failSound:play()
@@ -285,8 +285,8 @@ end
 function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
-	lander.x = gintOriginX + love.math.random (-50, 50)
-	lander.y = garrGround[lander.x] - 8
+	lander.x = ORIGIN_X + love.math.random (-50, 50)
+	lander.y = GROUND[lander.x] - 8
 	lander.connectionID = nil	-- used by enet
 	-- 270 = up
 	lander.angle = 270
@@ -300,8 +300,8 @@ function Lander.create(name)
 	lander.health = 100
 	lander.money = 0
 	lander.gameOver = false
-	lander.score = lander.x - gintOriginX
-	lander.name = name or gstrCurrentPlayerName
+	lander.score = lander.x - ORIGIN_X
+	lander.name = name or CURRENT_PLAYER_NAME
 
 	-- mass
 	lander.mass = {}
@@ -386,7 +386,7 @@ function Lander.update(lander, dt)
 
 	-- TODO: Calculate the offset so that it doesn't need to be global
 	-- Calculate worldOffset for everyone based on lander x position
-	gintWorldOffset = cf.round(lander.x) - gintOriginX
+	WORLD_OFFSET = cf.round(lander.x) - ORIGIN_X
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
 	-- Update ship
@@ -399,9 +399,9 @@ end
 
 function Lander.draw()
 	-- draw the lander and flame
-	for landerId, lander in pairs(garrLanders) do
+	for landerId, lander in pairs(LANDERS) do
 		local sx, sy = 1.5, 1.5
-		local x = lander.x - gintWorldOffset
+		local x = lander.x - WORLD_OFFSET
 		local y = lander.y
 		local ox = ship.width / 2
 		local oy = ship.height / 2
@@ -446,7 +446,7 @@ end
 
 function Lander.keypressed(key, scancode, isrepeat)
 	-- Let the player buy upgrades when landed on a fuel base
-	local lander = garrLanders[1]
+	local lander = LANDERS[1]
 	-- 2 = base type (fuel)
 	if Lander.isOnLandingPad(lander, 2) then
 		-- Iterate all available modules

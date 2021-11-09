@@ -23,12 +23,12 @@ function EnetHandler.createHost()
 		
 		local newLander = Lander.create()
 		newLander.connectionID = client:getConnectId()
-		table.insert(garrLanders, newLander)
+		table.insert(LANDERS, newLander)
 	end)
 	
 	server:on("clientdata", function(lander, clientInfo)
 		-- match the incoming lander object
-		for k,v in pairs(garrLanders) do
+		for k,v in pairs(LANDERS) do
 			if v.connectionID == lander.connectionID then
 				v.x = lander.x
 				v.y = lander.y
@@ -43,7 +43,7 @@ end
 function EnetHandler.createClient()
 -- called by menu
 
-	client = sock.newClient(garrGameSettings.hostIP, 22122)
+	client = sock.newClient(GAME_SETTINGS.hostIP, 22122)
 	
 	-- these are all the types of messages the client could receive from the host
 	
@@ -55,7 +55,7 @@ function EnetHandler.createClient()
         print("My connection ID is " .. msg)
 		assert(msg == client:getConnectId())
 		
-		garrLanders[1].connectionID = msg
+		LANDERS[1].connectionID = msg
 		
 		if not ENET_IS_CONNECTED then
 			fun.AddScreen("World")
@@ -64,12 +64,12 @@ function EnetHandler.createClient()
 	end)
 	
 	client:on("peerupdate", function(peerLander)
-		if garrLanders[1].connectionID == peerLander.connectionID then
+		if LANDERS[1].connectionID == peerLander.connectionID then
 			-- nothing to do
 		else
 			local isLanderFound = false
 			local myindex
-			for k,v in pairs(garrLanders) do
+			for k,v in pairs(LANDERS) do
 				myindex = k
 				if v.connectionID == peerLander.connectionID then
 					isLanderFound = true
@@ -77,9 +77,9 @@ function EnetHandler.createClient()
 				end
 			end
 			if isLanderFound == false then
-				table.insert(garrLanders, peerLander)
+				table.insert(LANDERS, peerLander)
 			else
-				garrLanders[myindex] = peerLander
+				LANDERS[myindex] = peerLander
 			end
 		end
 	end)
@@ -89,11 +89,11 @@ end
 
 function EnetHandler.update(dt)
 
-	if gbolIsAHost then
+	if IS_A_HOST then
 		timerHostSendTimer = timerHostSendTimer - dt
 		if timerHostSendTimer <= 0 then
 			timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
-			for _, lander in pairs(garrLanders) do
+			for _, lander in pairs(LANDERS) do
 				server:sendToAll("peerupdate",lander)
 			end
 		end
@@ -101,11 +101,11 @@ function EnetHandler.update(dt)
 		server:update()
 	end
 	
-	if gbolIsAClient then
+	if IS_A_CLIENT then
 		timerClientSendTimer = timerClientSendTimer - dt
 		if timerClientSendTimer <= 0 then
 			timerClientSendTimer = timerClientSendInterval
-			client:send("clientdata", garrLanders[1])
+			client:send("clientdata", LANDERS[1])
 		end
 	
 		client:update()

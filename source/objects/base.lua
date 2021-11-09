@@ -37,16 +37,16 @@ end
 
 
 function Base.draw()
-    for k,v in pairs(garrObjects) do
+    for k,v in pairs(OBJECTS) do
         local xvalue = v.x
         local objectvalue = v.objecttype
 
         -- check if on-screen
-        if xvalue > gintWorldOffset - 100 or xvalue < gintWorldOffset + gintScreenWidth then
+        if xvalue > WORLD_OFFSET - 100 or xvalue < WORLD_OFFSET + SCREEN_WIDTH then
             -- draw image based on object type
             if objectvalue == enum.basetypeFuel then
-                local baseX = xvalue - gintWorldOffset
-                local baseY = garrGround[xvalue] - baseOn.height
+                local baseX = xvalue - WORLD_OFFSET
+                local baseY = GROUND[xvalue] - baseOn.height
 
                 -- draw gas tank
                 -- draw the 'fuel level' before drawing the tank over it
