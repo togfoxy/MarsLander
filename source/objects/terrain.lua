@@ -97,7 +97,7 @@ function Terrain.generate(intAmountToCreate)
 			-- the next building is between one screenwidth and 1.66 away from the last building
 			local nextBuildingDistance = gintScreenWidth + love.math.random((gintScreenWidth * 0.66),gintScreenWidth)
 			nextBuildingX = garrObjects[lastBuildingIndex].x + nextBuildingDistance
-		end	
+		end
 		nextBuildingX = cf.round(nextBuildingX,0)
 		if nextBuildingX <= groundTableSize then
 			local newBaseType = love.math.random(7,8)		-- hack
