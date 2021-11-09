@@ -14,7 +14,7 @@ local timerClientSendTimer = timerClientSendInterval
 function EnetHandler.createHost()
 -- called by menu
 
-	server = sock.newServer(hostIPAddress, 22122)
+	server = sock.newServer(HOST_IP_ADDRESS, 22122)
 	
     -- Called when receiving a message of type "connect"
     server:on("connect", function(data, client)

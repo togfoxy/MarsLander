@@ -129,7 +129,7 @@ gintClientPort = nil
 gbolIsAClient = false		-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false			-- Will listen on load but is not a host until someone connects
 ENET_IS_CONNECTED = false	-- Will become true when received an acknowledgement from the server
-hostIPAddress = ""
+HOST_IP_ADDRESS = ""
 
 
 
@@ -195,10 +195,10 @@ function love.load()
     end
 	
 	local sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
-	hostIPAddress = sock.dns.toip(sock.dns.gethostname())
+	HOST_IP_ADDRESS = sock.dns.toip(sock.dns.gethostname())
 	sock = nil	
 
-	garrGameSettings.HostPort = "22122"
+	garrGameSettings.hostPort = "22122"
 
 	-- Load settings
 	fun.LoadGameSettings()

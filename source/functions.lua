@@ -63,10 +63,10 @@ function functions.LoadGameSettings()
 		garrGameSettings.PlayerName = gstrDefaultPlayerName
 	end
 	if garrGameSettings.hostIP == nil then
-		garrGameSettings.hostIP = "localhost"
+		garrGameSettings.hostIP = HOST_IP_ADDRESS
 	end
-	if garrGameSettings.HostPort == nil then
-		garrGameSettings.HostPort = "22122"
+	if garrGameSettings.hostPort == nil then
+		garrGameSettings.hostPort = "22122"
 	end
 	if garrGameSettings.FullScreen == nil then
 		garrGameSettings.FullScreen = false
@@ -248,16 +248,3 @@ function functions.ResetGame()
 end
 
 return functions
-
-
-
-
-
-
-
-
-
-
-
-
-

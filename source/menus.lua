@@ -78,7 +78,7 @@ function menus.DrawMainMenu()
 		end
 
 		if gbolIsAHost then
-			Slab.Text("Hosting on port: " .. garrGameSettings.HostPort)
+			Slab.Text("Hosting on port: " .. garrGameSettings.hostPort)
 			Slab.NewLine()
 		end
 
@@ -99,14 +99,14 @@ function menus.DrawMainMenu()
 			local joinPortOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=garrGameSettings.HostPort,
+				Text=garrGameSettings.hostPort,
 				NumbersOnly=true,
 				NoDrag=true,
 				MinNumber=22100,
 				MaxNumber=22199
 			}
 			if Slab.Input('HostPort', joinPortOptions) then
-				garrGameSettings.HostPort = Slab.GetInputText() or "22122"
+				garrGameSettings.hostPort = Slab.GetInputText() or "22122"
 			end
 
 			if Slab.Button("Join game",{W=155}) then
