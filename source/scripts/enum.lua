@@ -6,8 +6,8 @@ return {
     constGravity = 0.6,
 
     -- how frequently will client send to the host?
-    constSocketClientRate = 0.04,
-    timerHostSendInterval = 0.04,
+    TIMER_CLIENT_SEND_INTERVAL = 0.04,
+	TIMER_HOST_SEND_INTERVAL = 0.04,
 
     -- enumerators
     basetypeFuel = 2,
