@@ -248,7 +248,7 @@ function love.draw()
 
 	TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
 
-	local strCurrentScreen = Fun.CurrentScreenName()
+	strCurrentScreen = Fun.CurrentScreenName()
 
 	-- TODO: Add a Scene / Screen manager
 	if strCurrentScreen == "MainMenu" then
