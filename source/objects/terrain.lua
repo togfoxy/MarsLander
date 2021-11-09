@@ -31,57 +31,6 @@ local function getLastBaseID(baseType)
 end
 
 
-local function addBuildings(groundTableSize)
-	-- add some buildings before adding fuel
-
-	repeat
-		local lastBuildingIndex
-		local nextBuildingX
-
-		-- get the index/id of the last building
-		lastBuildingIndex = getLastBaseID(enum.basetypeBuilding)
-
-		if lastBuildingIndex < 1 then
-			nextBuildingX = gintOriginX + love.math.random((gintScreenWidth / 2),gintScreenWidth)
-		else
-			-- the next building is between one screenwidth and 1.66 away from the last building
-			local nextBuildingDistance = gintScreenWidth + love.math.random((gintScreenWidth * 0.66),gintScreenWidth)
-			nextBuildingX = garrObjects[lastBuildingIndex].x + nextBuildingDistance
-		end	
-		nextBuildingX = cf.round(nextBuildingX,0)
-		if nextBuildingX <= groundTableSize then
-			local newBaseType = love.math.random(7,8)		-- hack
-			cobjs.CreateObject(newBaseType, nextBuildingX)
-		else
-			break
-		end
-	until not true	-- infinite loop using a break statement
-end
-
-local function addFuelBases(groundTableSize)
--- create as many fuel bases as the current terrain allows
-
-	repeat
-		local lastFuelBaseIndex
-		local nextBaseX
-
-		lastFuelBaseIndex = getLastBaseID(enum.basetypeFuel)
-		if lastFuelBaseIndex == 0 then
-			nextBaseX = cf.round(gintScreenWidth * 1.5,0)	--! this should probably use originX and not screenwidth
-		else
-			nextBaseX = cf.round(garrObjects[lastFuelBaseIndex].x * 1.3,0)
-		end
-
-		if nextBaseX <= groundTableSize then
-			-- create base
-			cobjs.CreateObject(enum.basetypeFuel, nextBaseX)
-		else
-			break
-		end
-	until not true	-- infinite loop using a break statement
-end
-
-
 -- ~~~~~~~~~~~~~~~~~
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
@@ -119,6 +68,7 @@ function Terrain.generate(intAmountToCreate)
 	until 2 ^ terrainoctaves >= terrainstep
 
 	for i = originalGroundTableSize + 1, (originalGroundTableSize + intAmountToCreate) do
+
 		local newgroundaltitude
 		for oct = 1, terrainoctaves do
 			newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
@@ -133,10 +83,51 @@ function Terrain.generate(intAmountToCreate)
 	groundTableSize = #garrGround
 
 	-- add some buildings before adding fuel
-	addBuildings(groundTableSize)
+
+	repeat
+		local lastBuildingIndex
+		local nextBuildingX
+
+		-- get the index/id of the last building
+		lastBuildingIndex = getLastBaseID(enum.basetypeBuilding)
+
+		if lastBuildingIndex < 1 then
+			nextBuildingX = gintOriginX + love.math.random((gintScreenWidth / 2),gintScreenWidth)
+		else
+			-- the next building is between one screenwidth and 1.66 away from the last building
+			local nextBuildingDistance = gintScreenWidth + love.math.random((gintScreenWidth * 0.66),gintScreenWidth)
+			nextBuildingX = garrObjects[lastBuildingIndex].x + nextBuildingDistance
+		end	
+		nextBuildingX = cf.round(nextBuildingX,0)
+		if nextBuildingX <= groundTableSize then
+			local newBaseType = love.math.random(7,8)		-- hack
+			cobjs.CreateObject(newBaseType, nextBuildingX)
+		else
+			break
+		end
+	until not true	-- infinite loop using a break statement
 
 	-- add fuel bases after the buildings so they can draw layered if need be
-	addFuelBases(groundTableSize)
+
+	-- create as many fuel bases as the current terrain allows
+	repeat
+		local lastFuelBaseIndex
+		local nextBaseX
+
+		lastFuelBaseIndex = getLastBaseID(enum.basetypeFuel)
+		if lastFuelBaseIndex == 0 then
+			nextBaseX = cf.round(gintScreenWidth * 1.5,0)	--! this should probably use originX and not screenwidth
+		else
+			nextBaseX = cf.round(garrObjects[lastFuelBaseIndex].x * 1.3,0)
+		end
+
+		if nextBaseX <= groundTableSize then
+			-- create base
+			cobjs.CreateObject(enum.basetypeFuel, nextBaseX)
+		else
+			break
+		end
+	until not true	-- infinite loop using a break statement
 
 	-- TODO: find a way to remove terrain that is behind the lander and likely never needed
 
