@@ -285,8 +285,9 @@ end
 function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
-	lander.x = gintOriginX
+	lander.x = gintOriginX + love.math.random (-50, 50)
 	lander.y = garrGround[lander.x] - 8
+	lander.connectionID = nil	-- used by enet
 	-- 270 = up
 	lander.angle = 270
 	lander.vx = 0
