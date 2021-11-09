@@ -7,7 +7,7 @@ return {
 
     -- how frequently will client send to the host?
     TIMER_CLIENT_SEND_INTERVAL = 0.04,
-	TIMER_HOST_SEND_INTERVAL = 0.04,
+    TIMER_HOST_SEND_INTERVAL = 0.04,
 
     -- enumerators
     basetypeFuel = 2,
