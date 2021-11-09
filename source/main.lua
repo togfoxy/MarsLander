@@ -246,7 +246,6 @@ function love.draw()
 	-- this comes BEFORE the TLfres.beginRendering
 	drawWallpaper()
 
-	local strCurrentScreen = Fun.CurrentScreenName()
 	TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
 
 	local strCurrentScreen = Fun.CurrentScreenName()
