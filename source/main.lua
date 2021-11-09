@@ -122,12 +122,6 @@ gstrDefaultPlayerName = 'Player Name'
 gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
-gfltSocketHostTimer = enum.constSocketHostRate
-gfltSocketClientTimer = 0	-- enum.TIMER_CLIENT_SEND_INTERVAL
-gstrServerIP = nil			-- server's IP address
-gintServerPort = 22122		-- this is the port each client needs to connect to
-gstrClientIP = nil
-gintClientPort = nil
 gbolIsAClient = false		-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false			-- Will listen on load but is not a host until someone connects
 ENET_IS_CONNECTED = false	-- Will become true when received an acknowledgement from the server

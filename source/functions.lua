@@ -228,14 +228,6 @@ function functions.HandleSockets(dt)
 				end
 			end
 		until incoming == nil
-
-		-- this time is needed to stop the client flooding the network
-		local deltatime = love.timer.getDelta()
-		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
-		if gfltSocketClientTimer <= 0 then			
-			gfltSocketClientTimer = enum.TIMER_CLIENT_SEND_INTERVAL			
-			msg = {}
-		end
 	end
 end
 
