@@ -83,21 +83,30 @@ end
 
 local function drawRangefinder(lander)
 -- determine distance to nearest base and draw indicator
+
 	local module = Modules.rangefinder
 	if Lander.hasUpgrade(lander, module) then
 
-		local rawDistance = fun.GetDistanceToClosestBase(lander.x, enum.basetypeFuel)
-		local distance = math.abs(cf.round(rawDistance, 0))
-		Assets.setFont("font20")
+		-- get the real distance to the next closest base. Could be negative
+		local rawDistance, _ = fun.GetDistanceToClosestBase(lander.x, enum.basetypeFuel)
+		-- limit the rangefinder to a maximum distance
+		if rawDistance < enum.rangefinderMaximumDistance * -1 then
+			rawDistance = enum.rangefinderMaximumDistance * -1
+		end
+		if rawDistance > enum.rangefinderMaximumDistance then
+			rawDistance = enum.rangefinderMaximumDistance
+		end	
 
+		local absDistance = math.abs(cf.round(rawDistance, 0))		
 		-- don't draw if close to base
-		if distance > 100 then
+		if absDistance > 100 then
 			local halfScreenW = gintScreenWidth / 2
 			if rawDistance <= 0 then
+				Assets.setFont("font20")
 				-- closest base is to the right (forward)
-				love.graphics.print("--> " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
+				love.graphics.print("--> " .. absDistance, halfScreenW - 75, gintScreenHeight * 0.90)
 			else
-				love.graphics.print("<-- " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
+				love.graphics.print("<-- " .. absDistance, halfScreenW - 75, gintScreenHeight * 0.90)
 			end
 		end
 	end
@@ -134,7 +143,7 @@ local function drawShopMenu()
 
 		-- Create List of available modules
 		for _, module in pairs(Modules) do
-			local string = "%s. Buy '%s' - %s $\n"
+			local string = "%s. Buy '%s' - $%s \n"
 			itemListString = string.format(string, module.id, module.name, module.cost)
 			-- Draw list of modules
 			local color = {1, 1, 1, 1}
