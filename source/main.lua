@@ -190,9 +190,9 @@ function love.load()
 		love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
     end
 	
-	local Sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
-	HOST_IP_ADDRESS = Sock.dns.toip(Sock.dns.gethostname())
-	Sock = nil	
+	local socket = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
+	HOST_IP_ADDRESS = socket.dns.toip(socket.dns.gethostname())
+	socket = nil	
 
 	GAME_SETTINGS.hostPort = "22122"
 
