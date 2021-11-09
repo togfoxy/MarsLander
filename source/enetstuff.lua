@@ -14,7 +14,7 @@ local timerClientSendTimer = timerClientSendInterval
 function EnetHandler.createHost()
 -- called by menu
 
-	server = sock.newServer(HOST_IP_ADDRESS, 22122)
+	server = Sock.newServer(HOST_IP_ADDRESS, 22122)
 	
     -- Called when receiving a message of type "connect"
     server:on("connect", function(data, client)
@@ -43,7 +43,7 @@ end
 function EnetHandler.createClient()
 -- called by menu
 
-	client = sock.newClient(GAME_SETTINGS.hostIP, 22122)
+	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
 	
 	-- these are all the types of messages the client could receive from the host
 	
@@ -58,7 +58,7 @@ function EnetHandler.createClient()
 		LANDERS[1].connectionID = msg
 		
 		if not ENET_IS_CONNECTED then
-			fun.AddScreen("World")
+			Fun.AddScreen("World")
 			ENET_IS_CONNECTED = true
 		end
 	end)

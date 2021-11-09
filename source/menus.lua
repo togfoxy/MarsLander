@@ -1,7 +1,7 @@
-local menus = {}
+local Menus = {}
 
 
-function menus.DrawMainMenu()
+function Menus.DrawMainMenu()
 
 	local intSlabWidth = 700 -- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 550 	-- the height of the main menu slab
@@ -36,32 +36,32 @@ function menus.DrawMainMenu()
 
 		Slab.NewLine()
 		if Slab.Button("New game",{W=155}) then
-			fun.ResetGame()
-			fun.SaveGameSettings()
-			fun.AddScreen("World")
+			Fun.ResetGame()
+			Fun.SaveGameSettings()
+			Fun.AddScreen("World")
  		end
 		Slab.NewLine()
 
 		if Slab.Button("Resume game",{W=155}) then
-			fun.SaveGameSettings()
-			fun.AddScreen("World")
+			Fun.SaveGameSettings()
+			Fun.AddScreen("World")
 		end
 		Slab.NewLine()        
 
 		if Slab.Button("Load game",{W=155}) then
-            fun.LoadGame()
-			fun.SaveGameSettings()
-			fun.AddScreen("World")
+            Fun.LoadGame()
+			Fun.SaveGameSettings()
+			Fun.AddScreen("World")
 		end
 		Slab.NewLine()
 
 		if Slab.Button("Save game",{W=155}) then
-			fun.SaveGame() 
+			Fun.SaveGame() 
 		end
 		Slab.NewLine()
 
 		if Slab.Button("Settings",{W=155}) then
-			fun.AddScreen("Settings")
+			Fun.AddScreen("Settings")
 		end
 		Slab.NewLine()
 
@@ -70,9 +70,9 @@ function menus.DrawMainMenu()
 				IS_A_CLIENT = false
 				IS_A_HOST = true
 				LANDERS[1].connectionID = 111	-- random ID. Can be any number (not nil)
-				fun.SaveGameSettings()
+				Fun.SaveGameSettings()
 				EnetHandler.createHost()
-				fun.AddScreen("World")
+				Fun.AddScreen("World")
 			end
 			Slab.NewLine()
 		end
@@ -112,14 +112,14 @@ function menus.DrawMainMenu()
 			if Slab.Button("Join game",{W=155}) then
 				IS_A_HOST = false
 				IS_A_CLIENT = true
-				fun.SaveGameSettings()
+				Fun.SaveGameSettings()
 				EnetHandler.createClient()
 			end
 			Slab.NewLine()		
 		end
 
 		if Slab.Button("Credits",{W=155}) then
-			fun.AddScreen("Credits")		--!
+			Fun.AddScreen("Credits")		--!
 		end
 		Slab.NewLine()
 
@@ -140,7 +140,7 @@ function menus.DrawMainMenu()
 
 end
 
-function menus.DrawCredits()
+function Menus.DrawCredits()
 
 	local intSlabWidth = 550	-- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 500 	-- the height of the main menu slab
@@ -228,7 +228,7 @@ function menus.DrawCredits()
 
 			if Slab.Button("Awesome!") then
 				-- return to the previous game state
-				fun.RemoveScreen()
+				Fun.RemoveScreen()
 			end	
 		Slab.EndLayout()
 
@@ -236,7 +236,7 @@ function menus.DrawCredits()
 	Slab.EndWindow()
 end
 
-function menus.DrawSettingsMenu()
+function Menus.DrawSettingsMenu()
 	local intSlabWidth = 400	-- the width of the settings window slab.
 	local intSlabHeight = 250 	-- the height of the windowslab
 	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
@@ -283,7 +283,7 @@ function menus.DrawSettingsMenu()
 		if Slab.CheckBox(GAME_SETTINGS.FullScreen, "Full Screen") then
 			GAME_SETTINGS.FullScreen = not GAME_SETTINGS.FullScreen
 			love.window.setFullscreen(GAME_SETTINGS.FullScreen)
-			fun.SaveGameSettings()
+			Fun.SaveGameSettings()
 		end
 
 		Slab.NewLine()
@@ -292,11 +292,11 @@ function menus.DrawSettingsMenu()
 		Slab.NewLine()
 		if Slab.Button("OK") then
 			-- return to the previous game state
-			fun.RemoveScreen()
+			Fun.RemoveScreen()
 		end
 
 		Slab.EndLayout() -- layout-settings
 	Slab.EndWindow()
 end
 
-return menus
+return Menus

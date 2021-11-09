@@ -86,8 +86,8 @@ local function drawRangefinder(lander)
 	local module = Modules.rangefinder
 	if Lander.hasUpgrade(lander, module) then
 
-		local rawDistance = fun.GetDistanceToClosestBase(lander.x, enum.basetypeFuel)
-		local distance = math.abs(cf.round(rawDistance, 0))
+		local rawDistance = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
+		local distance = math.abs(Cf.round(rawDistance, 0))
 		Assets.setFont("font20")
 
 		-- don't draw if close to base
@@ -127,7 +127,7 @@ end
 local function drawShopMenu()
 	-- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
 	local gameOver = LANDERS[1].gameOver
-	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], enum.basetypeFuel)
+	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], Enum.basetypeFuel)
 	if not gameOver and isOnLandingPad then
 
 		Assets.setFont("font20")
@@ -165,9 +165,9 @@ end
 
 local function drawScore()
 	-- score is simply the amount of forward distance travelled (lander.x)
-	local roundedScore = cf.round(fun.CalculateScore())
-	local score = cf.strFormatThousand(roundedScore)
-	local highScore = cf.strFormatThousand(tonumber(cf.round(GAME_SETTINGS.HighScore)))
+	local roundedScore = Cf.round(Fun.CalculateScore())
+	local score = Cf.strFormatThousand(roundedScore)
+	local highScore = Cf.strFormatThousand(tonumber(Cf.round(GAME_SETTINGS.HighScore)))
 
 	Assets.setFont("font14")
 	love.graphics.printf("Score: " .. score, 0, 75, SCREEN_WIDTH, "center")
@@ -180,14 +180,14 @@ local function drawDebug()
 	Assets.setFont("font14")
 	local lander = LANDERS[1]
 
-	love.graphics.print("Mass = " .. cf.round(Lander.getMass(lander), 2), 5, 75)
-	love.graphics.print("Fuel = " .. cf.round(lander.fuel, 2), 5, 90)
+	love.graphics.print("Mass = " .. Cf.round(Lander.getMass(lander), 2), 5, 75)
+	love.graphics.print("Fuel = " .. Cf.round(lander.fuel, 2), 5, 90)
 	love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 120)
-	love.graphics.print("MEM: " .. cf.round(collectgarbage("count")), 10, 140)
+	love.graphics.print("MEM: " .. Cf.round(collectgarbage("count")), 10, 140)
 	love.graphics.print("Ground: " .. #GROUND, 10, 160)
 	love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
 	love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
-	--love.graphics.print(cf.round(LANDERS[1].x,0), LANDERS[1].x - WORLD_OFFSET, LANDERS[1].y + 25)
+	--love.graphics.print(Cf.round(LANDERS[1].x,0), LANDERS[1].x - WORLD_OFFSET, LANDERS[1].y + 25)
 end
 
 

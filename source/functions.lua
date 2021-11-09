@@ -26,7 +26,7 @@ function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.
 
-    fun.AddScreen(newscreen)
+    Fun.AddScreen(newscreen)
     table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
 end
 
@@ -39,8 +39,8 @@ function functions.SaveGameSettings()
 	local savedir = love.filesystem.getSource()
 
     savefile = savedir .. "/" .. "settings.dat"
-    serialisedString = bitser.dumps(GAME_SETTINGS)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(GAME_SETTINGS)
+    success, message = Nativefs.write(savefile, serialisedString )
 end
 
 
@@ -52,9 +52,9 @@ function functions.LoadGameSettings()
     local savefile, contents
 
     savefile = savedir .. "/" .. "settings.dat"
-    contents, _ = nativefs.read(savefile)
+    contents, _ = Nativefs.read(savefile)
 	local success
-    success, GAME_SETTINGS = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
+    success, GAME_SETTINGS = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
 
 	if success == false then
 		GAME_SETTINGS = {}
@@ -97,18 +97,18 @@ function functions.SaveGame()
     local savedir = love.filesystem.getSource()
 
     savefile = savedir .. "/" .. "landers.dat"
-    serialisedString = bitser.dumps(LANDERS)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(LANDERS)
+    success, message = Nativefs.write(savefile, serialisedString )
 
     savefile = savedir .. "/" .. "ground.dat"
-    serialisedString = bitser.dumps(GROUND)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(GROUND)
+    success, message = Nativefs.write(savefile, serialisedString )
 
     savefile = savedir .. "/" .. "objects.dat"
-    serialisedString = bitser.dumps(OBJECTS)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(OBJECTS)
+    success, message = Nativefs.write(savefile, serialisedString )
 
-	lovelyToasts.show("Game saved",3, "middle")
+	LovelyToasts.show("Game saved",3, "middle")
 
 end
 
@@ -122,16 +122,16 @@ function functions.LoadGame()
     local contents
 
     savefile = savedir .. "/" .. "landers.dat"
-    contents, _ = nativefs.read( savefile)
-    LANDERS = bitser.loads(contents)
+    contents, _ = Nativefs.read( savefile)
+    LANDERS = Bitser.loads(contents)
 
     savefile = savedir .. "/" .. "ground.dat"
-    contents, _ = nativefs.read( savefile)
-    GROUND = bitser.loads(contents)
+    contents, _ = Nativefs.read( savefile)
+    GROUND = Bitser.loads(contents)
 
     savefile = savedir .. "/" .. "objects.dat"
-    contents, _ = nativefs.read(savefile)
-    OBJECTS = bitser.loads(contents)
+    contents, _ = Nativefs.read(savefile)
+    OBJECTS = Bitser.loads(contents)
 
 end
 
@@ -141,7 +141,7 @@ function functions.CalculateScore()
 
 	if score > GAME_SETTINGS.HighScore then
 		GAME_SETTINGS.HighScore = score
-		fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
+		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
 	end
 
 	return score
@@ -216,8 +216,8 @@ function functions.HandleSockets(dt)
 				if incoming.name == "ConnectionAccepted" then
 					gbolIsConnected = true
 					if CURRENT_SCREEN[#CURRENT_SCREEN] == "MainMenu" then
-						fun.SaveGameSettings()
-						fun.AddScreen("World")
+						Fun.SaveGameSettings()
+						Fun.AddScreen("World")
 					end
 				else
 					LANDERS[2] = {}

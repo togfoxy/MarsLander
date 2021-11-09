@@ -101,7 +101,7 @@ local function moveShip(lander, dt)
 
 	if not lander.onGround then
 		-- apply gravity
-		lander.vy = lander.vy + (enum.constGravity * dt)
+		lander.vy = lander.vy + (Enum.constGravity * dt)
 		-- used to determine speed right before touchdown
 		LANDER_VY = lander.vy
 		LANDER_VX = lander.vx
@@ -127,7 +127,7 @@ local function payLanderFromBase(lander, base, baseDistance)
 	-- base is an object/table item from OBJECTS
 	local distance = math.abs(baseDistance)
 	if not base.paid then
-		lander.money = cf.round(lander.money + (100 - distance),0)
+		lander.money = Cf.round(lander.money + (100 - distance),0)
 		landingSound:play()
 	end
 end
@@ -137,9 +137,9 @@ end
 local function payLanderForControl(lander, base)
 	if base.paid == false then
 		-- pay for a good vertical speed
-		lander.money = cf.round(lander.money + ((1 - LANDER_VY) * 100),0)
+		lander.money = Cf.round(lander.money + ((1 - LANDER_VY) * 100),0)
 		-- pay for a good horizontal speed
-		lander.money = cf.round(lander.money + (0.60 - LANDER_VX * 100),0)
+		lander.money = Cf.round(lander.money + (0.60 - LANDER_VX * 100),0)
 	end
 end
 
@@ -147,8 +147,8 @@ end
 
 local function checkForDamage(lander)
 	-- apply damage if vertical speed is too higher
-	if lander.vy > enum.constVYThreshold then
-		local excessSpeed = lander.vy - enum.constVYThreshold
+	if lander.vy > Enum.constVYThreshold then
+		local excessSpeed = lander.vy - Enum.constVYThreshold
 		lander.health = lander.health - (excessSpeed * 100)
 		if lander.health < 0 then lander.health = 0 end
 	end
@@ -158,15 +158,15 @@ end
 
 local function checkForContact(lander, dt)
 	-- see if lander has contacted the ground
-	local roundedLanderX = cf.round(lander.x)
+	local roundedLanderX = Cf.round(lander.x)
 	local roundedGroundY
-	local onBase = Lander.isOnLandingPad(lander, enum.basetypeFuel)
+	local onBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
 
 	-- see if onGround near a fuel base
 	-- bestDistance could be a negative number meaning not yet past the base (but maybe really close to it)
 	-- FIXME: Couldn't baseType be a string like "fuelStation" instead of numbers?
 	-- 2 = type of base = fuel
-	local bestDistance, bestBase = fun.GetDistanceToClosestBase(lander.x, 2)
+	local bestDistance, bestBase = Fun.GetDistanceToClosestBase(lander.x, 2)
 	-- bestBase is an object/table item
 	-- add money based on alignment to centre of landing pad
 	if bestDistance >= -80 and bestDistance <= 40 then
@@ -174,7 +174,7 @@ local function checkForContact(lander, dt)
 	end
 
 	-- get the height of the terrain under the lander
-	roundedGroundY = cf.round(GROUND[roundedLanderX],0)
+	roundedGroundY = Cf.round(GROUND[roundedLanderX],0)
 
 	-- check if lander is at or below the terrain
 	-- the offset is the size of the lander image
@@ -344,7 +344,7 @@ end
 
 function Lander.isOnLandingPad(lander, baseId)
 	-- returns a true / false value
-    local baseDistance, _ = fun.GetDistanceToClosestBase(lander.x, baseId)
+    local baseDistance, _ = Fun.GetDistanceToClosestBase(lander.x, baseId)
     if baseDistance >= -80 and baseDistance <= 40 then
         return true
     else
@@ -386,7 +386,7 @@ function Lander.update(lander, dt)
 
 	-- TODO: Calculate the offset so that it doesn't need to be global
 	-- Calculate worldOffset for everyone based on lander x position
-	WORLD_OFFSET = cf.round(lander.x) - ORIGIN_X
+	WORLD_OFFSET = Cf.round(lander.x) - ORIGIN_X
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
 	-- Update ship

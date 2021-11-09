@@ -11,8 +11,8 @@ function createobjects.CreateObject(intType, intXValue)
 	mybase.active = true
 	mybase.paid = false				-- set true when lander lands and pays player. Ensures bases only pay once
 
-	if intType == enum.basetypeFuel then
-		mybase.totalFuel = enum.baseMaxFuel
+	if intType == Enum.basetypeFuel then
+		mybase.totalFuel = Enum.baseMaxFuel
 
 		-- smooth the terrain around the base
 		for i = 1, 125 do
@@ -20,13 +20,13 @@ function createobjects.CreateObject(intType, intXValue)
 			GROUND[myindex] = GROUND[intXValue]
 		end
 	end
-	if intType == enum.basetypeBuilding1 then
+	if intType == Enum.basetypeBuilding1 then
 		-- smooth the terrain around the base
 		for i = intXValue - 25, intXValue + 75 do
 			GROUND[i] = GROUND[intXValue]
 		end
 	end
-	if intType == enum.basetypeBuilding2 then
+	if intType == Enum.basetypeBuilding2 then
 		-- smooth the terrain around the base
 		for i = intXValue - 25, intXValue + 75 do
 			GROUND[i] = GROUND[intXValue]

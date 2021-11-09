@@ -23,7 +23,7 @@ local function getLastBaseID(baseType)
 		-- if the object type == base type then capture ID
 		-- if the baseType is any building then test for building1 or building2
 		if (OBJECTS[i].objecttype == baseType) or
-			(baseType == enum.basetypeBuilding and (OBJECTS[i].objecttype == enum.basetypeBuilding1 or OBJECTS[i].objecttype == enum.basetypeBuilding2)) then
+			(baseType == Enum.basetypeBuilding and (OBJECTS[i].objecttype == Enum.basetypeBuilding1 or OBJECTS[i].objecttype == Enum.basetypeBuilding2)) then
 			lastBaseID = i
 		end
 	end
@@ -38,7 +38,7 @@ local function addBuildings(groundTableSize)
 		local nextBuildingX
 
 		-- get the index/id of the last building
-		lastBuildingIndex = getLastBaseID(enum.basetypeBuilding)
+		lastBuildingIndex = getLastBaseID(Enum.basetypeBuilding)
 
 		if lastBuildingIndex < 1 then
 			nextBuildingX = ORIGIN_X + love.math.random((SCREEN_WIDTH / 2),SCREEN_WIDTH)
@@ -47,10 +47,10 @@ local function addBuildings(groundTableSize)
 			local nextBuildingDistance = SCREEN_WIDTH + love.math.random((SCREEN_WIDTH * 0.66),SCREEN_WIDTH)
 			nextBuildingX = OBJECTS[lastBuildingIndex].x + nextBuildingDistance
 		end	
-		nextBuildingX = cf.round(nextBuildingX,0)
+		nextBuildingX = Cf.round(nextBuildingX,0)
 		if nextBuildingX <= groundTableSize then
 			local newBaseType = love.math.random(7,8)		-- hack
-			cobjs.CreateObject(newBaseType, nextBuildingX)
+			Cobjs.CreateObject(newBaseType, nextBuildingX)
 		else
 			break
 		end
@@ -63,16 +63,16 @@ local function addFuelBases(groundTableSize)
 		local lastFuelBaseIndex
 		local nextBaseX
 
-		lastFuelBaseIndex = getLastBaseID(enum.basetypeFuel)
+		lastFuelBaseIndex = getLastBaseID(Enum.basetypeFuel)
 		if lastFuelBaseIndex == 0 then
-			nextBaseX = cf.round(SCREEN_WIDTH * 1.5,0)	--! this should probably use originX and not screenwidth
+			nextBaseX = Cf.round(SCREEN_WIDTH * 1.5,0)	--! this should probably use originX and not screenwidth
 		else
-			nextBaseX = cf.round(OBJECTS[lastFuelBaseIndex].x * 1.3,0)
+			nextBaseX = Cf.round(OBJECTS[lastFuelBaseIndex].x * 1.3,0)
 		end
 
 		if nextBaseX <= groundTableSize then
 			-- create base
-			cobjs.CreateObject(enum.basetypeFuel, nextBaseX)
+			Cobjs.CreateObject(Enum.basetypeFuel, nextBaseX)
 		else
 			break
 		end

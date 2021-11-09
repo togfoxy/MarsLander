@@ -44,7 +44,7 @@ function Base.draw()
         -- check if on-screen
         if xvalue > WORLD_OFFSET - 100 or xvalue < WORLD_OFFSET + SCREEN_WIDTH then
             -- draw image based on object type
-            if objectvalue == enum.basetypeFuel then
+            if objectvalue == Enum.basetypeFuel then
                 local baseX = xvalue - WORLD_OFFSET
                 local baseY = GROUND[xvalue] - baseOn.height
 
@@ -56,7 +56,7 @@ function Base.draw()
 
                 -- draw green gauge
                 -- pixel art gauge is 36 pixels high
-                local gaugeheight = v.totalFuel / enum.baseMaxFuel * 36
+                local gaugeheight = v.totalFuel / Enum.baseMaxFuel * 36
                 local gaugebottom = 120
                 love.graphics.setColor(0, 1, 0, 1)
                 love.graphics.rectangle("fill", baseX + 40, baseY + gaugebottom - gaugeheight, 5, gaugeheight)
