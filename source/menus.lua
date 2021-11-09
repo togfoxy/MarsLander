@@ -67,18 +67,18 @@ function menus.DrawMainMenu()
 
 		if not gbolIsAClient and not gbolIsAHost then
 			if Slab.Button("Host game",{W=155}) then
-				ss.startHosting(gintServerPort)
 				gbolIsAClient = false
 				gbolIsAHost = true
+				garrLanders[1].connectionID = 111	-- random ID. Can be any number (not nil)
 				fun.SaveGameSettings()
-				table.insert(garrLanders, Lander.create())
+				EnetHandler.createHost()
 				fun.AddScreen("World")
 			end
 			Slab.NewLine()
 		end
 
 		if gbolIsAHost then
-			Slab.Text("Hosting on port: " .. gintServerPort)
+			Slab.Text("Hosting on port: " .. garrGameSettings.HostPort)
 			Slab.NewLine()
 		end
 
@@ -87,12 +87,12 @@ function menus.DrawMainMenu()
 			local joinIPOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=garrGameSettings.HostIP,
+				Text=garrGameSettings.hostIP,
 				NumbersOnly=false,
 				NoDrag=true,
 			}			
-			if Slab.Input('HostIP', joinIPOptions) then
-				garrGameSettings.HostIP = Slab.GetInputText()
+			if Slab.Input('hostIP', joinIPOptions) then
+				garrGameSettings.hostIP = Slab.GetInputText()
 			end		
 
 			Slab.Text("Join on port:" )
@@ -102,27 +102,18 @@ function menus.DrawMainMenu()
 				Text=garrGameSettings.HostPort,
 				NumbersOnly=true,
 				NoDrag=true,
-				MinNumber=6000,
-				MaxNumber=6999
+				MinNumber=22100,
+				MaxNumber=22199
 			}
 			if Slab.Input('HostPort', joinPortOptions) then
-				garrGameSettings.HostPort = Slab.GetInputText() or 6000
+				garrGameSettings.HostPort = Slab.GetInputText() or "22122"
 			end
 
 			if Slab.Button("Join game",{W=155}) then
 				gbolIsAHost = false
 				gbolIsAClient = true
 				fun.SaveGameSettings()
-
-				ss.connectToHost(garrGameSettings.HostIP, garrGameSettings.HostPort)
-
-				-- send a test message to the host. The host will return the client's IP and port
-				local msg = {}
-				msg.name = "ConnectionRequest"
-
-				ss.addItemToClientOutgoingQueue(msg)
-				ss.sendToHost()
-				table.insert(garrLanders, Lander.create())
+				EnetHandler.createClient()
 			end
 			Slab.NewLine()		
 		end

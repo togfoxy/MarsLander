@@ -62,11 +62,11 @@ function functions.LoadGameSettings()
 	if garrGameSettings.PlayerName == nil then
 		garrGameSettings.PlayerName = gstrDefaultPlayerName
 	end
-	if garrGameSettings.HostIP == nil then
-		garrGameSettings.HostIP = "localhost"
+	if garrGameSettings.hostIP == nil then
+		garrGameSettings.hostIP = "localhost"
 	end
 	if garrGameSettings.HostPort == nil then
-		garrGameSettings.HostPort = "6000"
+		garrGameSettings.HostPort = "22122"
 	end
 	if garrGameSettings.FullScreen == nil then
 		garrGameSettings.FullScreen = false
@@ -185,9 +185,7 @@ function functions.HandleSockets(dt)
 
 		ss.hostListenPort()
 
-		-- get just one item from the queue and process it
 		repeat
-			local incoming = ss.getItemInHostQueue()		-- could be nil
 			if incoming ~= nil then
 				if incoming.name == "ConnectionRequest" then
 					gbolIsConnected = true
@@ -203,18 +201,10 @@ function functions.HandleSockets(dt)
 			end
 		until incoming == nil
 
-		ss.addItemToHostOutgoingQueue(msg)
-		ss.sendToClients()
 		msg = {}
 	end
 
 	if gbolIsAClient then
-
-		ss.clientListenPort()
-
-		-- get item from the queue and process it
-		local incoming = ss.getItemInClientQueue()		-- could be nil
-
 		repeat
 			if incoming ~= nil then
 				if incoming.name == "ConnectionAccepted" then
@@ -230,9 +220,7 @@ function functions.HandleSockets(dt)
 					garrLanders[2].angle = incoming.angle
 					garrLanders[2].name = incoming.name
 				end
-			else
 			end
-			incoming = ss.getItemInClientQueue()		-- could be nil
 		until incoming == nil
 
 		-- this time is needed to stop the client flooding the network
@@ -240,9 +228,6 @@ function functions.HandleSockets(dt)
 		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
 		if gfltSocketClientTimer <= 0 then			
 			gfltSocketClientTimer = enum.constSocketClientRate			
-
-			ss.addItemToClientOutgoingQueue(msg)	-- Lander[1]
-			ss.sendToHost()
 			msg = {}
 		end
 	end
@@ -263,3 +248,16 @@ function functions.ResetGame()
 end
 
 return functions
+
+
+
+
+
+
+
+
+
+
+
+
+
