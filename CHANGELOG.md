@@ -18,6 +18,8 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - buildings and fuel bases are determined on demand and not up-front
 - removed the images/sprites out of the lander table
 - major code re-organization and optimization
+- 'p' now unpauses the game
+
 
 
 
@@ -25,7 +27,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - fixed saved player name not being displayed correctly in-game
 - fixed regression introduced in v0.10 causing the rangefinder indicator not being displayed correctly
 - fixed the lag when running co-op. Can run two windows on localhost really well now (but only one at a time can receive keyboard input :( )
-- fixed a bizarre drawing bug when in co-op mode (work around appled)
+- fixed a bizarre drawing bug when in co-op mode (work around applied)
 - fuel bases are now determined on demand and not up front. Big performance boost.
 - save game bug
 - fixed game over not triggering (again)
