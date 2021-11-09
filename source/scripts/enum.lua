@@ -15,5 +15,6 @@ return {
     basetypeBuilding2 = 8,
     baseMaxFuel = 15,
 	
-	
+	-- miscellaneous
+	rangefinderMaximumDistance = 4000,
 }
