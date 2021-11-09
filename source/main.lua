@@ -189,10 +189,10 @@ function love.load()
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
 		love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
     end
-	
+
 	local sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = sock.dns.toip(sock.dns.gethostname())
-	sock = nil	
+	sock = nil
 
 	garrGameSettings.hostPort = "22122"
 
@@ -246,10 +246,7 @@ function love.draw()
 	-- this comes BEFORE the TLfres.beginRendering
 	drawWallpaper()
 
-	local strCurrentScreen = fun.CurrentScreenName()
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
-
-	local strCurrentScreen = fun.CurrentScreenName()
 
 	-- TODO: Add a Scene / Screen manager
 	if strCurrentScreen == "MainMenu" then
