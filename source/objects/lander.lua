@@ -285,7 +285,7 @@ end
 function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
-	lander.x = ORIGIN_X + love.math.random (-50, 50)
+	lander.x = ORIGIN_X
 	lander.y = GROUND[lander.x] - 8
 	lander.connectionID = nil	-- used by enet
 	-- 270 = up
