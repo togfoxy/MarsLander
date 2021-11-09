@@ -130,7 +130,20 @@ function Terrain.generate(intAmountToCreate)
 	until not true	-- infinite loop using a break statement
 
 	-- TODO: find a way to remove terrain that is behind the lander and likely never needed
+	--!!**
+--[[	
+	groundTableSize = #garrGround
 
+	-- add some buildings before adding fuel
+	if garrLanders[1] == nil then
+	
+	else
+		addBuildings(garrLanders[1].x + 6000)	-- an arbitrary 'draw ahead' distance
+		-- add fuel bases after the buildings so they can draw layered if need be
+		addFuelBases(garrLanders[1].x + 6000)	-- an arbitrary 'draw ahead' distance
+	end
+]]	
+	
 end
 
 

@@ -20,7 +20,7 @@ local ship = Assets.getImageSet("ship")
 local flame = Assets.getImageSet("flame")
 
 local landingSound = Assets.getSound("landingSuccess")
-local failSound = Assets.getSound("wrong")
+local failSound = Assets.getSound("wrongold")
 local lowFuelSound = Assets.getSound("lowFuel")
 local engineSound = Assets.getSound("engine")
 
@@ -248,7 +248,8 @@ local function buyModule(module, lander)
 		for i = 1, #lander.modules do
 			if lander.modules[i] == module then
 				-- this module is already purchased. Abort
-				--! make a 'wrong' sound
+				-- play 'failed' sound
+				failSound:play()
 				return
 			end
 		end

@@ -37,16 +37,16 @@ end
 
 
 function Base.draw()
-    for k,v in pairs(garrObjects) do
-        local xvalue = v.x
-        local objectvalue = v.objecttype
+    for k,obj in pairs(garrObjects) do
+        local objXValue = obj.x
+        local objectvalue = obj.objecttype
 
         -- check if on-screen
-        if xvalue > gintWorldOffset - 100 or xvalue < gintWorldOffset + gintScreenWidth then
+        if (objXValue > gintWorldOffset - gintScreenWidth) and objXValue < (gintWorldOffset + gintScreenWidth) then
             -- draw image based on object type
             if objectvalue == enum.basetypeFuel then
-                local baseX = xvalue - gintWorldOffset
-                local baseY = garrGround[xvalue] - baseOn.height
+                local baseX = objXValue - gintWorldOffset
+                local baseY = garrGround[objXValue] - baseOn.height
 
                 -- draw gas tank
                 -- draw the 'fuel level' before drawing the tank over it
@@ -56,14 +56,14 @@ function Base.draw()
 
                 -- draw green gauge
                 -- pixel art gauge is 36 pixels high
-                local gaugeheight = v.totalFuel / enum.baseMaxFuel * 36
+                local gaugeheight = obj.totalFuel / enum.baseMaxFuel * 36
                 local gaugebottom = 120
                 love.graphics.setColor(0, 1, 0, 1)
                 love.graphics.rectangle("fill", baseX + 40, baseY + gaugebottom - gaugeheight, 5, gaugeheight)
 
                 -- set colour based on ACTIVE status
                 love.graphics.setColor(1, 1, 1, 1)
-                if v.active then
+                if obj.active then
                     love.graphics.draw(baseOn.image, baseX, baseY)
                 else
                     love.graphics.draw(baseOff.image, baseX, baseY)
@@ -71,7 +71,7 @@ function Base.draw()
 
                 -- draw landing lights
                 -- the image is white so the colour can be controlled here at runtime
-                if v.paid then
+                if obj.paid then
                     love.graphics.setColor(1, 0, 0, 1)
                 else
                     love.graphics.setColor(0, 1, 0, 1)
