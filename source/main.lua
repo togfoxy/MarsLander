@@ -39,12 +39,8 @@ bitser = require 'lib.bitser'
 -- https://github.com/megagrump/nativefs
 nativefs = require 'lib.nativefs'
 
--- socket it native to LOVE2D
--- https://love2d.org/wiki/Tutorial:Networking_with_UDP
--- http://w3.impa.br/~diego/software/luasocket/reference.html
--- https://aiq0.github.io/luasocket/reference.html
 -- https://github.com/camchenry/sock.lua
-socket = require 'socket'
+sock = require 'lib.sock'
 
 -- https://github.com/Loucee/Lovely-Toasts
 lovelyToasts = require 'lib.lovelyToasts'
@@ -94,7 +90,7 @@ HUD			= require 'hud'
 cobjs		= require 'createobjects'
 fun			= require 'functions'
 menus		= require 'menus'
-ss			= require 'socketstuff'
+EnetHandler = require 'enetstuff'
 
 
 
@@ -112,6 +108,8 @@ garrGameSettings = {}	-- track game settings
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
 gintOriginX = cf.round(gintScreenWidth / 2, 0)
+gintWorldOffset = gintOriginX
+
 -- this is the mass the lander starts with hence the mass the noob engines are tuned to
 gintDefaultMass = 220
 
@@ -125,14 +123,15 @@ gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
 gfltSocketHostTimer = enum.constSocketHostRate
-gfltSocketClientTimer = 0	-- enum.constSocketClientRate
+gfltSocketClientTimer = 0	-- enum.TIMER_CLIENT_SEND_INTERVAL
 gstrServerIP = nil			-- server's IP address
-gintServerPort = 6000		-- this is the port each client needs to connect to
+gintServerPort = 22122		-- this is the port each client needs to connect to
 gstrClientIP = nil
 gintClientPort = nil
 gbolIsAClient = false		-- defaults to NOT a client until the player chooses to connect to a host
 gbolIsAHost = false			-- Will listen on load but is not a host until someone connects
-gbolIsConnected = false		-- Will become true when received an acknowledgement from the server
+ENET_IS_CONNECTED = false	-- Will become true when received an acknowledgement from the server
+HOST_IP_ADDRESS = ""
 
 
 
@@ -196,6 +195,12 @@ function love.load()
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
 		love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
     end
+	
+	local sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
+	HOST_IP_ADDRESS = sock.dns.toip(sock.dns.gethostname())
+	sock = nil	
+
+	garrGameSettings.hostPort = "22122"
 
 	-- Load settings
 	fun.LoadGameSettings()
@@ -235,7 +240,7 @@ function love.update(dt)
 		Building.update(dt)
 	end
 
-	fun.HandleSockets()
+	EnetHandler.update(dt)
 
 	-- can potentially move this with the Slab.Update as it is only used on the main menu
 	lovelyToasts.update(dt)
