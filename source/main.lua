@@ -192,7 +192,6 @@ function love.load()
 
 	local sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = sock.dns.toip(sock.dns.gethostname())
-	sock = nil
 
 	garrGameSettings.hostPort = "22122"
 
