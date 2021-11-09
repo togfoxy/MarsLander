@@ -55,7 +55,7 @@ function EnetHandler.createClient()
         print("My connection ID is " .. msg)
 		assert(msg == client:getConnectId())
 		
-		garrLanders[1].connectionID = msgo
+		garrLanders[1].connectionID = msg
 		
 		if not ENET_IS_CONNECTED then
 			fun.AddScreen("World")
