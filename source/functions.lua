@@ -16,6 +16,12 @@ function functions.RemoveScreen()
 end
 
 
+function functions.CurrentScreenName()
+-- returns the current active screen
+	return garrCurrentScreen[#garrCurrentScreen]
+end
+
+
 function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.
@@ -46,7 +52,7 @@ function functions.LoadGameSettings()
     local savefile, contents
 
     savefile = savedir .. "/" .. "settings.dat"
-    contents, _ = nativefs.read(savefile) 
+    contents, _ = nativefs.read(savefile)
 	local success
     success, garrGameSettings = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
 
@@ -56,7 +62,7 @@ function functions.LoadGameSettings()
 
 	--[[ FIXME:
 	-- This is horrible bugfix and needs refactoring. If a player doesn't have
-	-- a settings.dat already then all the values in garrGameSettings table are 
+	-- a settings.dat already then all the values in garrGameSettings table are
 	-- nil. This sets some reasonable defaults to stop nil value crashes.
 	]]--
 	if garrGameSettings.PlayerName == nil then
@@ -151,7 +157,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	local closestbase = {}
 	local absdist
 	local dist
-	
+
 	for k,v in pairs(garrObjects) do
 		if v.objecttype == intBaseType then
 			absdist = math.abs(xvalue - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
@@ -162,7 +168,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 			end
 		end
 	end
-	
+
 	-- now we have the closest base, work out the distance to the landing pad for that base
 	local realdist = xvalue - (closestbase.x + 85)			-- the + bit is an offset to calculate the landing pad and not the image
 
@@ -199,7 +205,7 @@ function functions.HandleSockets(dt)
 					garrLanders[2].y = incoming.y
 					garrLanders[2].angle = incoming.angle
 					garrLanders[2].name = incoming.name
-				end	
+				end
 			end
 		until incoming == nil
 
@@ -238,8 +244,8 @@ function functions.HandleSockets(dt)
 		-- this time is needed to stop the client flooding the network
 		local deltatime = love.timer.getDelta()
 		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
-		if gfltSocketClientTimer <= 0 then			
-			gfltSocketClientTimer = enum.constSocketClientRate			
+		if gfltSocketClientTimer <= 0 then
+			gfltSocketClientTimer = enum.constSocketClientRate
 
 			ss.addItemToClientOutgoingQueue(msg)	-- Lander[1]
 			ss.sendToHost()

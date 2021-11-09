@@ -247,7 +247,10 @@ function love.draw()
 	-- this comes BEFORE the TLfres.beginRendering
 	drawWallpaper()
 
+	local strCurrentScreen = fun.CurrentScreenName()
 	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
+
+	local strCurrentScreen = fun.CurrentScreenName()
 
 	-- TODO: Add a Scene / Screen manager
 	if strCurrentScreen == "MainMenu" then
@@ -295,11 +298,16 @@ function love.keypressed(key, scancode, isrepeat)
 		-- Pause the game
 		elseif key == "p" then
 			fun.AddScreen("Pause")
-		-- Open options menu
+			-- Open options menu
 		elseif key == "o" then
 			fun.AddScreen("Settings")
 		end
+	elseif strCurrentScreen == "Pause" then
+		if key == "p" then
+			fun.RemoveScreen()
+		end
 	end
+
 	-- update Lander keys
 	Lander.keypressed(key, scancode, isrepeat)
 end
