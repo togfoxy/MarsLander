@@ -5,8 +5,8 @@ local EnetHandler = {}
 local server
 local client
 
-local timerHostSendInterval = 0.05
-local timerHostSendTimer = timerHostSendInterval
+local TIMER_HOST_SEND_INTERVAL = 0.05
+local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 
 local timerClientSendInterval = 0.05
 local timerClientSendTimer = timerClientSendInterval
@@ -92,7 +92,7 @@ function EnetHandler.update(dt)
 	if gbolIsAHost then
 		timerHostSendTimer = timerHostSendTimer - dt
 		if timerHostSendTimer <= 0 then
-			timerHostSendTimer = timerHostSendInterval
+			timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 			for _, lander in pairs(garrLanders) do
 				server:sendToAll("peerupdate",lander)
 			end

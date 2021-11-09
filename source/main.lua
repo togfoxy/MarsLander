@@ -121,7 +121,7 @@ gstrCurrentPlayerName = gstrDefaultPlayerName
 
 -- socket stuff
 gfltSocketHostTimer = enum.constSocketHostRate
-gfltSocketClientTimer = 0	-- enum.constSocketClientRate
+gfltSocketClientTimer = 0	-- enum.TIMER_CLIENT_SEND_INTERVAL
 gstrServerIP = nil			-- server's IP address
 gintServerPort = 22122		-- this is the port each client needs to connect to
 gstrClientIP = nil

@@ -227,7 +227,7 @@ function functions.HandleSockets(dt)
 		local deltatime = love.timer.getDelta()
 		gfltSocketClientTimer = gfltSocketClientTimer - deltatime
 		if gfltSocketClientTimer <= 0 then			
-			gfltSocketClientTimer = enum.constSocketClientRate			
+			gfltSocketClientTimer = enum.TIMER_CLIENT_SEND_INTERVAL			
 			msg = {}
 		end
 	end
