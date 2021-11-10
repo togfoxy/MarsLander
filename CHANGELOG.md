@@ -6,6 +6,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ## UNRELEASED
 ### Added
+- added the 'wrong' sound in an additional place in the shop
 
 
 
@@ -18,6 +19,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - removed the images/sprites out of the lander table
 - major code re-organization and optimization
 - 'p' now unpauses the game
+- restored the original 'wrong' sound as it is better
 
 
 
@@ -32,6 +34,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - fixed game over not triggering (again)
 - loading a game that doesn't exist no longer crashes the game
 - rangefinder fixed
+- fixed the '$' sign in the shop
 
 
 ## v0.10

@@ -13,7 +13,7 @@ local Base = {}
 -- Local Variables
 -- ~~~~~~~~~~~~~~~~
 
-local landingLights     = Assets.getImageSet("landingLights")
+local landingLights     = Assets.getImageSet("landingLights2")
 landingLights.animation = Assets.newAnimation("landingLights", landingLights.image, 64, 8, 1, '1-4', 0.5)
 
 local baseOn    = Assets.getImageSet("fuelbaseOn")

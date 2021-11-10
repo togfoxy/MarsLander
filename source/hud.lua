@@ -141,7 +141,7 @@ local function drawShopMenu()
 
 		-- Create List of available modules
 		for _, module in pairs(Modules) do
-			local string = "%s. Buy '%s' - %s $\n"
+			local string = "%s. Buy '%s' - $%s \n"
 			itemListString = string.format(string, module.id, module.name, module.cost)
 			-- Draw list of modules
 			local color = {1, 1, 1, 1}
