@@ -5,18 +5,18 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-gstrGameVersion = "0.11"
-love.window.setTitle("Mars Lander " .. gstrGameVersion)
+GAME_VERSION = "0.11"
+love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
 io.stdout:setvbuf("no")
 
 -- Do debug stuff like display info text etc
-gbolDebug = true
+DEBUG = true
 
 -- Global screen dimensions
-gintScreenWidth = 1024 -- 1920
-gintScreenHeight = 768 -- 1080
+SCREEN_WIDTH = 1024 -- 1920
+SCREEN_HEIGHT = 768 -- 1080
 
 
 
@@ -24,7 +24,7 @@ gintScreenHeight = 768 -- 1080
 -- Libraries
 -- ~~~~~~~~~~~
 
-inspect = require 'lib.inspect'
+Inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
 
 -- https://love2d.org/wiki/TLfres
@@ -34,19 +34,19 @@ TLfres = require 'lib.tlfres'
 Slab = require 'lib.Slab.Slab'
 
 -- https://github.com/gvx/bitser
-bitser = require 'lib.bitser'
+Bitser = require 'lib.bitser'
 
 -- https://github.com/megagrump/nativefs
-nativefs = require 'lib.nativefs'
+Nativefs = require 'lib.nativefs'
 
--- https://github.com/camchenry/sock.lua
-sock = require 'lib.sock'
+-- https://github.com/camchenry/Sock.lua
+Sock = require 'lib.sock'
 
 -- https://github.com/Loucee/Lovely-Toasts
-lovelyToasts = require 'lib.lovelyToasts'
+LovelyToasts = require 'lib.lovelyToasts'
 
 -- Common functions
-cf = require 'lib.commonfunctions'
+Cf = require 'lib.commonfunctions'
 
 -- Our asset-loader
 Assets = require 'lib.assetloader'
@@ -78,7 +78,7 @@ Assets.newFont(20)
 -- TODO: Turn global modules / objects to local ones
 -- Scripts
 Modules		= require 'scripts.modules'		-- Lander modules
-enum		= require 'scripts.enum'
+Enum		= require 'scripts.enum'
 -- Objects
 Smoke 		= require 'objects.smoke'		-- Smoke particles for objects
 Lander 		= require 'objects.lander'
@@ -87,9 +87,9 @@ Building	= require 'objects.building'
 Terrain 	= require 'objects.terrain'
 -- Other
 HUD			= require 'hud'
-cobjs		= require 'createobjects'
-fun			= require 'functions'
-menus		= require 'menus'
+Cobjs		= require 'createobjects'
+Fun			= require 'functions'
+Menus		= require 'menus'
 EnetHandler = require 'enetstuff'
 
 
@@ -98,32 +98,32 @@ EnetHandler = require 'enetstuff'
 -- Global variables
 -- ~~~~~~~~~~~~~~~~~
 
-garrCurrentScreen = {}	-- Current screen / state the user is in
+CURRENT_SCREEN = {}	-- Current screen / state the user is in
 
-garrLanders = {}
-garrGround = {}			-- stores the y value for the ground
-garrObjects = {}		-- stores objects that need to be drawn
-garrMassRatio = 0		-- for debugging only. Records current mass/default mass ratio
-garrGameSettings = {}	-- track game settings
+LANDERS = {}
+GROUND = {}			-- stores the y value for the ground
+OBJECTS = {}		-- stores objects that need to be drawn
+MASS_RATIO = 0		-- for debugging only. Records current mass/default mass ratio
+GAME_SETTINGS = {}	-- track game settings
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
-gintOriginX = cf.round(gintScreenWidth / 2, 0)
-gintWorldOffset = gintOriginX
+ORIGIN_X = Cf.round(SCREEN_WIDTH / 2, 0)
+WORLD_OFFSET = ORIGIN_X
 
 -- this is the mass the lander starts with hence the mass the noob engines are tuned to
-gintDefaultMass = 220
+DEFAULT_MASS = 220
 
 -- track speed of the lander to detect crashes etc
-gfltLandervy = 0
-gfltLandervx = 0
+LANDER_VX = 0
+LANDER_VY = 0
 
 -- Default Player values
-gstrDefaultPlayerName = 'Player Name'
-gstrCurrentPlayerName = gstrDefaultPlayerName
+DEFAULT_PLAYER_NAME = 'Player Name'
+CURRENT_PLAYER_NAME = DEFAULT_PLAYER_NAME
 
 -- socket stuff
-gbolIsAClient = false		-- defaults to NOT a client until the player chooses to connect to a host
-gbolIsAHost = false			-- Will listen on load but is not a host until someone connects
+IS_A_CLIENT = false		-- defaults to NOT a client until the player chooses to connect to a host
+IS_A_HOST = false			-- Will listen on load but is not a host until someone connects
 ENET_IS_CONNECTED = false	-- Will become true when received an acknowledgement from the server
 HOST_IP_ADDRESS = ""
 
@@ -144,8 +144,8 @@ local background = Assets.getImageSet("background1")
 
 local function drawWallpaper()
 	-- stretch or shrink the image to fit the window
-	local sx = gintScreenWidth / background.width
-	local sy = gintScreenHeight / background.height
+	local sx = SCREEN_WIDTH / background.width
+	local sy = SCREEN_HEIGHT / background.height
 	love.graphics.setColor(1, 1, 1, 0.25)
 	love.graphics.draw(background.image, 0, 0, 0, sx, sy)
 	love.graphics.setColor(1, 1, 1, 1)
@@ -178,8 +178,8 @@ function love.load()
     if love.filesystem.isFused() then
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
-        love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
-        gbolDebug = false
+        love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
+        DEBUG = false
 
 		-- Play music
 		-- true for "isLooping"
@@ -187,27 +187,31 @@ function love.load()
     else
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
-		love.window.setMode(gintScreenWidth, gintScreenHeight, flags)
+		love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
     end
 
 	local sock = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = sock.dns.toip(sock.dns.gethostname())
 
-	garrGameSettings.hostPort = "22122"
+	local socket = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
+	HOST_IP_ADDRESS = socket.dns.toip(socket.dns.gethostname())
+	socket = nil
+
+	GAME_SETTINGS.hostPort = "22122"
 
 	-- Load settings
-	fun.LoadGameSettings()
+	Fun.LoadGameSettings()
 	-- Restore full screen setting
-	love.window.setFullscreen(garrGameSettings.FullScreen)
+	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
 
 	-- First screen / entry point
-	fun.AddScreen("MainMenu")
-	fun.ResetGame()
+	Fun.AddScreen("MainMenu")
+	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
-	gintDefaultMass = Lander.getMass(garrLanders[1])
+	DEFAULT_MASS = Lander.getMass(LANDERS[1])
 
-	lovelyToasts.options.queueEnabled = true
+	LovelyToasts.options.queueEnabled = true
 
 	-- Initalize GUI Library
 	Slab.SetINIStatePath(nil)
@@ -218,7 +222,7 @@ end
 
 function love.update(dt)
 
-	strCurrentScreen = garrCurrentScreen[#garrCurrentScreen]
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
 
 	if strCurrentScreen == "MainMenu"
 	or strCurrentScreen == "Credits"
@@ -227,7 +231,7 @@ function love.update(dt)
 	end
 
 	if strCurrentScreen == "World" then
-		Lander.update(garrLanders[1], dt)
+		Lander.update(LANDERS[1], dt)
 		Smoke.update(dt)
 		Base.update(dt)
 		Building.update(dt)
@@ -236,7 +240,7 @@ function love.update(dt)
 	EnetHandler.update(dt)
 
 	-- can potentially move this with the Slab.Update as it is only used on the main menu
-	lovelyToasts.update(dt)
+	LovelyToasts.update(dt)
 end
 
 
@@ -245,11 +249,13 @@ function love.draw()
 	-- this comes BEFORE the TLfres.beginRendering
 	drawWallpaper()
 
-	TLfres.beginRendering(gintScreenWidth,gintScreenHeight)
+	TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
+
+	strCurrentScreen = Fun.CurrentScreenName()
 
 	-- TODO: Add a Scene / Screen manager
 	if strCurrentScreen == "MainMenu" then
-		menus.DrawMainMenu()
+		Menus.DrawMainMenu()
 	end
 
 	if strCurrentScreen == "World" then
@@ -257,7 +263,7 @@ function love.draw()
 	end
 
 	if strCurrentScreen == "Credits" then
-		menus.DrawCredits()
+		Menus.DrawCredits()
 	end
 
 	if strCurrentScreen == "Pause" then
@@ -266,14 +272,14 @@ function love.draw()
 	end
 
 	if strCurrentScreen == "Settings" then
-		menus.DrawSettingsMenu()
+		Menus.DrawSettingsMenu()
 	end
 
 	--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 	Slab.Draw()
 
 	--* Put this AFTER the slab so that it draws over the slab
-	lovelyToasts.draw()
+	LovelyToasts.draw()
 
 	TLfres.endRendering({0, 0, 0, 1})
 end
@@ -283,23 +289,23 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	-- Back to previous screen
 	if key == "escape" then
-		fun.RemoveScreen()
+		Fun.RemoveScreen()
 	elseif strCurrentScreen == "World" then
 		-- Restart the game
 		if key == "r" then
-			if garrLanders[1].gameOver then
-				fun.ResetGame()
+			if LANDERS[1].gameOver then
+				Fun.ResetGame()
 			end
 		-- Pause the game
 		elseif key == "p" then
-			fun.AddScreen("Pause")
+			Fun.AddScreen("Pause")
 			-- Open options menu
 		elseif key == "o" then
-			fun.AddScreen("Settings")
+			Fun.AddScreen("Settings")
 		end
 	elseif strCurrentScreen == "Pause" then
 		if key == "p" then
-			fun.RemoveScreen()
+			Fun.RemoveScreen()
 		end
 	end
 

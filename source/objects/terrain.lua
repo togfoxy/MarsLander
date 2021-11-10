@@ -14,16 +14,16 @@ local Terrain = {}
 -- ~~~~~~~~~~~~~~~~
 
 local function getLastBaseID(baseType)
--- scans the garrObjects array and returns the index (id) of the last object in the array of type baseType
+-- scans the OBJECTS array and returns the index (id) of the last object in the array of type baseType
 -- returns 0 if no base of that type found
 -- accepts basetypeBuilding meaning any building
 
 	local lastBaseID = 0
-	for i = 1, #garrObjects do
+	for i = 1, #OBJECTS do
 		-- if the object type == base type then capture ID
 		-- if the baseType is any building then test for building1 or building2
-		if (garrObjects[i].objecttype == baseType) or
-			(baseType == enum.basetypeBuilding and (garrObjects[i].objecttype == enum.basetypeBuilding1 or garrObjects[i].objecttype == enum.basetypeBuilding2)) then
+		if (OBJECTS[i].objecttype == baseType) or
+			(baseType == Enum.basetypeBuilding and (OBJECTS[i].objecttype == Enum.basetypeBuilding1 or OBJECTS[i].objecttype == Enum.basetypeBuilding2)) then
 			lastBaseID = i
 		end
 	end
@@ -38,19 +38,19 @@ local function addBuildings(groundTableSize)
 		local nextBuildingX
 
 		-- get the index/id of the last building
-		lastBuildingIndex = getLastBaseID(enum.basetypeBuilding)
+		lastBuildingIndex = getLastBaseID(Enum.basetypeBuilding)
 
 		if lastBuildingIndex < 1 then
-			nextBuildingX = gintOriginX + love.math.random((gintScreenWidth / 2),gintScreenWidth)
+			nextBuildingX = ORIGIN_X + love.math.random((SCREEN_WIDTH / 2),SCREEN_WIDTH)
 		else
 			-- the next building is between one screenwidth and 1.66 away from the last building
-			local nextBuildingDistance = gintScreenWidth + love.math.random((gintScreenWidth * 0.66),gintScreenWidth)
-			nextBuildingX = garrObjects[lastBuildingIndex].x + nextBuildingDistance
+			local nextBuildingDistance = SCREEN_WIDTH + love.math.random((SCREEN_WIDTH * 0.66),SCREEN_WIDTH)
+			nextBuildingX = OBJECTS[lastBuildingIndex].x + nextBuildingDistance
 		end	
-		nextBuildingX = cf.round(nextBuildingX,0)
+		nextBuildingX = Cf.round(nextBuildingX,0)
 		if nextBuildingX <= groundTableSize then
 			local newBaseType = love.math.random(7,8)		-- hack
-			cobjs.CreateObject(newBaseType, nextBuildingX)
+			Cobjs.CreateObject(newBaseType, nextBuildingX)
 		else
 			break
 		end
@@ -63,16 +63,16 @@ local function addFuelBases(groundTableSize)
 		local lastFuelBaseIndex
 		local nextBaseX
 
-		lastFuelBaseIndex = getLastBaseID(enum.basetypeFuel)
+		lastFuelBaseIndex = getLastBaseID(Enum.basetypeFuel)
 		if lastFuelBaseIndex == 0 then
-			nextBaseX = cf.round(gintScreenWidth * 1.5,0)	--! this should probably use originX and not screenwidth
+			nextBaseX = Cf.round(SCREEN_WIDTH * 1.5,0)	--! this should probably use originX and not screenwidth
 		else
-			nextBaseX = cf.round(garrObjects[lastFuelBaseIndex].x * 1.3,0)
+			nextBaseX = Cf.round(OBJECTS[lastFuelBaseIndex].x * 1.3,0)
 		end
 
 		if nextBaseX <= groundTableSize then
 			-- create base
-			cobjs.CreateObject(enum.basetypeFuel, nextBaseX)
+			Cobjs.CreateObject(Enum.basetypeFuel, nextBaseX)
 		else
 			break
 		end
@@ -86,14 +86,14 @@ end
 
 function Terrain.init()
 -- initialise the ground array to be a flat line
--- add bases to garrObjects
+-- add bases to OBJECTS
 
 	-- this creates a big flat space at the start of the game
-	for i = 0, (gintScreenWidth * 0.90) do
-		garrGround[i] = gintScreenHeight * 0.80
+	for i = 0, (SCREEN_WIDTH * 0.90) do
+		GROUND[i] = SCREEN_HEIGHT * 0.80
 	end
 
-	Terrain.generate(gintScreenWidth * 2)
+	Terrain.generate(SCREEN_WIDTH * 2)
 end
 
 
@@ -104,11 +104,11 @@ function Terrain.generate(intAmountToCreate)
 	-- create terrain
 
 	-- capture the original array size for use later on
-	local originalGroundTableSize = #garrGround
+	local originalGroundTableSize = #GROUND
 	local gameID = math.pi
 
-	local terrainmaxheight = (gintScreenHeight * 0.90)
-	local terrainminheight = (gintScreenHeight * 0.65)
+	local terrainmaxheight = (SCREEN_HEIGHT * 0.90)
+	local terrainminheight = (SCREEN_HEIGHT * 0.65)
 	local terrainstep = (terrainmaxheight - terrainminheight) / 2
 	local terrainoctaves = 8
 
@@ -120,16 +120,16 @@ function Terrain.generate(intAmountToCreate)
 
 		local newgroundaltitude
 		for oct = 1, terrainoctaves do
-			newgroundaltitude = garrGround[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
+			newgroundaltitude = GROUND[i-1] + (love.math.noise(i / 2^oct, gameID) - 0.5) * 2 ^ (terrainoctaves - oct - 1)
 		end
 		if newgroundaltitude < terrainminheight then newgroundaltitude = terrainminheight end
 		if newgroundaltitude > terrainmaxheight then newgroundaltitude = terrainmaxheight end
 
-		table.insert(garrGround, newgroundaltitude)
+		table.insert(GROUND, newgroundaltitude)
 
 	end
 
-	groundTableSize = #garrGround
+	groundTableSize = #GROUND
 
 	-- add some buildings before adding fuel
 
@@ -168,17 +168,17 @@ end
 -- draws the terrain as a bunch of lines that are 1 pixel in length
 function Terrain.draw()
 	-- ensure we have enough terrain
-	if (gintWorldOffset + gintScreenWidth) > #garrGround then
-		Terrain.generate(gintScreenWidth * 2)
+	if (WORLD_OFFSET + SCREEN_WIDTH) > #GROUND then
+		Terrain.generate(SCREEN_WIDTH * 2)
 	end
 
-	for i = 1, #garrGround - 1 do
-		if i >= gintWorldOffset - (gintScreenWidth) and i <= gintWorldOffset + (gintScreenWidth) then
+	for i = 1, #GROUND - 1 do
+		if i >= WORLD_OFFSET - (SCREEN_WIDTH) and i <= WORLD_OFFSET + (SCREEN_WIDTH) then
 			-- only draw what is visible on the screen
-			love.graphics.line(i - gintWorldOffset, garrGround[i], i + 1 - gintWorldOffset, garrGround[i+1])
+			love.graphics.line(i - WORLD_OFFSET, GROUND[i], i + 1 - WORLD_OFFSET, GROUND[i+1])
 			-- draw a vertical line straight down to reflect solid terra firma
 			love.graphics.setColor(0.8, 0.35, 0.35, 1)
-			love.graphics.line(i - gintWorldOffset, garrGround[i],i - gintWorldOffset, gintScreenHeight)
+			love.graphics.line(i - WORLD_OFFSET, GROUND[i],i - WORLD_OFFSET, SCREEN_HEIGHT)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
 	end
