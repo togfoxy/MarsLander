@@ -24,17 +24,20 @@ Smoke.particles = {}
 -- ~~~~~~~~~~~~~~~~
 
 function Smoke.createParticle(x, y, angle)
-	local particle = {}
-	particle.x = x
-	particle.y = y
-	-- FIXME: not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
-	particle.angle = (angle or 0) + 135
-    local onLoop = function()
-        particle.animation:pauseAtEnd()
-        particle.removed = true
-    end
-    particle.animation = Assets.newAnimation("smoke", smokeSprite.image, 30, 30, '1-8', 1, 0.4, onLoop)
-	table.insert(Smoke.particles, particle)
+	if Smoke.timer == 0 then
+		local particle = {}
+		particle.x = x
+		particle.y = y
+		-- FIXME: not sure why the smoke sprite needs to be rotate +135. Suspect the image is drawn wrong. This works but!
+		particle.angle = (angle or 0) + 135
+		local onLoop = function()
+			particle.animation:pauseAtEnd()
+			particle.removed = true
+		end
+		particle.animation = Assets.newAnimation("smoke", smokeSprite.image, 30, 30, '1-8', 1, 0.4, onLoop)
+		table.insert(Smoke.particles, particle)
+		Smoke.timer = Smoke.spawnRate
+	end
 end
 
 
@@ -46,13 +49,9 @@ end
 
 
 function Smoke.update(dt)
-	-- TODO: Don't hardcode the lander into smoke particle creation
-	local lander = LANDERS[1]
 	-- Spawn smoke particles
-	local engineFiring = lander.engineOn or lander.leftEngineOn or lander.rightEngineOn
-	if Smoke.timer <= 0 and engineFiring then
-		Smoke.createParticle(lander.x, lander.y, lander.angle)
-		Smoke.timer = Smoke.spawnRate
+	if Smoke.timer <= 0 then
+		Smoke.timer = 0
 	else
 		Smoke.timer = Smoke.timer - dt
 	end

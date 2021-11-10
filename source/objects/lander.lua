@@ -57,6 +57,11 @@ local function doThrust(lander, dt)
 		else
 			lander.fuel = lander.fuel - (dt * 1)
 		end
+
+		-- Add smoke particles if available
+		if Smoke then
+			Smoke.createParticle(lander.x, lander.y, lander.angle)
+		end
 	else
 		-- no fuel to thrust
 		--! probably need to make a serious alert here
