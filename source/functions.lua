@@ -120,19 +120,38 @@ function functions.LoadGame()
 
     local savefile
     local contents
+	local size
+	local error = false
 
     savefile = savedir .. "/" .. "landers.dat"
-    contents, _ = Nativefs.read( savefile)
-    LANDERS = Bitser.loads(contents)
+
+	if not love.filesystem.getInfo(savefile) then
+	    contents, size = nativefs.read(savefile)
+	    garrLanders = bitser.loads(contents)
+	else
+		error = true
+	end
 
     savefile = savedir .. "/" .. "ground.dat"
-    contents, _ = Nativefs.read( savefile)
-    GROUND = Bitser.loads(contents)
+	if not love.filesystem.getInfo(savefile) then
+		contents, size = nativefs.read(savefile)
+	    garrGround = bitser.loads(contents)
+	else
+		error = true
+	end
 
     savefile = savedir .. "/" .. "objects.dat"
-    contents, _ = Nativefs.read(savefile)
-    OBJECTS = Bitser.loads(contents)
+	if not love.filesystem.getInfo(savefile) then
+		contents, size = nativefs.read(savefile)
+	    garrObjects = bitser.loads(contents)
+	else
+		error = true
+	end
 
+	if error then
+		-- a file is missing, so display a popup on a new game
+		lovelyToasts.show("ERROR: Unable to load game!", 3, "middle")
+	end
 end
 
 
