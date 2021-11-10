@@ -15,13 +15,12 @@ Smoke.particles = {}
 -- Local Variables
 -- ~~~~~~~~~~~~~~~~
 
--- TODO: Create the spriteData with width and height automatically (except for animations)
  local smokeSprite = Assets.getImageSet("smoke")
 
 
 
 -- ~~~~~~~~~~~~~~~~
--- Local functions
+-- Public functions
 -- ~~~~~~~~~~~~~~~~
 
 function Smoke.createParticle(x, y, angle)
@@ -36,6 +35,12 @@ function Smoke.createParticle(x, y, angle)
     end
     particle.animation = Assets.newAnimation("smoke", smokeSprite.image, 30, 30, '1-8', 1, 0.4, onLoop)
 	table.insert(Smoke.particles, particle)
+end
+
+
+
+function Smoke.destroy()
+	Smoke.particles = {}
 end
 
 

@@ -261,6 +261,7 @@ function functions.ResetGame()
 
 	GROUND = {}
 	OBJECTS = {}
+	Smoke.destroy()
 
 	-- ensure Terrain.init appears before Lander.create
 	Terrain.init()
