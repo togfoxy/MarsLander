@@ -132,7 +132,29 @@ function Terrain.generate(intAmountToCreate)
 	groundTableSize = #GROUND
 
 	-- add some buildings before adding fuel
-	addBuildings(groundTableSize)
+
+	repeat
+		local lastBuildingIndex
+		local nextBuildingX
+
+		-- get the index/id of the last building
+		lastBuildingIndex = getLastBaseID(enum.basetypeBuilding)
+
+		if lastBuildingIndex < 1 then
+			nextBuildingX = gintOriginX + love.math.random((gintScreenWidth / 2),gintScreenWidth)
+		else
+			-- the next building is between one screenwidth and 1.66 away from the last building
+			local nextBuildingDistance = gintScreenWidth + love.math.random((gintScreenWidth * 0.66),gintScreenWidth)
+			nextBuildingX = garrObjects[lastBuildingIndex].x + nextBuildingDistance
+		end
+		nextBuildingX = cf.round(nextBuildingX,0)
+		if nextBuildingX <= groundTableSize then
+			local newBaseType = love.math.random(7,8)		-- hack
+			cobjs.CreateObject(newBaseType, nextBuildingX)
+		else
+			break
+		end
+	until not true	-- infinite loop using a break statement
 
 	-- add fuel bases after the buildings so they can draw layered if need be
 	addFuelBases(groundTableSize)

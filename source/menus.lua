@@ -40,18 +40,21 @@ function Menus.DrawMainMenu()
 			Fun.SaveGameSettings()
 			Fun.AddScreen("World")
  		end
+
 		Slab.NewLine()
 
 		if Slab.Button("Resume game",{W=155}) then
 			Fun.SaveGameSettings()
 			Fun.AddScreen("World")
 		end
-		Slab.NewLine()        
+		Slab.NewLine()
 
 		if Slab.Button("Load game",{W=155}) then
-            Fun.LoadGame()
+
+      Fun.LoadGame()
 			Fun.SaveGameSettings()
 			Fun.AddScreen("World")
+
 		end
 		Slab.NewLine()
 
@@ -90,7 +93,7 @@ function Menus.DrawMainMenu()
 				Text=GAME_SETTINGS.hostIP,
 				NumbersOnly=false,
 				NoDrag=true,
-			}			
+			}
 			if Slab.Input('hostIP', joinIPOptions) then
 				GAME_SETTINGS.hostIP = Slab.GetInputText()
 			end		
@@ -115,7 +118,7 @@ function Menus.DrawMainMenu()
 				Fun.SaveGameSettings()
 				EnetHandler.createClient()
 			end
-			Slab.NewLine()		
+			Slab.NewLine()
 		end
 
 		if Slab.Button("Credits",{W=155}) then
@@ -158,7 +161,7 @@ function Menus.DrawCredits()
 		W = intSlabWidth,
 		H = intSlabHeight,
 	}
-	local URLOptions = function(url) 
+	local URLOptions = function(url)
 		local option = {}
 		option.URL = url
 		option.IsSelectable = true
@@ -191,8 +194,8 @@ function Menus.DrawCredits()
 
 			Slab.Text("Thanks to beta testers:",{Align = 'center'})
 			Slab.NewLine()
-        	Slab.Textf("Boatman",{Align = 'right'})
-        	Slab.Textf("Darth Carcas",{Align = 'right'})
+			Slab.Textf("Boatman",{Align = 'right'})
+			Slab.Textf("Darth Carcas",{Align = 'right'})
 			Slab.Textf("Mini Yum",{Align = 'right'})
 			Slab.NewLine()
 
@@ -204,7 +207,7 @@ function Menus.DrawCredits()
 			Slab.Text("tlsfres", URLOptions("https://love2d.org/wiki/TLfres"))
 			Slab.Text("inspect", URLOptions("https://github.com/kikito/inspect.lua"))
 			Slab.Text("freesound.org", URLOptions("https://freesound.org/"))
- 			Slab.Text("Kenney.nl", URLOptions("https://kenney.nl"))
+			Slab.Text("Kenney.nl", URLOptions("https://kenney.nl"))
 			Slab.Text("bitser", URLOptions("https://github.com/gvx/bitser"))
 			Slab.Text("nativefs", URLOptions("https://github.com/megagrump/nativefs"))
 			Slab.Text("anim8", URLOptions("https://github.com/kikito/anim8"))
@@ -230,6 +233,7 @@ function Menus.DrawCredits()
 				-- return to the previous game state
 				Fun.RemoveScreen()
 			end	
+
 		Slab.EndLayout()
 
 	Slab.EndLayout()
