@@ -14,6 +14,6 @@ return {
     basetypeBuilding1 = 7,
     basetypeBuilding2 = 8,
     baseMaxFuel = 15,
-	
-	
+
+
 }
