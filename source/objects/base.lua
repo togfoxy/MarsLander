@@ -42,7 +42,7 @@ function Base.draw()
         local objectvalue = v.objecttype
 
         -- check if on-screen
-        if xvalue > WORLD_OFFSET - 100 or xvalue < WORLD_OFFSET + SCREEN_WIDTH then
+        if (xvalue > WORLD_OFFSET - SCREEN_WIDTH) and (xvalue < WORLD_OFFSET + SCREEN_WIDTH) then
             -- draw image based on object type
             if objectvalue == Enum.basetypeFuel then
                 local baseX = xvalue - WORLD_OFFSET

@@ -33,21 +33,21 @@ end
 
 
 function Building.draw()
-    for k,v in pairs(OBJECTS) do
-        local xvalue = v.x
-        local objectvalue = v.objecttype
+    for k, obj in pairs(OBJECTS) do
+        local xvalue = obj.x
+        local objType = obj.objecttype
 
         -- check if on-screen
-        if xvalue > WORLD_OFFSET - 100 or xvalue < WORLD_OFFSET + SCREEN_WIDTH then
+        if (xvalue > WORLD_OFFSET - SCREEN_WIDTH) and (xvalue < (WORLD_OFFSET + SCREEN_WIDTH)) then
             -- Draw building type 1
-			if objectvalue == Enum.basetypeBuilding1 then
+			if objType == Enum.basetypeBuilding1 then
 				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local x = xvalue - WORLD_OFFSET
 				local y = GROUND[xvalue] - building1.height
 				love.graphics.draw(building1.image, x, y)
 			end
 			-- Draw building type 2
-			if objectvalue == Enum.basetypeBuilding2 then
+			if objType == Enum.basetypeBuilding2 then
 				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local x = xvalue - WORLD_OFFSET
 				local y = GROUND[xvalue] - building2.height
