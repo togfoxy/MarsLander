@@ -126,7 +126,7 @@ function functions.LoadGame()
     savefile = savedir .. "/" .. "landers.dat"
 
 	if not love.filesystem.getInfo(savefile) then
-	    contents, size = nativefs.read(savefile)
+	    contents, size = Nativefs.read(savefile)
 	    garrLanders = bitser.loads(contents)
 	else
 		error = true
@@ -134,7 +134,7 @@ function functions.LoadGame()
 
     savefile = savedir .. "/" .. "ground.dat"
 	if not love.filesystem.getInfo(savefile) then
-		contents, size = nativefs.read(savefile)
+		contents, size = Nativefs.read(savefile)
 	    garrGround = bitser.loads(contents)
 	else
 		error = true
@@ -142,7 +142,7 @@ function functions.LoadGame()
 
     savefile = savedir .. "/" .. "objects.dat"
 	if not love.filesystem.getInfo(savefile) then
-		contents, size = nativefs.read(savefile)
+		contents, size = Nativefs.read(savefile)
 	    garrObjects = bitser.loads(contents)
 	else
 		error = true
