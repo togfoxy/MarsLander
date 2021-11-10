@@ -30,6 +30,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - fuel bases are now determined on demand and not up front. Big performance boost.
 - save game bug
 - fixed game over not triggering (again)
+- loading a game that doesn't exist no longer crashes the game
 
 
 ## v0.10
@@ -65,7 +66,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - added a lovelyToast to the SAVE button
 - simple "end game" screen allows a game restart
 - low fuel audio
-- added smoke effect 
+- added smoke effect
 - an image to the main menu
 - some commentary to the code to ease understanding and maintenance
 - a CONST section (for constants) to enum.lua
