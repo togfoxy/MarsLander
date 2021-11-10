@@ -94,6 +94,8 @@ function Terrain.init()
 	end
 
 	Terrain.generate(SCREEN_WIDTH * 2)
+	-- TODO: Proper fix for crash when lander.update is called before a fuel base is spawned
+	addFuelBases(#GROUND)
 end
 
 
@@ -128,8 +130,6 @@ function Terrain.generate(intAmountToCreate)
 		table.insert(GROUND, newgroundaltitude)
 
 	end
-
-	groundTableSize = #GROUND
 
 	-- add some buildings before adding fuel
 	if LANDERS[1] == nil then
