@@ -247,8 +247,8 @@ local function buyModule(module, lander)
 	if lander.money >= module.cost then
 		for i = 1, #lander.modules do
 			if lander.modules[i] == module then
-				-- this module is already purchased. Abort
-				--! make a 'wrong' sound
+				-- this module is already purchased
+				failSound:play()
 				return
 			end
 		end
