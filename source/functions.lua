@@ -173,14 +173,17 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- note: if distance is a negative value then the Lander has not yet passed the base
 
 	local closestdistance = 0
-	local closestbase = {}
+	local closestbase
 	local absdist
 	local dist
+	local realdist
 
 	for k,v in pairs(OBJECTS) do
 		if v.objecttype == intBaseType then
-			absdist = math.abs(xvalue - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
-			dist = (xvalue - (v.x + 85))						-- same but without the math.abs
+			-- the + bit is an offset to calculate the landing pad and not the image
+			absdist = math.abs(xvalue - (v.x + 85))
+			-- same but without the math.abs
+			dist = (xvalue - (v.x + 85))
 			if closestdistance == 0 or absdist <= closestdistance then
 				closestdistance = absdist
 				closestbase = v
@@ -189,7 +192,10 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	end
 
 	-- now we have the closest base, work out the distance to the landing pad for that base
-	local realdist = xvalue - (closestbase.x + 85)			-- the + bit is an offset to calculate the landing pad and not the image
+	if closestbase then
+		-- the + bit is an offset to calculate the landing pad and not the image
+		realdist = xvalue - (closestbase.x + 85)
+	end
 
 	return  realdist, closestbase
 
