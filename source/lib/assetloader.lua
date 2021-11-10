@@ -132,9 +132,10 @@ end
 
 
 
-function Assets.newAnimation(name, image, width, height, frames, row, durations, onLoop)
+function Assets.newAnimation(name, image, width, height, column, row, durations, onLoop)
+
     local grid = Anim8.newGrid(width, height, image:getWidth(), image:getHeight())
-    local animation = Anim8.newAnimation(grid(frames, row), durations, onLoop)
+    local animation = Anim8.newAnimation(grid(column, row), durations, onLoop)
     animation.name = name
     animation.grid = grid
     animation.image = image
