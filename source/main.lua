@@ -303,12 +303,15 @@ function love.keypressed(key, scancode, isrepeat)
 		elseif key == "o" then
 			Fun.AddScreen("Settings")
 		end
+		
+		-- update Lander keys
+		Lander.keypressed(key, scancode, isrepeat)
 	elseif strCurrentScreen == "Pause" then
 		if key == "p" then
 			Fun.RemoveScreen()
 		end
 	end
 
-	-- update Lander keys
-	Lander.keypressed(key, scancode, isrepeat)
+	
+
 end
