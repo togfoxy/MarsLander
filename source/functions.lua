@@ -123,27 +123,26 @@ function functions.LoadGame()
 	local size
 	local error = false
 
-    savefile = savedir .. "/" .. "landers.dat"
-
-	if love.filesystem.getInfo(savefile) ~= nil then
-	    contents, size = Nativefs.read(savefile)
-	    garrLanders = bitser.loads(contents)
-	else
-		error = true
-	end
-
-    savefile = savedir .. "/" .. "ground.dat"
-	if love.filesystem.getInfo(savefile) ~= nil then
+	savefile = savedir .. "/" .. "ground.dat"
+	if Nativefs.getInfo(savefile) then
 		contents, size = Nativefs.read(savefile)
-	    garrGround = bitser.loads(contents)
+	    GROUND = bitser.loads(contents)
 	else
 		error = true
 	end
 
     savefile = savedir .. "/" .. "objects.dat"
-	if love.filesystem.getInfo(savefile) ~= nil then
+	if Nativefs.getInfo(savefile) then
 		contents, size = Nativefs.read(savefile)
-	    garrObjects = bitser.loads(contents)
+	    OBJECTS = bitser.loads(contents)
+	else
+		error = true
+	end
+
+    savefile = savedir .. "/" .. "landers.dat"
+	if Nativefs.getInfo(savefile) then
+	    contents, size = Nativefs.read(savefile)
+	    LANDERS = bitser.loads(contents)
 	else
 		error = true
 	end
