@@ -6,6 +6,7 @@
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 local Assets = {}
+Assets.debugOutput  = false
 Assets.imageSets    = {}
 Assets.images       = {}
 Assets.sounds       = {}
@@ -37,6 +38,14 @@ local newFont   = love.graphics.newFont
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
+local function debugPrint(...)
+    if Assets.debugOutput then
+        print(...)
+    end
+end
+
+
+
 local function getFilenameFromPath(path)
     return path:match("([^/]+)%..+")
 end
@@ -47,7 +56,7 @@ local function getDirectoryItems(path)
     local items = {}
     local info = love.filesystem.getInfo(path)
     if info and info.type == "directory" then
-        print(prefix.."Found directory at path '/"..path.."'")
+        debugPrint(prefix.."Found directory at path '/"..path.."'")
         local filenames = love.filesystem.getDirectoryItems(path)
         for _, name in pairs(filenames) do
             local item = {}
@@ -56,7 +65,7 @@ local function getDirectoryItems(path)
             table.insert(items, item)
         end
     else
-        print(prefix.."No directory at path '"..path.."'. Skipping!")
+        debugPrint(prefix.."No directory at path '"..path.."'. Skipping!")
     end
     return items
 end
@@ -74,13 +83,13 @@ function Assets.loadDirectory(path, type)
     for _, item in pairs(items) do
         if type == "image" then
             Assets.newImageSet(item.path)
-            print(prefix.."New Image: "..item.name)
+            debugPrint(prefix.."New Image: "..item.name)
         elseif type == "sound" then
             Assets.newSound(item.path, "static")
-            print(prefix.."New Sound: "..item.name)
+            debugPrint(prefix.."New Sound: "..item.name)
         elseif type == "music" then
             local music = Assets.newSound(item.path, "stream")
-            print(prefix.."New Music: "..item.name)
+            debugPrint(prefix.."New Music: "..item.name)
         end
     end
 end
