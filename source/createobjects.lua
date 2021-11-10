@@ -2,7 +2,7 @@ local createobjects = {}
 
 
 function createobjects.CreateObject(intType, intXValue)
--- creates a base and appends it to the garrObjects table
+-- creates a base and appends it to the OBJECTS table
 
 	local mybase = {}
 	mybase.x = intXValue			-- where on the map this object is positioned.
@@ -11,29 +11,29 @@ function createobjects.CreateObject(intType, intXValue)
 	mybase.active = true
 	mybase.paid = false				-- set true when lander lands and pays player. Ensures bases only pay once
 
-	if intType == enum.basetypeFuel then
-		mybase.totalFuel = enum.baseMaxFuel
+	if intType == Enum.basetypeFuel then
+		mybase.totalFuel = Enum.baseMaxFuel
 
 		-- smooth the terrain around the base
 		for i = 1, 125 do
 			local myindex = intXValue + i
-			garrGround[myindex] = garrGround[intXValue]
+			GROUND[myindex] = GROUND[intXValue]
 		end
 	end
-	if intType == enum.basetypeBuilding1 then
+	if intType == Enum.basetypeBuilding1 then
 		-- smooth the terrain around the base
 		for i = intXValue - 25, intXValue + 75 do
-			garrGround[i] = garrGround[intXValue]
+			GROUND[i] = GROUND[intXValue]
 		end
 	end
-	if intType == enum.basetypeBuilding2 then
+	if intType == Enum.basetypeBuilding2 then
 		-- smooth the terrain around the base
 		for i = intXValue - 25, intXValue + 75 do
-			garrGround[i] = garrGround[intXValue]
+			GROUND[i] = GROUND[intXValue]
 		end
 	end
 
-	table.insert(garrObjects, mybase)
+	table.insert(OBJECTS, mybase)
 
 end
 

@@ -1,13 +1,13 @@
 local functions = {}
 
 function functions.AddScreen(strNewScreen)
-	table.insert(garrCurrentScreen, strNewScreen)
+	table.insert(CURRENT_SCREEN, strNewScreen)
 end
 
 
 function functions.RemoveScreen()
-	table.remove(garrCurrentScreen)
-	if #garrCurrentScreen < 1 then
+	table.remove(CURRENT_SCREEN)
+	if #CURRENT_SCREEN < 1 then
 
 		--if success then
 			love.event.quit()       --! this doesn't dothe same as the EXIT button
@@ -18,7 +18,7 @@ end
 
 function functions.CurrentScreenName()
 -- returns the current active screen
-	return garrCurrentScreen[#garrCurrentScreen]
+	return CURRENT_SCREEN[#CURRENT_SCREEN]
 end
 
 
@@ -26,8 +26,8 @@ function functions.SwapScreen(newscreen)
 -- swaps screens so that the old screen is removed from the stack
 -- this adds the new screen then removes the 2nd last screen.
 
-    fun.AddScreen(newscreen)
-    table.remove(garrCurrentScreen, #garrCurrentScreen - 1)
+    Fun.AddScreen(newscreen)
+    table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
 end
 
 
@@ -39,8 +39,8 @@ function functions.SaveGameSettings()
 	local savedir = love.filesystem.getSource()
 
     savefile = savedir .. "/" .. "settings.dat"
-    serialisedString = bitser.dumps(garrGameSettings)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(GAME_SETTINGS)
+    success, message = Nativefs.write(savefile, serialisedString )
 end
 
 
@@ -52,37 +52,37 @@ function functions.LoadGameSettings()
     local savefile, contents
 
     savefile = savedir .. "/" .. "settings.dat"
-    contents, _ = nativefs.read(savefile)
+    contents, _ = Nativefs.read(savefile)
 	local success
-    success, garrGameSettings = pcall(bitser.loads, contents)		--! should do pcall on all the "load" functions
+    success, GAME_SETTINGS = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
 
 	if success == false then
-		garrGameSettings = {}
+		GAME_SETTINGS = {}
 	end
 
 	--[[ FIXME:
 	-- This is horrible bugfix and needs refactoring. If a player doesn't have
-	-- a settings.dat already then all the values in garrGameSettings table are
+	-- a settings.dat already then all the values in GAME_SETTINGS table are
 	-- nil. This sets some reasonable defaults to stop nil value crashes.
 	]]--
-	if garrGameSettings.PlayerName == nil then
-		garrGameSettings.PlayerName = gstrDefaultPlayerName
+	if GAME_SETTINGS.PlayerName == nil then
+		GAME_SETTINGS.PlayerName = DEFAULT_PLAYER_NAME
 	end
-	if garrGameSettings.hostIP == nil then
-		garrGameSettings.hostIP = HOST_IP_ADDRESS
+	if GAME_SETTINGS.hostIP == nil then
+		GAME_SETTINGS.hostIP = HOST_IP_ADDRESS
 	end
-	if garrGameSettings.hostPort == nil then
-		garrGameSettings.hostPort = "22122"
+	if GAME_SETTINGS.hostPort == nil then
+		GAME_SETTINGS.hostPort = "22122"
 	end
-	if garrGameSettings.FullScreen == nil then
-		garrGameSettings.FullScreen = false
+	if GAME_SETTINGS.FullScreen == nil then
+		GAME_SETTINGS.FullScreen = false
 	end
-	if garrGameSettings.HighScore == nil then
-		garrGameSettings.HighScore = 0
+	if GAME_SETTINGS.HighScore == nil then
+		GAME_SETTINGS.HighScore = 0
 	end
 
 	-- Set the gloal player name to the new value
-	gstrCurrentPlayerName = garrGameSettings.PlayerName
+	CURRENT_PLAYER_NAME = GAME_SETTINGS.PlayerName
 end
 
 
@@ -97,18 +97,18 @@ function functions.SaveGame()
     local savedir = love.filesystem.getSource()
 
     savefile = savedir .. "/" .. "landers.dat"
-    serialisedString = bitser.dumps(garrLanders)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(LANDERS)
+    success, message = Nativefs.write(savefile, serialisedString )
 
     savefile = savedir .. "/" .. "ground.dat"
-    serialisedString = bitser.dumps(garrGround)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(GROUND)
+    success, message = Nativefs.write(savefile, serialisedString )
 
     savefile = savedir .. "/" .. "objects.dat"
-    serialisedString = bitser.dumps(garrObjects)
-    success, message = nativefs.write(savefile, serialisedString )
+    serialisedString = Bitser.dumps(OBJECTS)
+    success, message = Nativefs.write(savefile, serialisedString )
 
-	lovelyToasts.show("Game saved",3, "middle")
+	LovelyToasts.show("Game saved",3, "middle")
 
 end
 
@@ -125,7 +125,7 @@ function functions.LoadGame()
 
     savefile = savedir .. "/" .. "landers.dat"
 
-	if love.filesystem.getInfo(savefile) ~= nil then
+	if not love.filesystem.getInfo(savefile) then
 	    contents, size = nativefs.read(savefile)
 	    garrLanders = bitser.loads(contents)
 	else
@@ -133,7 +133,7 @@ function functions.LoadGame()
 	end
 
     savefile = savedir .. "/" .. "ground.dat"
-	if love.filesystem.getInfo(savefile) ~= nil then
+	if not love.filesystem.getInfo(savefile) then
 		contents, size = nativefs.read(savefile)
 	    garrGround = bitser.loads(contents)
 	else
@@ -141,7 +141,7 @@ function functions.LoadGame()
 	end
 
     savefile = savedir .. "/" .. "objects.dat"
-	if love.filesystem.getInfo(savefile) ~= nil then
+	if not love.filesystem.getInfo(savefile) then
 		contents, size = nativefs.read(savefile)
 	    garrObjects = bitser.loads(contents)
 	else
@@ -156,11 +156,11 @@ end
 
 
 function functions.CalculateScore()
-	local score = garrLanders[1].x - gintOriginX
+	local score = LANDERS[1].x - ORIGIN_X
 
-	if score > garrGameSettings.HighScore then
-		garrGameSettings.HighScore = score
-		fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
+	if score > GAME_SETTINGS.HighScore then
+		GAME_SETTINGS.HighScore = score
+		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
 	end
 
 	return score
@@ -177,7 +177,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	local absdist
 	local dist
 
-	for k,v in pairs(garrObjects) do
+	for k,v in pairs(OBJECTS) do
 		if v.objecttype == intBaseType then
 			absdist = math.abs(xvalue - (v.x + 85))			-- the + bit is an offset to calculate the landing pad and not the image
 			dist = (xvalue - (v.x + 85))						-- same but without the math.abs
@@ -200,13 +200,13 @@ function functions.HandleSockets(dt)
 
 	-- add lander info to the outgoing queue
 	local msg = {}
-	msg.x = garrLanders[1].x
-	msg.y = garrLanders[1].y
-	msg.angle = garrLanders[1].angle
-	msg.name = garrLanders[1].name
+	msg.x = LANDERS[1].x
+	msg.y = LANDERS[1].y
+	msg.angle = LANDERS[1].angle
+	msg.name = LANDERS[1].name
 	-- ** msg is set here and sent across UDP below
 
-	if gbolIsAHost then
+	if IS_A_HOST then
 
 		ss.hostListenPort()
 
@@ -217,11 +217,11 @@ function functions.HandleSockets(dt)
 					msg = {}
 					msg.name = "ConnectionAccepted"
 				else
-					garrLanders[2] = {}			--! super big flaw: this hardcodes garrLanders[2]
-					garrLanders[2].x = incoming.x
-					garrLanders[2].y = incoming.y
-					garrLanders[2].angle = incoming.angle
-					garrLanders[2].name = incoming.name
+					LANDERS[2] = {}			--! super big flaw: this hardcodes LANDERS[2]
+					LANDERS[2].x = incoming.x
+					LANDERS[2].y = incoming.y
+					LANDERS[2].angle = incoming.angle
+					LANDERS[2].name = incoming.name
 				end
 			end
 		until incoming == nil
@@ -229,21 +229,21 @@ function functions.HandleSockets(dt)
 		msg = {}
 	end
 
-	if gbolIsAClient then
+	if IS_A_CLIENT then
 		repeat
 			if incoming ~= nil then
 				if incoming.name == "ConnectionAccepted" then
 					gbolIsConnected = true
-					if garrCurrentScreen[#garrCurrentScreen] == "MainMenu" then
-						fun.SaveGameSettings()
-						fun.AddScreen("World")
+					if CURRENT_SCREEN[#CURRENT_SCREEN] == "MainMenu" then
+						Fun.SaveGameSettings()
+						Fun.AddScreen("World")
 					end
 				else
-					garrLanders[2] = {}
-					garrLanders[2].x = incoming.x
-					garrLanders[2].y = incoming.y
-					garrLanders[2].angle = incoming.angle
-					garrLanders[2].name = incoming.name
+					LANDERS[2] = {}
+					LANDERS[2].x = incoming.x
+					LANDERS[2].y = incoming.y
+					LANDERS[2].angle = incoming.angle
+					LANDERS[2].name = incoming.name
 				end
 			end
 		until incoming == nil
@@ -253,14 +253,14 @@ end
 
 function functions.ResetGame()
 
-	garrGround = {}
-	garrObjects = {}
+	GROUND = {}
+	OBJECTS = {}
 
 	-- ensure Terrain.init appears before Lander.create
 	Terrain.init()
 
-	garrLanders = {}
-	table.insert(garrLanders, Lander.create())
+	LANDERS = {}
+	table.insert(LANDERS, Lander.create())
 
 end
 

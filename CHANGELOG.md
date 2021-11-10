@@ -31,6 +31,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - save game bug
 - fixed game over not triggering (again)
 - loading a game that doesn't exist no longer crashes the game
+- rangefinder fixed
 
 
 ## v0.10

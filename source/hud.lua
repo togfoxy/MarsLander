@@ -10,7 +10,7 @@ HUD.font = love.graphics.newFont(20)
 
 -- TODO: Create variables in a init or create function
 -- Fuel indicator elements
-HUD.fuel = {x = 20, y = 20, width = gintScreenWidth - 40, height = 50, cornerSize = 15}
+HUD.fuel = {x = 20, y = 20, width = SCREEN_WIDTH - 40, height = 50, cornerSize = 15}
 HUD.fuel.middle = HUD.fuel.x + math.floor(HUD.fuel.width / 2)
 HUD.fuel.bottom = HUD.fuel.y + HUD.fuel.height
 HUD.fuel.text = {image=love.graphics.newText(HUD.font, "FUEL")}
@@ -59,7 +59,7 @@ local function drawOffscreenIndicator(lander)
     love.graphics.setLineWidth(3)
     local indicatorY = 40
     local magnifier = 1.5
-    local x, y = lander.x - gintWorldOffset, ship.height + indicatorY
+    local x, y = lander.x - WORLD_OFFSET, ship.height + indicatorY
     if lander.y < 0 then
         love.graphics.draw(ship.image, x, y, math.rad(lander.angle), magnifier, magnifier, ship.width/2, ship.height/2)
         love.graphics.circle("line", x, y, ship.height + 5)
@@ -76,7 +76,7 @@ end
 
 local function drawMoney(lander)
 	Assets.setFont("font20")
-	love.graphics.print("$" .. lander.money, gintScreenWidth - 100, 75)
+	love.graphics.print("$" .. lander.money, SCREEN_WIDTH - 100, 75)
 end
 
 
@@ -86,18 +86,26 @@ local function drawRangefinder(lander)
 	local module = Modules.rangefinder
 	if Lander.hasUpgrade(lander, module) then
 
-		local rawDistance = fun.GetDistanceToClosestBase(lander.x, enum.basetypeFuel)
-		local distance = math.abs(cf.round(rawDistance, 0))
-		Assets.setFont("font20")
-
+		local rawDistance, _ = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
+		-- limit the rangefinder to a maximum distance
+		if rawDistance < Enum.rangefinderMaximumDistance * -1 then
+			rawDistance = Enum.rangefinderMaximumDistance * -1
+		end
+		if rawDistance > Enum.rangefinderMaximumDistance then
+			rawDistance = Enum.rangefinderMaximumDistance
+		end	
+		
+		local absDistance = math.abs(Cf.round(rawDistance, 0))
+		
 		-- don't draw if close to base
-		if distance > 100 then
-			local halfScreenW = gintScreenWidth / 2
+		if absDistance > 100 then
+			local halfScreenW = SCREEN_WIDTH / 2
 			if rawDistance <= 0 then
+				Assets.setFont("font20")
 				-- closest base is to the right (forward)
-				love.graphics.print("--> " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
+				love.graphics.print("--> " .. absDistance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
 			else
-				love.graphics.print("<-- " .. distance, halfScreenW - 75, gintScreenHeight * 0.90)
+				love.graphics.print("<-- " .. absDistance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
 			end
 		end
 	end
@@ -105,12 +113,11 @@ end
 
 
 
-
 local function drawHealthIndicator(lander)
 	-- lander.health reports health from 0 (dead) to 100 (best health)
 	local indicatorLength = lander.health * -1
-	local x  = gintScreenWidth - 30
-	local y  = gintScreenHeight * 0.33
+	local x  = SCREEN_WIDTH - 30
+	local y  = SCREEN_HEIGHT * 0.33
 	local width = 10
 	local height = indicatorLength
 
@@ -126,8 +133,8 @@ end
 
 local function drawShopMenu()
 	-- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
-	local gameOver = garrLanders[1].gameOver
-	local isOnLandingPad = Lander.isOnLandingPad(garrLanders[1], enum.basetypeFuel)
+	local gameOver = LANDERS[1].gameOver
+	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], Enum.basetypeFuel)
 	if not gameOver and isOnLandingPad then
 
 		Assets.setFont("font20")
@@ -138,12 +145,12 @@ local function drawShopMenu()
 			itemListString = string.format(string, module.id, module.name, module.cost)
 			-- Draw list of modules
 			local color = {1, 1, 1, 1}
-			local y = gintScreenHeight * 0.33
-			if Lander.hasUpgrade(garrLanders[1], module) then
+			local y = SCREEN_HEIGHT * 0.33
+			if Lander.hasUpgrade(LANDERS[1], module) then
 				color = {.8, .1, .1, .5}
 			end
 			love.graphics.setColor(color)
-			love.graphics.printf(itemListString, 0, y + (20*module.id), gintScreenWidth, "center")
+			love.graphics.printf(itemListString, 0, y + (20*module.id), SCREEN_WIDTH, "center")
 			love.graphics.setColor(1, 1, 1, 1)
 		end
 	end
@@ -156,8 +163,8 @@ local function drawGameOver()
     local text = "You are out of fuel. Game over. Press R to reset"
 
 	-- try to get centre of screen
-    local x = (gintScreenWidth / 2) - 150
-    local y = gintScreenHeight * 0.33
+    local x = (SCREEN_WIDTH / 2) - 150
+    local y = SCREEN_HEIGHT * 0.33
     love.graphics.print(text, x, y)
 end
 
@@ -165,39 +172,39 @@ end
 
 local function drawScore()
 	-- score is simply the amount of forward distance travelled (lander.x)
-	local roundedScore = cf.round(fun.CalculateScore())
-	local score = cf.strFormatThousand(roundedScore)
-	local highScore = cf.strFormatThousand(tonumber(cf.round(garrGameSettings.HighScore)))
+	local roundedScore = Cf.round(Fun.CalculateScore())
+	local score = Cf.strFormatThousand(roundedScore)
+	local highScore = Cf.strFormatThousand(tonumber(Cf.round(GAME_SETTINGS.HighScore)))
 
 	Assets.setFont("font14")
-	love.graphics.printf("Score: " .. score, 0, 75, gintScreenWidth, "center")
-	love.graphics.printf("High Score: " .. highScore, 0, 90, gintScreenWidth, "center")
+	love.graphics.printf("Score: " .. score, 0, 75, SCREEN_WIDTH, "center")
+	love.graphics.printf("High Score: " .. highScore, 0, 90, SCREEN_WIDTH, "center")
 end
 
 
 
 local function drawDebug()
 	Assets.setFont("font14")
-	local lander = garrLanders[1]
+	local lander = LANDERS[1]
 
-	love.graphics.print("Mass = " .. cf.round(Lander.getMass(lander), 2), 5, 75)
-	love.graphics.print("Fuel = " .. cf.round(lander.fuel, 2), 5, 90)
+	love.graphics.print("Mass = " .. Cf.round(Lander.getMass(lander), 2), 5, 75)
+	love.graphics.print("Fuel = " .. Cf.round(lander.fuel, 2), 5, 90)
 	love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 120)
-	love.graphics.print("MEM: " .. cf.round(collectgarbage("count")), 10, 140)
-	love.graphics.print("Ground: " .. #garrGround, 10, 160)
-	love.graphics.print("Objects: " .. #garrObjects, 10, 180)
-	love.graphics.print("WorldOffsetX: " .. gintWorldOffset, 10, 200)
-	--love.graphics.print(cf.round(garrLanders[1].x,0), garrLanders[1].x - gintWorldOffset, garrLanders[1].y + 25)
+	love.graphics.print("MEM: " .. Cf.round(collectgarbage("count")), 10, 140)
+	love.graphics.print("Ground: " .. #GROUND, 10, 160)
+	love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
+	love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
+	--love.graphics.print(Cf.round(LANDERS[1].x,0), LANDERS[1].x - WORLD_OFFSET, LANDERS[1].y + 25)
 end
 
 
 
 local function drawPortInformation()
-	if gbolIsAHost then
+	if IS_A_HOST then
 		love.graphics.setColor(1,1,1,0.50)
 		Assets.setFont("font14")
-		local txt = "Hosting on port: " .. HOST_IP_ADDRESS .. ":" .. garrGameSettings.hostPort
-		love.graphics.printf(txt, 0, 5, gintScreenWidth, "center")
+		local txt = "Hosting on port: " .. HOST_IP_ADDRESS .. ":" .. GAME_SETTINGS.hostPort
+		love.graphics.printf(txt, 0, 5, SCREEN_WIDTH, "center")
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 end
@@ -213,13 +220,13 @@ function HUD.drawPause()
     Assets.setFont("font18")
     love.graphics.setColor(1,1,1,1)
     local text = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
-    love.graphics.print(text, gintScreenWidth / 2 - 200, gintScreenHeight /2)
+    love.graphics.print(text, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT /2)
 end
 
 
 
 function HUD.draw()
-	local lander = garrLanders[1]
+	local lander = LANDERS[1]
 	drawFuelIndicator(lander)
 	drawHealthIndicator(lander)
 	drawScore()
@@ -234,7 +241,7 @@ function HUD.draw()
 		drawShopMenu()
 	end
 
-	if gbolDebug then
+	if DEBUG then
 		drawDebug()
 	end
 end
