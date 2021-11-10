@@ -86,23 +86,30 @@ local function drawRangefinder(lander)
 	local module = Modules.rangefinder
 	if Lander.hasUpgrade(lander, module) then
 
-		local rawDistance = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
-		local distance = math.abs(Cf.round(rawDistance, 0))
-		Assets.setFont("font20")
-
+		local rawDistance, _ = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
+		-- limit the rangefinder to a maximum distance
+		if rawDistance < Enum.rangefinderMaximumDistance * -1 then
+			rawDistance = Enum.rangefinderMaximumDistance * -1
+		end
+		if rawDistance > Enum.rangefinderMaximumDistance then
+			rawDistance = Enum.rangefinderMaximumDistance
+		end	
+		
+		local absDistance = math.abs(Cf.round(rawDistance, 0))
+		
 		-- don't draw if close to base
-		if distance > 100 then
+		if absDistance > 100 then
 			local halfScreenW = SCREEN_WIDTH / 2
 			if rawDistance <= 0 then
+				Assets.setFont("font20")
 				-- closest base is to the right (forward)
-				love.graphics.print("--> " .. distance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
+				love.graphics.print("--> " .. absDistance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
 			else
-				love.graphics.print("<-- " .. distance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
+				love.graphics.print("<-- " .. absDistance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
 			end
 		end
 	end
 end
-
 
 
 
