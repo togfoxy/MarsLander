@@ -42,7 +42,7 @@ end
 
 function Smoke.update(dt)
 	-- TODO: Don't hardcode the lander into smoke particle creation
-	local lander = garrLanders[1]
+	local lander = LANDERS[1]
 	-- Spawn smoke particles
 	local engineFiring = lander.engineOn or lander.leftEngineOn or lander.rightEngineOn
 	if Smoke.timer <= 0 and engineFiring then
@@ -67,13 +67,12 @@ end
 function Smoke.draw()
 	-- draw smoke trail
 	for key, particle in ipairs(Smoke.particles) do
-        local particle = Smoke.particles[key]
 		--[[ TODO: currently the sprite rotates around it's top left corner and kinda works visually because of the way
 				the frames of the animation are drawn in the actual image file.
 				It would be better to rotate around a center point of the frame and then adjust the position of the
 				sprite to be fixed at a certain location. Some adjustments to the sprite itself might be nessecary.
 		--]]
-		particle.animation:draw(particle.x - gintWorldOffset, particle.y, math.rad(particle.angle))
+		particle.animation:draw(particle.x - WORLD_OFFSET, particle.y, math.rad(particle.angle))
 	end
 end
 

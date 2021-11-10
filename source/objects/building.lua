@@ -39,19 +39,17 @@ function Building.draw()
 
         -- check if on-screen
  		if (objXValue > gintWorldOffset - gintScreenWidth) and objXValue < (gintWorldOffset + gintScreenWidth) then
-            -- Draw building type 1
-			if objectvalue == enum.basetypeBuilding1 then
+        -- Draw building type 1
+			if objectvalue == Enum.basetypeBuilding1 then
 				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
-
 				local x = objXValue - gintWorldOffset
 				local y = garrGround[objXValue] - building1.height
 				love.graphics.draw(building1.image, x, y)
 			end
 			-- Draw building type 2
-			if objectvalue == enum.basetypeBuilding2 then
+			if objectvalue == Enum.basetypeBuilding2 then
 				-- getting an odd 'nil' error probably means that some x value has not been rounded to zero places.
 				local x = objXValue - gintWorldOffset
-
 				local y = garrGround[objXValue] - building2.height
 				love.graphics.draw(building2.image, x, y)
 			end

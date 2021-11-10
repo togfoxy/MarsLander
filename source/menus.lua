@@ -1,17 +1,17 @@
-local menus = {}
+local Menus = {}
 
 
-function menus.DrawMainMenu()
+function Menus.DrawMainMenu()
 
 	local intSlabWidth = 700 -- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 550 	-- the height of the main menu slab
-	local fltSlabWindowX = gintScreenWidth / 2 - intSlabWidth / 2
-	local fltSlabWindowY = gintScreenHeight / 2 - intSlabHeight / 2
+	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
+	local fltSlabWindowY = SCREEN_HEIGHT / 2 - intSlabHeight / 2
 
 	-- try to centre the Slab window
 	-- note: Border is the border between the window and the layout
 	local mainMenuOptions = {
-		Title = "Main menu " .. gstrGameVersion,
+		Title = "Main menu " .. GAME_VERSION,
 		X = fltSlabWindowX,
 		Y = fltSlabWindowY,
 		W = intSlabWidth,
@@ -32,94 +32,97 @@ function menus.DrawMainMenu()
 		Slab.SetLayoutColumn(2)
 
 		Slab.NewLine()
-		Slab.Text("Name: " .. garrGameSettings.PlayerName)
+		Slab.Text("Name: " .. GAME_SETTINGS.PlayerName)
 
 		Slab.NewLine()
 		if Slab.Button("New game",{W=155}) then
-			fun.ResetGame()
-			fun.SaveGameSettings()
-			fun.AddScreen("World")
+			Fun.ResetGame()
+			Fun.SaveGameSettings()
+			Fun.AddScreen("World")
  		end
+
 		Slab.NewLine()
 
 		if Slab.Button("Resume game",{W=155}) then
-			fun.SaveGameSettings()
-			fun.AddScreen("World")
+			Fun.SaveGameSettings()
+			Fun.AddScreen("World")
 		end
-		Slab.NewLine()        
+		Slab.NewLine()
 
 		if Slab.Button("Load game",{W=155}) then
-            fun.LoadGame()
-			fun.SaveGameSettings()
-			fun.AddScreen("World")
+
+      Fun.LoadGame()
+			Fun.SaveGameSettings()
+			Fun.AddScreen("World")
+
 		end
 		Slab.NewLine()
 
 		if Slab.Button("Save game",{W=155}) then
-			fun.SaveGame() 
+			Fun.SaveGame() 
 		end
 		Slab.NewLine()
 
 		if Slab.Button("Settings",{W=155}) then
-			fun.AddScreen("Settings")
+			Fun.AddScreen("Settings")
 		end
 		Slab.NewLine()
 
-		if not gbolIsAClient and not gbolIsAHost then
+		if not IS_A_CLIENT and not IS_A_HOST then
 			if Slab.Button("Host game",{W=155}) then
-				gbolIsAClient = false
-				gbolIsAHost = true
-				garrLanders[1].connectionID = 111	-- random ID. Can be any number (not nil)
-				fun.SaveGameSettings()
+				IS_A_CLIENT = false
+				IS_A_HOST = true
+				LANDERS[1].connectionID = 111	-- random ID. Can be any number (not nil)
+				Fun.SaveGameSettings()
 				EnetHandler.createHost()
-				fun.AddScreen("World")
+				Fun.AddScreen("World")
 			end
 			Slab.NewLine()
 		end
 
-		if gbolIsAHost then
-			Slab.Text("Hosting on port: " .. garrGameSettings.hostPort)
+		if IS_A_HOST then
+			Slab.Text("Hosting on port: " .. GAME_SETTINGS.hostPort)
 			Slab.NewLine()
 		end
 
-		if not gbolIsAHost then
+		if not IS_A_HOST then
 			Slab.Text("Join on IP:")
 			local joinIPOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=garrGameSettings.hostIP,
+				Text=GAME_SETTINGS.hostIP,
 				NumbersOnly=false,
 				NoDrag=true,
-			}			
+			}
 			if Slab.Input('hostIP', joinIPOptions) then
-				garrGameSettings.hostIP = Slab.GetInputText()
+				GAME_SETTINGS.hostIP = Slab.GetInputText()
 			end		
 
 			Slab.Text("Join on port:" )
 			local joinPortOptions = {
 				ReturnOnText=true,
 				W=100,
-				Text=garrGameSettings.hostPort,
+				Text=GAME_SETTINGS.hostPort,
 				NumbersOnly=true,
 				NoDrag=true,
 				MinNumber=22100,
 				MaxNumber=22199
 			}
 			if Slab.Input('HostPort', joinPortOptions) then
-				garrGameSettings.hostPort = Slab.GetInputText() or "22122"
+				GAME_SETTINGS.hostPort = Slab.GetInputText() or "22122"
 			end
 
 			if Slab.Button("Join game",{W=155}) then
-				gbolIsAHost = false
-				gbolIsAClient = true
-				fun.SaveGameSettings()
+				IS_A_HOST = false
+				IS_A_CLIENT = true
+				Fun.SaveGameSettings()
 				EnetHandler.createClient()
 			end
-			Slab.NewLine()		
+			Slab.NewLine()
 		end
 
 		if Slab.Button("Credits",{W=155}) then
-			fun.AddScreen("Credits")		--!
+			Fun.AddScreen("Credits")		--!
 		end
 		Slab.NewLine()
 
@@ -140,12 +143,12 @@ function menus.DrawMainMenu()
 
 end
 
-function menus.DrawCredits()
+function Menus.DrawCredits()
 
 	local intSlabWidth = 550	-- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 500 	-- the height of the main menu slab
-	local fltSlabWindowX = gintScreenWidth / 2 - intSlabWidth / 2
-	local fltSlabWindowY = gintScreenHeight / 2 - intSlabHeight / 2
+	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
+	local fltSlabWindowY = SCREEN_HEIGHT / 2 - intSlabHeight / 2
 
 	local creditBoxOptions = {
 		Title ='About',
@@ -158,7 +161,7 @@ function menus.DrawCredits()
 		W = intSlabWidth,
 		H = intSlabHeight,
 	}
-	local URLOptions = function(url) 
+	local URLOptions = function(url)
 		local option = {}
 		option.URL = url
 		option.IsSelectable = true
@@ -191,8 +194,8 @@ function menus.DrawCredits()
 
 			Slab.Text("Thanks to beta testers:",{Align = 'center'})
 			Slab.NewLine()
-        	Slab.Textf("Boatman",{Align = 'right'})
-        	Slab.Textf("Darth Carcas",{Align = 'right'})
+			Slab.Textf("Boatman",{Align = 'right'})
+			Slab.Textf("Darth Carcas",{Align = 'right'})
 			Slab.Textf("Mini Yum",{Align = 'right'})
 			Slab.NewLine()
 
@@ -204,7 +207,7 @@ function menus.DrawCredits()
 			Slab.Text("tlsfres", URLOptions("https://love2d.org/wiki/TLfres"))
 			Slab.Text("inspect", URLOptions("https://github.com/kikito/inspect.lua"))
 			Slab.Text("freesound.org", URLOptions("https://freesound.org/"))
- 			Slab.Text("Kenney.nl", URLOptions("https://kenney.nl"))
+			Slab.Text("Kenney.nl", URLOptions("https://kenney.nl"))
 			Slab.Text("bitser", URLOptions("https://github.com/gvx/bitser"))
 			Slab.Text("nativefs", URLOptions("https://github.com/megagrump/nativefs"))
 			Slab.Text("anim8", URLOptions("https://github.com/kikito/anim8"))
@@ -228,19 +231,20 @@ function menus.DrawCredits()
 
 			if Slab.Button("Awesome!") then
 				-- return to the previous game state
-				fun.RemoveScreen()
+				Fun.RemoveScreen()
 			end	
+
 		Slab.EndLayout()
 
 	Slab.EndLayout()
 	Slab.EndWindow()
 end
 
-function menus.DrawSettingsMenu()
+function Menus.DrawSettingsMenu()
 	local intSlabWidth = 400	-- the width of the settings window slab.
 	local intSlabHeight = 250 	-- the height of the windowslab
-	local fltSlabWindowX = gintScreenWidth / 2 - intSlabWidth / 2
-	local fltSlabWindowY = gintScreenHeight / 2 - intSlabHeight / 2
+	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
+	local fltSlabWindowY = SCREEN_HEIGHT / 2 - intSlabHeight / 2
 
 	local settingsWindowOptions = {
 		Title ='Game Settings',
@@ -262,17 +266,17 @@ function menus.DrawSettingsMenu()
 		Slab.Textf("Player Settings:")
 		Slab.NewLine()
 		Slab.Textf("Name:")
-		local PlayerName = garrGameSettings.PlayerName
+		local PlayerName = GAME_SETTINGS.PlayerName
 		if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
 			PlayerName = Slab.GetInputText()
 			if PlayerName == "" then
 				-- Blank name isn't allowed, so reset to the default
-				garrLanders[1].name = gstrDefaultPlayerName
+				LANDERS[1].name = DEFAULT_PLAYER_NAME
 			else
 				-- save the current name in the global variable (Yeah its horrible - FIXME)
-				garrLanders[1].name = PlayerName
-				gstrCurrentPlayerName = PlayerName
-				garrGameSettings.PlayerName = PlayerName
+				LANDERS[1].name = PlayerName
+				CURRENT_PLAYER_NAME = PlayerName
+				GAME_SETTINGS.PlayerName = PlayerName
 			end
 		end
 		Slab.NewLine()
@@ -280,10 +284,10 @@ function menus.DrawSettingsMenu()
 
 		Slab.NewLine()
 		Slab.Text("Game Settings:")
-		if Slab.CheckBox(garrGameSettings.FullScreen, "Full Screen") then
-			garrGameSettings.FullScreen = not garrGameSettings.FullScreen
-			love.window.setFullscreen(garrGameSettings.FullScreen)
-			fun.SaveGameSettings()
+		if Slab.CheckBox(GAME_SETTINGS.FullScreen, "Full Screen") then
+			GAME_SETTINGS.FullScreen = not GAME_SETTINGS.FullScreen
+			love.window.setFullscreen(GAME_SETTINGS.FullScreen)
+			Fun.SaveGameSettings()
 		end
 
 		Slab.NewLine()
@@ -292,11 +296,11 @@ function menus.DrawSettingsMenu()
 		Slab.NewLine()
 		if Slab.Button("OK") then
 			-- return to the previous game state
-			fun.RemoveScreen()
+			Fun.RemoveScreen()
 		end
 
 		Slab.EndLayout() -- layout-settings
 	Slab.EndWindow()
 end
 
-return menus
+return Menus
