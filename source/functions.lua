@@ -149,6 +149,7 @@ function functions.LoadGame()
 
 	if error then
 		-- a file is missing, so display a popup on a new game
+		Fun.ResetGame()
 		LovelyToasts.show("ERROR: Unable to load game!", 3, "middle")
 	end
 end
