@@ -13,7 +13,7 @@ local Base = {}
 -- Local Variables
 -- ~~~~~~~~~~~~~~~~
 
-local landingLights     = Assets.getImageSet("landingLights")
+local landingLights     = Assets.getImageSet("landingLights2")
 landingLights.animation = Assets.newAnimation("landingLights", landingLights.image, 64, 8, 1, '1-4', 0.5)
 
 local baseOn    = Assets.getImageSet("fuelbaseOn")
@@ -42,7 +42,7 @@ function Base.draw()
         local objectvalue = v.objecttype
 
         -- check if on-screen
-        if xvalue > WORLD_OFFSET - 100 or xvalue < WORLD_OFFSET + SCREEN_WIDTH then
+        if (xvalue > WORLD_OFFSET - SCREEN_WIDTH) and (xvalue < WORLD_OFFSET + SCREEN_WIDTH) then
             -- draw image based on object type
             if objectvalue == Enum.basetypeFuel then
                 local baseX = xvalue - WORLD_OFFSET
