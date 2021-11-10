@@ -4,15 +4,15 @@ All notable changes to this project should be documented in this file.
 
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
+
 ## UNRELEASED
+
 ### Added
 - added the 'wrong' sound in an additional place in the shop
 
 
 
-
 ### Changed
-
 - removed the generation of buildings for now. Intend to put them back in soon
 - buildings are now being generated again
 - buildings and fuel bases are determined on demand and not up-front
@@ -20,7 +20,6 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - major code re-organization and optimization
 - 'p' now unpauses the game
 - restored the original 'wrong' sound as it is better
-
 
 
 
@@ -35,6 +34,8 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - loading a game that doesn't exist no longer crashes the game
 - rangefinder fixed
 - fixed the '$' sign in the shop
+- Fix smoke particles not being removed after starting a new game
+
 
 
 ## v0.10
