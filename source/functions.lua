@@ -258,13 +258,14 @@ end
 
 
 function functions.ResetGame()
+-- this resets the game for all landers - including multiplayer landers
 
-	GROUND = {}
-	OBJECTS = {}
-	Smoke.destroy()
+	-- GROUND = {}
+	OBJECTS = {}	-- TODO: don't reset whole table but instead reset status, fuel amounts etc.
+	-- Smoke.destroy()
 
 	-- ensure Terrain.init appears before Lander.create
-	Terrain.init()
+	-- Terrain.init()
 
 	LANDERS = {}
 	table.insert(LANDERS, Lander.create())

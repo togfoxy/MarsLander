@@ -330,6 +330,48 @@ end
 
 
 
+function Lander.reset(lander)
+-- resets a single lander. Used in multiplayer mode when you don't want to reset every lander.
+-- this function largely follows same behaviour as the CREATE function
+
+	lander.x = ORIGIN_X
+	lander.y = GROUND[lander.x] - 8
+	-- lander.connectionID = nil	-- used by enet
+	-- 270 = up
+	lander.angle = 270
+	lander.vx = 0
+	lander.vy = 0
+	lander.engineOn = false
+	lander.leftEngineOn = false
+	lander.rightEngineOn = false
+	lander.onGround = false
+	-- Health in percent
+	lander.health = 100
+	lander.money = 0
+	lander.gameOver = false
+	lander.score = lander.x - ORIGIN_X
+	-- lander.name = name or CURRENT_PLAYER_NAME
+
+	-- mass
+	lander.mass = {}
+	-- base mass of lander
+	table.insert(lander.mass, 100)
+	-- volume in arbitrary units
+	lander.fuelCapacity = 25
+	-- start with a full tank
+	lander.fuel = lander.fuelCapacity
+	-- this is the mass of an empty tank
+	table.insert(lander.mass, 20)
+	-- this is the mass of the rangefinder (not yet purchased)
+	table.insert(lander.mass, 0)
+
+	-- modules
+	-- this will be strings/names of modules
+	lander.modules = {}
+end
+
+
+
 function Lander.getMass(lander)
 	-- return the mass of all the bits on the lander
     local result = 0
@@ -370,6 +412,19 @@ end
 
 
 
+local function updateScore(lander)
+-- updates the lander score that is saved in the lander table
+-- this is the same as functions.CalculateScore(). Intention is to deprecate and remove that function and use this.
+-- this procedure does not return the score. It updates the lander table
+	lander.score = lander.x - ORIGIN_X
+	if lander.score > GAME_SETTINGS.HighScore then
+		GAME_SETTINGS.HighScore = score
+		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
+	end
+end
+
+
+
 function Lander.update(lander, dt)
     if keyDown("up") or keyDown("w") or keyDown("kp8") then
         doThrust(lander, dt)
@@ -398,6 +453,8 @@ function Lander.update(lander, dt)
     moveShip(lander, dt)
     playSoundEffects(lander)
     checkForContact(lander, dt)
+	updateScore(lander)
+	
 end
 
 

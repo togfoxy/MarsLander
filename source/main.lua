@@ -202,6 +202,9 @@ function love.load()
 
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
+	
+	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
+	Terrain.init()	
 	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
@@ -287,15 +290,19 @@ function love.keypressed(key, scancode, isrepeat)
 	if key == "escape" then
 		Fun.RemoveScreen()
 	elseif strCurrentScreen == "World" then
-		-- Restart the game
+		-- Restart the game. Different to reset a single lander
 		if key == "r" then
-			if LANDERS[1].gameOver then
-				Fun.ResetGame()
-			end
+			Fun.ResetGame()
+				
+		-- restart just the player lander (for mulitplayer)
+		elseif key == "kpenter" or key == "return" then
+			Lander.reset(LANDERS[1])
+			
 		-- Pause the game
 		elseif key == "p" then
 			Fun.AddScreen("Pause")
-			-- Open options menu
+			
+		-- Open options menu
 		elseif key == "o" then
 			Fun.AddScreen("Settings")
 		end

@@ -171,14 +171,20 @@ end
 
 
 local function drawScore()
-	-- score is simply the amount of forward distance travelled (lander.x)
-	local roundedScore = Cf.round(Fun.CalculateScore())
-	local score = Cf.strFormatThousand(roundedScore)
-	local highScore = Cf.strFormatThousand(tonumber(Cf.round(GAME_SETTINGS.HighScore)))
-
+	-- score is simply the amount of forward distance travelled (lander.score)
+	local x = SCREEN_WIDTH - 100
+	local y = SCREEN_HEIGHT * 0.20
+	local lineLength = 100	-- printf will wrap after this point
+	local alignment	= "right"
+	
 	Assets.setFont("font14")
-	love.graphics.printf("Score: " .. score, 0, 75, SCREEN_WIDTH, "center")
-	love.graphics.printf("High Score: " .. highScore, 0, 90, SCREEN_WIDTH, "center")
+	for _,lander in pairs(LANDERS) do
+		local roundedScore = Cf.round(lander.score)
+		local formattedScore = Cf.strFormatThousand(roundedScore)		
+		local tempString = lander.name .. ": " .. formattedScore
+		love.graphics.printf(tempString,x,y, lineLength, alignment)
+		y = y + 35	-- prep the y value for the next score (will be ignored for single player)
+	end
 end
 
 

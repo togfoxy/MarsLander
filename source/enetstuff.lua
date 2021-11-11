@@ -24,6 +24,8 @@ function EnetHandler.createHost()
 		local newLander = Lander.create()
 		newLander.connectionID = client:getConnectId()
 		table.insert(LANDERS, newLander)
+		
+		LovelyToasts.show("Client connected",3, "top")
 	end)
 	
 	server:on("clientdata", function(lander, clientInfo)
@@ -42,6 +44,8 @@ end
 
 function EnetHandler.createClient()
 -- called by menu
+
+	LovelyToasts.show("Trying to connect ...",3, "middle")
 
 	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
 	
@@ -64,14 +68,15 @@ function EnetHandler.createClient()
 	end)
 	
 	client:on("peerupdate", function(peerLander)
-		if LANDERS[1].connectionID == peerLander.connectionID then
-			-- nothing to do
-		else
+		-- have received information about other peers
+		-- cycle through list of known peers
+		-- if peer is new (unknown) then update list of known peers
+		if LANDERS[1].connectionID ~= peerLander.connectionID then
 			local isLanderFound = false
 			local myindex
-			for k,v in pairs(LANDERS) do
+			for k,lander in pairs(LANDERS) do
 				myindex = k
-				if v.connectionID == peerLander.connectionID then
+				if lander.connectionID == peerLander.connectionID or LANDERS[1].connectionID ~= peerLander.connectionID then
 					isLanderFound = true
 					break
 				end
@@ -94,7 +99,23 @@ function EnetHandler.update(dt)
 		if timerHostSendTimer <= 0 then
 			timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 			for _, lander in pairs(LANDERS) do
-				server:sendToAll("peerupdate",lander)
+				-- could send the whole LANDERS element
+				-- but better to send a skinny version
+				local skinnyLander = {}
+				skinnyLander = lander.x 
+				skinnyLander = lander.y
+				skinnyLander = lander.angle
+				skinnyLander = lander.engineOn
+				skinnyLander = lander.leftEngineOn
+				skinnyLander = lander.rightEngineOn
+				-- Health in percent
+				-- skinnyLander = lander.health		-- to be incorporated later
+				skinnyLander = lander.score
+				skinnyLander = lander.name
+				-- modules
+				-- skinnyLander = lander.modules	-- to be incorporated later			
+						
+				server:sendToAll("peerupdate",skinnyLander)
 			end
 		end
 		
