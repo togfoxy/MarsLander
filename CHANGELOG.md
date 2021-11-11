@@ -19,7 +19,8 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - each lander's score is now saved in the lander table and refreshed during Lander.update
 - 
 ### Fixed
-
+- fixed a runtime bug with getNextBase function
+- removed redundant code that wasn't being called
 
 ## v0.10
 ### Added
