@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "0.11"
+GAME_VERSION = "0.12"
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -162,11 +162,15 @@ local function drawWorld()
 	Building.draw()
 	Base.draw()
 	-- draw the lander
+	assert(LANDERS[1].fuel ~= nil)
 	Lander.draw()
+	assert(LANDERS[1].fuel ~= nil)
 	-- Draw smoke particles
 	Smoke.draw()
 	-- draw HUD elements
+	assert(LANDERS[1].fuel ~= nil)
 	HUD.draw()
+	assert(LANDERS[1].fuel ~= nil)
 end
 
 
@@ -176,6 +180,10 @@ end
 
 function love.load()
     if love.filesystem.isFused() then
+	
+		-- nullify the assert function for performance reasons
+		function assert() end
+	
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
         love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
@@ -197,7 +205,7 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
-assert(GAME_SETTINGS.HighScore ~= nil)
+
 	-- Restore full screen setting
 	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
 
@@ -259,7 +267,9 @@ function love.draw()
 	end
 
 	if strCurrentScreen == "World" then
+		assert(LANDERS[1].fuel ~= nil)
 		drawWorld()
+		assert(LANDERS[1].fuel ~= nil)
 	end
 
 	if strCurrentScreen == "Credits" then

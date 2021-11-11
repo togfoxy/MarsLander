@@ -45,6 +45,8 @@ end
 function EnetHandler.createClient()
 -- called by menu
 
+print("alpha : " .. LANDERS[1].name)
+
 	LovelyToasts.show("Trying to connect ...",3, "middle")
 
 	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
@@ -90,6 +92,7 @@ function EnetHandler.createClient()
 	end)
 	
 	client:connect()
+print("bravo : " .. LANDERS[1].name)
 end
 
 function EnetHandler.update(dt)
@@ -102,16 +105,16 @@ function EnetHandler.update(dt)
 				-- could send the whole LANDERS element
 				-- but better to send a skinny version
 				local skinnyLander = {}
-				skinnyLander = lander.x 
-				skinnyLander = lander.y
-				skinnyLander = lander.angle
-				skinnyLander = lander.engineOn
-				skinnyLander = lander.leftEngineOn
-				skinnyLander = lander.rightEngineOn
+				skinnyLander.x = lander.x 
+				skinnyLander.y = lander.y
+				skinnyLander.angle = lander.angle
+				skinnyLander.engineOn = lander.engineOn
+				skinnyLander.leftEngineOn = lander.leftEngineOn
+				skinnyLander.rightEngineOn = lander.rightEngineOn
 				-- Health in percent
 				-- skinnyLander = lander.health		-- to be incorporated later
-				skinnyLander = lander.score
-				skinnyLander = lander.name
+				skinnyLander.score = lander.score
+				skinnyLander.name = lander.name
 				-- modules
 				-- skinnyLander = lander.modules	-- to be incorporated later			
 						

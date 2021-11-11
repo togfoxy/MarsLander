@@ -60,8 +60,6 @@ function functions.LoadGameSettings()
 		GAME_SETTINGS = {}
 	end
 
-print(GAME_SETTINGS.HighScore)
-
 	--[[ FIXME:
 	-- This is horrible bugfix and needs refactoring. If a player doesn't have
 	-- a settings.dat already then all the values in GAME_SETTINGS table are
@@ -82,8 +80,6 @@ print(GAME_SETTINGS.HighScore)
 	if GAME_SETTINGS.HighScore == nil then
 		GAME_SETTINGS.HighScore = 0
 	end
-
-print(GAME_SETTINGS.HighScore)
 
 	-- Set the gloal player name to the new value
 	CURRENT_PLAYER_NAME = GAME_SETTINGS.PlayerName
@@ -171,6 +167,7 @@ function functions.CalculateScore()
 end
 
 
+
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
 -- if there are no bases (impossible) then the distance value returned will be -1
@@ -205,61 +202,6 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 
 end
 
-
-
-function functions.HandleSockets(dt)
-
-	-- add lander info to the outgoing queue
-	local msg = {}
-	msg.x = LANDERS[1].x
-	msg.y = LANDERS[1].y
-	msg.angle = LANDERS[1].angle
-	msg.name = LANDERS[1].name
-	-- ** msg is set here and sent across UDP below
-
-	if IS_A_HOST then
-
-		ss.hostListenPort()
-
-		repeat
-			if incoming ~= nil then
-				if incoming.name == "ConnectionRequest" then
-					gbolIsConnected = true
-					msg = {}
-					msg.name = "ConnectionAccepted"
-				else
-					LANDERS[2] = {}			--! super big flaw: this hardcodes LANDERS[2]
-					LANDERS[2].x = incoming.x
-					LANDERS[2].y = incoming.y
-					LANDERS[2].angle = incoming.angle
-					LANDERS[2].name = incoming.name
-				end
-			end
-		until incoming == nil
-
-		msg = {}
-	end
-
-	if IS_A_CLIENT then
-		repeat
-			if incoming ~= nil then
-				if incoming.name == "ConnectionAccepted" then
-					gbolIsConnected = true
-					if CURRENT_SCREEN[#CURRENT_SCREEN] == "MainMenu" then
-						Fun.SaveGameSettings()
-						Fun.AddScreen("World")
-					end
-				else
-					LANDERS[2] = {}
-					LANDERS[2].x = incoming.x
-					LANDERS[2].y = incoming.y
-					LANDERS[2].angle = incoming.angle
-					LANDERS[2].name = incoming.name
-				end
-			end
-		until incoming == nil
-	end
-end
 
 
 function functions.ResetGame()

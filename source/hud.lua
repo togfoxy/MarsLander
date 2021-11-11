@@ -34,6 +34,10 @@ local function drawFuelIndicator(lander)
 	-- refactored by Fox
 
     -- Fuel indicator
+	
+print(lander.name, lander.fuel, lander.fuelCapacity)
+	assert(lander.fuel ~= nil)
+
     local grad = lander.fuel / lander.fuelCapacity
     local color = {1, grad, grad}
 	local x, y = HUD.fuel.x, HUD.fuel.y
@@ -200,7 +204,6 @@ local function drawDebug()
 	love.graphics.print("Ground: " .. #GROUND, 10, 160)
 	love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
 	love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
-	--love.graphics.print(Cf.round(LANDERS[1].x,0), LANDERS[1].x - WORLD_OFFSET, LANDERS[1].y + 25)
 end
 
 
@@ -233,7 +236,9 @@ end
 
 function HUD.draw()
 	local lander = LANDERS[1]
+	assert(lander.fuel ~= nil)
 	drawFuelIndicator(lander)
+	assert(lander.fuel ~= nil)
 	drawHealthIndicator(lander)
 	drawScore()
 	drawOffscreenIndicator(lander)

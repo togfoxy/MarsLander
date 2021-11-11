@@ -111,6 +111,8 @@ local function moveShip(lander, dt)
 		LANDER_VY = lander.vy
 		LANDER_VX = lander.vx
 	end
+	
+	lander.x = Cf.round(lander.x,0)
 end
 
 
@@ -290,7 +292,7 @@ end
 function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
-	lander.x = ORIGIN_X
+	lander.x = Cf.round(ORIGIN_X,0)
 	lander.y = GROUND[lander.x] - 8
 	lander.connectionID = nil	-- used by enet
 	-- 270 = up
@@ -334,7 +336,7 @@ function Lander.reset(lander)
 -- resets a single lander. Used in multiplayer mode when you don't want to reset every lander.
 -- this function largely follows same behaviour as the CREATE function
 
-	lander.x = ORIGIN_X
+	lander.x = Cf.round(ORIGIN_X,0)
 	lander.y = GROUND[lander.x] - 8
 	-- lander.connectionID = nil	-- used by enet
 	-- 270 = up
@@ -469,7 +471,7 @@ function Lander.draw()
 	for landerId, lander in pairs(LANDERS) do
 		local sx, sy = 1.5, 1.5
 
-print(lander.x)
+		assert(lander.x ~= nil)
 
 		local x = lander.x - WORLD_OFFSET
 		local y = lander.y
