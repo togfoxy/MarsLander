@@ -197,6 +197,7 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
+assert(GAME_SETTINGS.HighScore ~= nil)
 	-- Restore full screen setting
 	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
 

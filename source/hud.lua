@@ -172,9 +172,9 @@ end
 
 local function drawScore()
 	-- score is simply the amount of forward distance travelled (lander.score)
-	local x = SCREEN_WIDTH - 100
+	local lineLength = 150	-- printf will wrap after this point
+	local x = SCREEN_WIDTH - 15 - lineLength	-- the 15 is an asthetic margin from the right edge
 	local y = SCREEN_HEIGHT * 0.20
-	local lineLength = 100	-- printf will wrap after this point
 	local alignment	= "right"
 	
 	Assets.setFont("font14")

@@ -60,6 +60,8 @@ function functions.LoadGameSettings()
 		GAME_SETTINGS = {}
 	end
 
+print(GAME_SETTINGS.HighScore)
+
 	--[[ FIXME:
 	-- This is horrible bugfix and needs refactoring. If a player doesn't have
 	-- a settings.dat already then all the values in GAME_SETTINGS table are
@@ -80,6 +82,8 @@ function functions.LoadGameSettings()
 	if GAME_SETTINGS.HighScore == nil then
 		GAME_SETTINGS.HighScore = 0
 	end
+
+print(GAME_SETTINGS.HighScore)
 
 	-- Set the gloal player name to the new value
 	CURRENT_PLAYER_NAME = GAME_SETTINGS.PlayerName
@@ -172,8 +176,8 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- if there are no bases (impossible) then the distance value returned will be -1
 -- note: if distance is a negative value then the Lander has not yet passed the base
 
-	local closestdistance = 0
-	local closestbase
+	local closestdistance = -1
+	local closestbase = {}
 	local absdist
 	local dist
 	local realdist
@@ -182,9 +186,9 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 		if v.objecttype == intBaseType then
 			-- the + bit is an offset to calculate the landing pad and not the image
 			absdist = math.abs(xvalue - (v.x + 85))
-			-- same but without the math.abs
+			-- same but without the math.abs)
 			dist = (xvalue - (v.x + 85))
-			if closestdistance == 0 or absdist <= closestdistance then
+			if closestdistance == -1 or absdist <= closestdistance then
 				closestdistance = absdist
 				closestbase = v
 			end
@@ -200,6 +204,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	return  realdist, closestbase
 
 end
+
 
 
 function functions.HandleSockets(dt)
@@ -261,7 +266,7 @@ function functions.ResetGame()
 -- this resets the game for all landers - including multiplayer landers
 
 	-- GROUND = {}
-	OBJECTS = {}	-- TODO: don't reset whole table but instead reset status, fuel amounts etc.
+	-- OBJECTS = {}	-- TODO: don't reset whole table but instead reset status, fuel amounts etc.
 	-- Smoke.destroy()
 
 	-- ensure Terrain.init appears before Lander.create

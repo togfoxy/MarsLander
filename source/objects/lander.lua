@@ -391,6 +391,7 @@ end
 
 function Lander.isOnLandingPad(lander, baseId)
 	-- returns a true / false value
+
     local baseDistance, _ = Fun.GetDistanceToClosestBase(lander.x, baseId)
     if baseDistance >= -80 and baseDistance <= 40 then
         return true
@@ -416,9 +417,11 @@ local function updateScore(lander)
 -- updates the lander score that is saved in the lander table
 -- this is the same as functions.CalculateScore(). Intention is to deprecate and remove that function and use this.
 -- this procedure does not return the score. It updates the lander table
+	
 	lander.score = lander.x - ORIGIN_X
+
 	if lander.score > GAME_SETTINGS.HighScore then
-		GAME_SETTINGS.HighScore = score
+		GAME_SETTINGS.HighScore = lander.score
 		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
 	end
 end
@@ -453,7 +456,9 @@ function Lander.update(lander, dt)
     moveShip(lander, dt)
     playSoundEffects(lander)
     checkForContact(lander, dt)
+assert(GAME_SETTINGS.HighScore ~= nil)
 	updateScore(lander)
+assert(GAME_SETTINGS.HighScore ~= nil)	
 	
 end
 
@@ -463,6 +468,9 @@ function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(LANDERS) do
 		local sx, sy = 1.5, 1.5
+
+print(lander.x)
+
 		local x = lander.x - WORLD_OFFSET
 		local y = lander.y
 		local ox = ship.width / 2
