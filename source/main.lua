@@ -144,8 +144,12 @@ local background = Assets.getImageSet("background1")
 
 local function drawWallpaper()
 	-- stretch or shrink the image to fit the window
-	local sx = SCREEN_WIDTH / background.width
-	local sy = SCREEN_HEIGHT / background.height
+	
+	-- this is the size of the window
+	local screenwidth, screenheight = love.graphics.getDimensions( )
+	
+	local sx = screenwidth / background.width
+	local sy = screenheight / background.height
 	love.graphics.setColor(1, 1, 1, 0.25)
 	love.graphics.draw(background.image, 0, 0, 0, sx, sy)
 	love.graphics.setColor(1, 1, 1, 1)
