@@ -234,9 +234,7 @@ end
 
 function HUD.draw()
 	local lander = LANDERS[1]
-	assert(lander.fuel ~= nil)
 	drawFuelIndicator(lander)
-	assert(lander.fuel ~= nil)
 	drawHealthIndicator(lander)
 	drawScore()
 	drawOffscreenIndicator(lander)

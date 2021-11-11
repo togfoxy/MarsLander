@@ -162,15 +162,11 @@ local function drawWorld()
 	Building.draw()
 	Base.draw()
 	-- draw the lander
-	assert(LANDERS[1].fuel ~= nil)
 	Lander.draw()
-	assert(LANDERS[1].fuel ~= nil)
 	-- Draw smoke particles
 	Smoke.draw()
 	-- draw HUD elements
-	assert(LANDERS[1].fuel ~= nil)
 	HUD.draw()
-	assert(LANDERS[1].fuel ~= nil)
 end
 
 
@@ -267,9 +263,7 @@ function love.draw()
 	end
 
 	if strCurrentScreen == "World" then
-		assert(LANDERS[1].fuel ~= nil)
 		drawWorld()
-		assert(LANDERS[1].fuel ~= nil)
 	end
 
 	if strCurrentScreen == "Credits" then
