@@ -112,7 +112,7 @@ local function moveShip(lander, dt)
 		LANDER_VX = lander.vx
 	end
 	
-	lander.x = Cf.round(lander.x,0)
+	-- lander.x = Cf.round(lander.x,0)
 end
 
 

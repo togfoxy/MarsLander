@@ -34,8 +34,6 @@ local function drawFuelIndicator(lander)
 	-- refactored by Fox
 
     -- Fuel indicator
-	
-print(lander.name, lander.fuel, lander.fuelCapacity)
 	assert(lander.fuel ~= nil)
 
     local grad = lander.fuel / lander.fuelCapacity
@@ -187,7 +185,7 @@ local function drawScore()
 		local formattedScore = Cf.strFormatThousand(roundedScore)		
 		local tempString = lander.name .. ": " .. formattedScore
 		love.graphics.printf(tempString,x,y, lineLength, alignment)
-		y = y + 35	-- prep the y value for the next score (will be ignored for single player)
+		y = y + 20	-- prep the y value for the next score (will be ignored for single player)
 	end
 end
 

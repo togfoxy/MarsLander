@@ -5,10 +5,10 @@ local EnetHandler = {}
 local server
 local client
 
-local TIMER_HOST_SEND_INTERVAL = 0.05
+local TIMER_HOST_SEND_INTERVAL = 0.04
 local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 
-local timerClientSendInterval = 0.05
+local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
 function EnetHandler.createHost()
@@ -45,9 +45,7 @@ end
 function EnetHandler.createClient()
 -- called by menu
 
-print("alpha : " .. LANDERS[1].name)
-
-	LovelyToasts.show("Trying to connect ...",3, "middle")
+	LovelyToasts.show("Trying to connect on " .. GAME_SETTINGS.hostIP,3, "middle")
 
 	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
 	
@@ -78,7 +76,7 @@ print("alpha : " .. LANDERS[1].name)
 			local myindex
 			for k,lander in pairs(LANDERS) do
 				myindex = k
-				if lander.connectionID == peerLander.connectionID or LANDERS[1].connectionID ~= peerLander.connectionID then
+				if lander.connectionID == peerLander.connectionID then
 					isLanderFound = true
 					break
 				end
@@ -92,7 +90,6 @@ print("alpha : " .. LANDERS[1].name)
 	end)
 	
 	client:connect()
-print("bravo : " .. LANDERS[1].name)
 end
 
 function EnetHandler.update(dt)
@@ -107,6 +104,7 @@ function EnetHandler.update(dt)
 				local skinnyLander = {}
 				skinnyLander.x = lander.x 
 				skinnyLander.y = lander.y
+				skinnyLander.connectionID = lander.connectionID	-- used by enet
 				skinnyLander.angle = lander.angle
 				skinnyLander.engineOn = lander.engineOn
 				skinnyLander.leftEngineOn = lander.leftEngineOn
