@@ -111,8 +111,6 @@ local function moveShip(lander, dt)
 		LANDER_VY = lander.vy
 		LANDER_VX = lander.vx
 	end
-	
-	-- lander.x = Cf.round(lander.x,0)
 end
 
 
@@ -458,10 +456,7 @@ function Lander.update(lander, dt)
     moveShip(lander, dt)
     playSoundEffects(lander)
     checkForContact(lander, dt)
-assert(GAME_SETTINGS.HighScore ~= nil)
 	updateScore(lander)
-assert(GAME_SETTINGS.HighScore ~= nil)	
-	
 end
 
 
@@ -469,10 +464,8 @@ end
 function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(LANDERS) do
-		local sx, sy = 1.5, 1.5
-
 		assert(lander.x ~= nil)
-
+		local sx, sy = 1.5, 1.5
 		local x = lander.x - WORLD_OFFSET
 		local y = lander.y
 		local ox = ship.width / 2
