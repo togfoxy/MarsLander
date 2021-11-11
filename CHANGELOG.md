@@ -6,11 +6,24 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 
 ## UNRELEASED
+### Added
+- host is notified when a client connects
+- client is notified when it tries to connect
+- the score for every lander is now displayed (relevant in mplayer mode)
+- introduced a new keypress: the return/enter/keypad enter key now resets just the one lander. The 'r' key is untouched and resets the whole game for every lander (mplayer mode)
+- introduced a Lander.reset function that resets a single lander
+- 
+### Changed
+- host now sends a skinny version of lander to reduce net lag
+- some efficiencies in ResetGame
+- each lander's score is now saved in the lander table and refreshed during Lander.update
+- 
+### Fixed
 
+
+## v0.10
 ### Added
 - added the 'wrong' sound in an additional place in the shop
-
-
 
 ### Changed
 - removed the generation of buildings for now. Intend to put them back in soon
@@ -20,8 +33,6 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - major code re-organization and optimization
 - 'p' now unpauses the game
 - restored the original 'wrong' sound as it is better
-
-
 
 ### Fixed
 - fixed saved player name not being displayed correctly in-game
@@ -35,8 +46,6 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - rangefinder fixed
 - fixed the '$' sign in the shop
 - Fix smoke particles not being removed after starting a new game
-
-
 
 ## v0.10
 ### Added
