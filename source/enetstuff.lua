@@ -29,12 +29,18 @@ function EnetHandler.createHost()
 	end)
 	
 	server:on("clientdata", function(lander, clientInfo)
+
 		-- match the incoming lander object
 		for k,v in pairs(LANDERS) do
 			if v.connectionID == lander.connectionID then
-				v.x = lander.x
+				v.x = lander.x 
 				v.y = lander.y
+				v.connectionID = lander.connectionID	-- used by enet
 				v.angle = lander.angle
+				v.engineOn = lander.engineOn
+				v.leftEngineOn = lander.leftEngineOn
+				v.rightEngineOn = lander.rightEngineOn
+				v.score = lander.score
 				v.name = lander.name
 				break
 			end
@@ -109,13 +115,11 @@ function EnetHandler.update(dt)
 				skinnyLander.engineOn = lander.engineOn
 				skinnyLander.leftEngineOn = lander.leftEngineOn
 				skinnyLander.rightEngineOn = lander.rightEngineOn
-				-- Health in percent
-				-- skinnyLander = lander.health		-- to be incorporated later
 				skinnyLander.score = lander.score
 				skinnyLander.name = lander.name
-				-- modules
+				-- skinnyLander = lander.health		-- to be incorporated later
 				-- skinnyLander = lander.modules	-- to be incorporated later			
-						
+		
 				server:sendToAll("peerupdate",skinnyLander)
 			end
 		end
