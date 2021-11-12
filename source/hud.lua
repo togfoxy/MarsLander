@@ -183,8 +183,8 @@ local function drawScore()
 	for _,lander in pairs(LANDERS) do
 		local roundedScore = Cf.round(lander.score)
 		local formattedScore = Cf.strFormatThousand(roundedScore)		
-		local text = lander.name .. ": " .. formattedScore
-		love.graphics.printf(text,x,y, lineLength, alignment)
+		local tempString = lander.name .. ": " .. formattedScore
+		love.graphics.printf(tempString,x,y, lineLength, alignment)
 		y = y + 20	-- prep the y value for the next score (will be ignored for single player)
 	end
 end
