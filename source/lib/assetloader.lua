@@ -32,7 +32,7 @@ local license = [[
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   ]]
 
-local Assets = {}
+local Assets = {audioStreamSizeLimit = 1024}
 Assets.debugOutput  = true
 Assets.imageSets    = {}
 Assets.images       = {}
@@ -63,7 +63,6 @@ local fileExtensions = {
     ["image"] = {"png", "jpg", "jpeg", "bmp", "tga", "hdr", "pic", "exr"},
     ["sound"] = {"ogg", "mp3", "oga", "ogv", "wav", "flac"},
 }
-local audioStreamSizeLimit = 1024
 
 
 
@@ -88,6 +87,16 @@ end
 
 local function getFilename(path)
     return path:match("([^/]+)%..+")
+end
+
+
+
+local function getAsset(table, name)
+    local file = table[name]
+    if not file then
+        error(prefix.."Asset '"..name.."' does not exist.")
+    end
+    return file
 end
 
 
@@ -160,7 +169,7 @@ function Assets.loadDirectory(path)
                 -- Determine if the file should be streamed
                 -- fileSize in kilobytes
                 local mode = "static"
-                if item.fileSize >= audioStreamSizeLimit then
+                if item.fileSize >= Assets.audioStreamSizeLimit then
                     mode = "stream"
                 end
 
@@ -215,11 +224,10 @@ function Assets.newFont(...)
     local args      = {...}
     local font      = newFont(...)
     local filename  = "font"..args[1]
-
+    -- If the first argument is a string, attach the font size (second argument)
     if type(args[1]) == "string" then
         filename = getFilename(args[1])..args[2]
     end
-
     Assets.fonts[filename] = font
     return font
 end
@@ -227,12 +235,13 @@ end
 
 
 function Assets.newAnimation(name, image, width, height, column, row, durations, onLoop)
-
     local grid = Anim8.newGrid(width, height, image:getWidth(), image:getHeight())
     local animation = Anim8.newAnimation(grid(column, row), durations, onLoop)
     animation.name = name
     animation.grid = grid
     animation.image = image
+    animation.width = width
+    animation.height = height
     local anim8_draw = animation.draw
     animation.draw = function(animation, ...)
         -- just to skip passing the spritesheet everytime manually.. yikes -_-'
@@ -252,56 +261,9 @@ end
 
 function Assets.playSound(name, isLooping)
     local sound = Assets.getSound(name)
-    -- if the sound needs to be played more then once at the same time, clone it
-    -- sound = Assets.getSound(name):clone()
     sound:setLooping(isLooping or false)
     sound:play()
     return sound
-end
-
-
-
-function Assets.getImage(name)
-    if not Assets.images[name] then
-        error(prefix.."Image '"..name.."' does not exist.")
-    end
-    return Assets.images[name].image
-end
-
-
-
-function Assets.getImageSet(name)
-    if not Assets.images[name] then
-        error(prefix.."Image '"..name.."' does not exist.")
-    end
-    return Assets.images[name]
-end
-
-
-
-function Assets.getAnimation(name)
-    if not Assets.animations[name] then
-        error(prefix.."Animation '"..name.."' does not exist.")
-    end
-    return Assets.animations[name]
-end
-
-
-
-function Assets.getSound(name)
-    if not Assets.sounds[name] then
-        error(prefix.."Sound '"..name.."' does not exist.")
-    end
-    return Assets.sounds[name]
-end
-
-
-
-function Assets.getFont(name)
-    if not Assets.fonts[name] then
-        error(prefix.."Font '"..name.."' does not exist.")
-    end
-    return Assets.fonts[name]
 end
 
 
@@ -310,6 +272,41 @@ function Assets.setFont(name)
     local font = Assets.getFont(name)
     love.graphics.setFont(font)
     return font
+end
+
+
+
+function Assets.getImage(name)
+    local asset = getAsset(Assets.imageSets, name)
+    return asset.image
+end
+
+
+
+function Assets.getImageSet(name)
+    local asset = getAsset(Assets.imageSets, name)
+    return asset
+end
+
+
+
+function Assets.getAnimation(name)
+    local asset = getAsset(Assets.animations, name)
+    return asset
+end
+
+
+
+function Assets.getSound(name)
+    local asset = getAsset(Assets.sounds, name)
+    return asset
+end
+
+
+
+function Assets.getFont(name)
+    local asset = getAsset(Assets.fonts, name)
+    return asset
 end
 
 
