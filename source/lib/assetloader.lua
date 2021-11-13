@@ -174,7 +174,7 @@ function Assets.loadDirectory(path)
 
                 -- Create new sound data
                 Assets.newSound(item.path, mode)
-                log("[Info] New Sound: "..item.name)
+                log("[Info] New Sound: "..item.name.." ("..mode.." mode)")
                 fileLoaded = true
                 break
             end
