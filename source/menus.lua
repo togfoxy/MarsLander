@@ -5,8 +5,8 @@ function Menus.DrawMainMenu()
 
 	local intSlabWidth = 700 -- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 550 	-- the height of the main menu slab
-	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
-	local fltSlabWindowY = SCREEN_HEIGHT / 2 - intSlabHeight / 2
+	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
+	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
 	-- try to centre the Slab window
 	-- note: Border is the border between the window and the layout
@@ -155,8 +155,8 @@ function Menus.DrawCredits()
 
 	local intSlabWidth = 550	-- the width of the main menu slab. Change this to change appearance.
 	local intSlabHeight = 500 	-- the height of the main menu slab
-	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
-	local fltSlabWindowY = SCREEN_HEIGHT / 2 - intSlabHeight / 2
+	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
+	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
 	local creditBoxOptions = {
 		Title ='About',
@@ -251,8 +251,8 @@ end
 function Menus.DrawSettingsMenu()
 	local intSlabWidth = 400	-- the width of the settings window slab.
 	local intSlabHeight = 250 	-- the height of the windowslab
-	local fltSlabWindowX = SCREEN_WIDTH / 2 - intSlabWidth / 2
-	local fltSlabWindowY = SCREEN_HEIGHT / 2 - intSlabHeight / 2
+	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
+	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
 	local settingsWindowOptions = {
 		Title ='Game Settings',
