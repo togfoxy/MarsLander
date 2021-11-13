@@ -458,10 +458,7 @@ function Lander.update(lander, dt)
     moveShip(lander, dt)
     playSoundEffects(lander)
     checkForContact(lander, dt)
-assert(GAME_SETTINGS.HighScore ~= nil)
 	updateScore(lander)
-assert(GAME_SETTINGS.HighScore ~= nil)	
-	
 end
 
 
