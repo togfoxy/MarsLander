@@ -9,6 +9,8 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ### Added
 - added the 'wrong' sound in an additional place in the shop
+- the 'R'eset key is disabled in mplayer mode. Use the new enter/return key to reset a single lander
+- disabled load/save when in multiplayer mode
 
 
 
@@ -34,7 +36,8 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - loading a game that doesn't exist no longer crashes the game
 - rangefinder fixed
 - fixed the '$' sign in the shop
-- Fix smoke particles not being removed after starting a new game
+- fix smoke particles not being removed after starting a new game
+- fix background drawn wrong on full screen
 
 
 

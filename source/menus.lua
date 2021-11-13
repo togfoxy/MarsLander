@@ -51,15 +51,23 @@ function Menus.DrawMainMenu()
 
 		if Slab.Button("Load game",{W=155}) then
 
-      Fun.LoadGame()
-			Fun.SaveGameSettings()
-			Fun.AddScreen("World")
+			if not ENET_IS_CONNECTED then
+				Fun.LoadGame()
+				Fun.SaveGameSettings()
+				Fun.AddScreen("World")
+			else
+				LovelyToasts.show("Can't load when in multiplayer mode",3, "middle")
+			end
 
 		end
 		Slab.NewLine()
 
 		if Slab.Button("Save game",{W=155}) then
-			Fun.SaveGame() 
+			if not ENET_IS_CONNECTED then
+				Fun.SaveGame() 
+			else
+				LovelyToasts.show("Can't save a multiplayer game",3, "middle")
+			end
 		end
 		Slab.NewLine()
 

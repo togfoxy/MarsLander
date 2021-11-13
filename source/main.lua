@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "0.11"
+GAME_VERSION = "0.12"
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -145,7 +145,7 @@ local background = Assets.getImageSet("background1")
 local function drawWallpaper()
 	-- stretch or shrink the image to fit the window
 	
-	-- this is the size of the window
+	-- this is the current size of the window
 	local screenwidth, screenheight = love.graphics.getDimensions( )
 	
 	local sx = screenwidth / background.width
@@ -180,6 +180,10 @@ end
 
 function love.load()
     if love.filesystem.isFused() then
+	
+		-- nullify the assert function for performance reasons
+		function assert() end
+	
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
         love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
@@ -202,11 +206,15 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
+
 	-- Restore full screen setting
 	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
 
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
+	
+	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
+	Terrain.init()	
 	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
@@ -292,15 +300,19 @@ function love.keypressed(key, scancode, isrepeat)
 	if key == "escape" then
 		Fun.RemoveScreen()
 	elseif strCurrentScreen == "World" then
-		-- Restart the game
+		-- Restart the game. Different to reset a single lander
 		if key == "r" then
-			if LANDERS[1].gameOver then
-				Fun.ResetGame()
-			end
+			Fun.ResetGame()
+				
+		-- restart just the player lander (for mulitplayer)
+		elseif key == "kpenter" or key == "return" then
+			Lander.reset(LANDERS[1])
+			
 		-- Pause the game
 		elseif key == "p" then
 			Fun.AddScreen("Pause")
-			-- Open options menu
+			
+		-- Open options menu
 		elseif key == "o" then
 			Fun.AddScreen("Settings")
 		end

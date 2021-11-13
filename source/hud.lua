@@ -34,6 +34,8 @@ local function drawFuelIndicator(lander)
 	-- refactored by Fox
 
     -- Fuel indicator
+	assert(lander.fuel ~= nil)
+
     local grad = lander.fuel / lander.fuelCapacity
     local color = {1, grad, grad}
 	local x, y = HUD.fuel.x, HUD.fuel.y
@@ -171,14 +173,20 @@ end
 
 
 local function drawScore()
-	-- score is simply the amount of forward distance travelled (lander.x)
-	local roundedScore = Cf.round(Fun.CalculateScore())
-	local score = Cf.strFormatThousand(roundedScore)
-	local highScore = Cf.strFormatThousand(tonumber(Cf.round(GAME_SETTINGS.HighScore)))
-
+	-- score is simply the amount of forward distance travelled (lander.score)
+	local lineLength = 150	-- printf will wrap after this point
+	local x = SCREEN_WIDTH - 15 - lineLength	-- the 15 is an asthetic margin from the right edge
+	local y = SCREEN_HEIGHT * 0.20
+	local alignment	= "right"
+	
 	Assets.setFont("font14")
-	love.graphics.printf("Score: " .. score, 0, 75, SCREEN_WIDTH, "center")
-	love.graphics.printf("High Score: " .. highScore, 0, 90, SCREEN_WIDTH, "center")
+	for _,lander in pairs(LANDERS) do
+		local roundedScore = Cf.round(lander.score)
+		local formattedScore = Cf.strFormatThousand(roundedScore)		
+		local tempString = lander.name .. ": " .. formattedScore
+		love.graphics.printf(tempString,x,y, lineLength, alignment)
+		y = y + 20	-- prep the y value for the next score (will be ignored for single player)
+	end
 end
 
 
@@ -194,7 +202,6 @@ local function drawDebug()
 	love.graphics.print("Ground: " .. #GROUND, 10, 160)
 	love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
 	love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
-	--love.graphics.print(Cf.round(LANDERS[1].x,0), LANDERS[1].x - WORLD_OFFSET, LANDERS[1].y + 25)
 end
 
 

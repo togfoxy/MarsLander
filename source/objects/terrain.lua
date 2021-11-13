@@ -96,6 +96,7 @@ function Terrain.init()
 	Terrain.generate(SCREEN_WIDTH * 2)
 	-- TODO: Proper fix for crash when lander.update is called before a fuel base is spawned
 	addFuelBases(#GROUND)
+	addBuildings(#GROUND)
 end
 
 
