@@ -35,6 +35,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - rangefinder fixed
 - fixed the '$' sign in the shop
 - Fix smoke particles not being removed after starting a new game
+- Fixed assets not being check for support file types
 
 
 

@@ -60,7 +60,6 @@ Assets = require 'lib.assetloader'
 -- Load assets
 Assets.loadDirectory("assets")
 
-
 -- Load fonts
 Assets.newFont(14)
 Assets.newFont(16)
