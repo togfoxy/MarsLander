@@ -143,7 +143,7 @@ end
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
 
-function Assets.loadDirectory(path)
+function Assets.loadDirectory(path, audioMode)
     local directoryName = path:match("([^/]+)$")
     local items = getDirectoryItems(path)
 
@@ -173,7 +173,7 @@ function Assets.loadDirectory(path)
                 end
 
                 -- Create new sound data
-                Assets.newSound(item.path, mode)
+                Assets.newSound(item.path, audioMode or mode)
                 log("[Info] New Sound: "..item.name.." ("..mode.." mode)")
                 fileLoaded = true
                 break
