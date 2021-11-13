@@ -185,6 +185,7 @@ function love.load()
 		-- Play music
 		-- true for "isLooping"
 		Assets.playSound("menuTheme", true)
+		Assets.getSound("menuTheme"):setVolume(.2)
     else
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
