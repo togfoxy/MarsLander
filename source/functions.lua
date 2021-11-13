@@ -212,10 +212,11 @@ function functions.ResetGame()
 	Smoke.destroy()
 
 	-- ensure Terrain.init appears before Lander.create
-	-- Terrain.init()
+	Terrain.init()
 	
 	-- TODO: mplayer needs to reset without wiping LANDERS
 	--       or to wipe LANDERS and recreate each client
+
 	if not ENET_IS_CONNECTED then
 		LANDERS = {}
 		table.insert(LANDERS, Lander.create())
