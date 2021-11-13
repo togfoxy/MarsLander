@@ -1,12 +1,12 @@
 
--- ~~~~~~~~~~~~~~
+-- ~~~~~~~~~~~~~~~
 -- assetloader.lua
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- Asset managment tool for Mars Lander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 local Assets = {}
-Assets.debugOutput  = false
+Assets.debugOutput  = true
 Assets.imageSets    = {}
 Assets.images       = {}
 Assets.sounds       = {}
@@ -31,6 +31,12 @@ local prefix    = " [Asset Tool] "
 local newSource = love.audio.newSource
 local newImage  = love.graphics.newImage
 local newFont   = love.graphics.newFont
+local fs        = love.filesystem
+local fileExtensions = {
+    ["image"] = {"png", "jpg", "jpeg", "bmp", "tga", "hdr", "pic", "exr"},
+    ["sound"] = {"ogg", "mp3", "oga", "ogv", "wav", "flac"},
+}
+local audioStreamSizeLimit = 1024
 
 
 
@@ -38,34 +44,60 @@ local newFont   = love.graphics.newFont
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
-local function debugPrint(...)
+local function log(...)
     if Assets.debugOutput then
-        print(...)
+        print(prefix.. ...)
+        -- TODO: Add support for logging into a logfile
     end
 end
 
 
 
-local function getFilenameFromPath(path)
+local function getFileExtension(path)
+    return path:match("[^.]+$")
+end
+
+
+
+local function getFilename(path)
     return path:match("([^/]+)%..+")
 end
 
 
 
-local function getDirectoryItems(path)
-    local items = {}
-    local info = love.filesystem.getInfo(path)
-    if info and info.type == "directory" then
-        debugPrint(prefix.."Found directory at path '/"..path.."'")
-        local filenames = love.filesystem.getDirectoryItems(path)
-        for _, name in pairs(filenames) do
-            local item = {}
-            item.name = name
-            item.path = path.."/"..name
-            table.insert(items, item)
+local function getDirectoryItems(basePath, items)
+    local items = items or {}
+
+    -- Check if the given path is valid
+    local baseInfo = fs.getInfo(basePath)
+    if baseInfo.type == "directory" then
+
+        -- Found initial directory
+        log("[Info] Found directory at path '/"..basePath.."'")
+
+        -- Recursivly load directories and files
+        local fileNames = fs.getDirectoryItems(basePath)
+        for _, name in ipairs(fileNames) do
+            local filePath = basePath.."/"..name
+
+            -- Found a single file
+            local fileInfo = fs.getInfo(filePath)
+            if fileInfo.type == "file" then
+                local item = {}
+                item.name = name
+                item.path = filePath
+                item.fileType = getFileExtension(item.path)
+                item.fileSize = fileInfo.size / 1000 -- Convert bytes to kb
+                table.insert(items, item)
+
+            -- Found another directory, load the content as well!
+            elseif fileInfo.type == "directory" then
+                getDirectoryItems(filePath, items)
+            end
         end
     else
-        debugPrint(prefix.."No directory at path '"..path.."'. Skipping!")
+        -- Base directory not found
+        log("[WARN] No directory at path '"..basePath.."'. Skipping!")
     end
     return items
 end
@@ -76,20 +108,46 @@ end
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
 
--- FIXME: Make sure the file to load is actually an image / sound
-function Assets.loadDirectory(path, type)
+function Assets.loadDirectory(path)
     local directoryName = path:match("([^/]+)$")
     local items = getDirectoryItems(path)
+
+    -- Iterate all loaded files and sort based on their type
     for _, item in pairs(items) do
-        if type == "image" then
-            Assets.newImageSet(item.path)
-            debugPrint(prefix.."New Image: "..item.name)
-        elseif type == "sound" then
-            Assets.newSound(item.path, "static")
-            debugPrint(prefix.."New Sound: "..item.name)
-        elseif type == "music" then
-            local music = Assets.newSound(item.path, "stream")
-            debugPrint(prefix.."New Music: "..item.name)
+        local fileLoaded = false
+
+        -- Check if the file is an image
+        for _, extension in pairs(fileExtensions.image) do
+            if item.fileType == extension then
+                -- Create new image data
+                Assets.newImageSet(item.path)
+                log("[Info] New image: "..item.name)
+                fileLoaded = true
+                break
+            end
+        end
+
+        -- Check if the file is a sound
+        for _, extension in pairs(fileExtensions.sound) do
+            if item.fileType == extension then
+                -- Determine if the file should be streamed
+                -- fileSize in kilobytes
+                local mode = "static"
+                if item.fileSize >= audioStreamSizeLimit then
+                    mode = "stream"
+                end
+
+                -- Create new sound data
+                Assets.newSound(item.path, mode)
+                log("[Info] New Sound: "..item.name)
+                fileLoaded = true
+                break
+            end
+        end
+
+        -- Show a warning when no supported file type is found
+        if not fileLoaded then
+            log("[WARN] Cannot load file '"..item.name.."'. Skipping!")
         end
     end
 end
@@ -101,7 +159,7 @@ function Assets.newImageSet(path, ...)
     imageData.image    = newImage(path, ...)
     imageData.width    = imageData.image:getWidth()
     imageData.height   = imageData.image:getHeight()
-    local filename  = getFilenameFromPath(path)
+    local filename  = getFilename(path)
     Assets.images[filename] = imageData
     return imageData
 end
@@ -110,7 +168,7 @@ end
 
 function Assets.newImage(path, ...)
     local image     = newImage(path, ...)
-    local filename  = getFilenameFromPath(path)
+    local filename  = getFilename(path)
     Assets.images[filename] = image
     return image
 end
@@ -119,7 +177,7 @@ end
 
 function Assets.newSound(path, ...)
     local sound     = newSource(path, ...)
-    local filename  = getFilenameFromPath(path)
+    local filename  = getFilename(path)
     Assets.sounds[filename] = sound
     return sound
 end
@@ -132,7 +190,7 @@ function Assets.newFont(...)
     local filename  = "font"..args[1]
 
     if type(args[1]) == "string" then
-        filename = getFilenameFromPath(args[1])..args[2]
+        filename = getFilename(args[1])..args[2]
     end
 
     Assets.fonts[filename] = font
