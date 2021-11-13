@@ -35,7 +35,6 @@ local license = [[
 local Assets = {audioStreamSizeLimit = 1024}
 Assets.debugOutput  = true
 Assets.imageSets    = {}
-Assets.images       = {}
 Assets.sounds       = {}
 Assets.fonts        = {}
 Assets.animations   = {}
@@ -196,17 +195,16 @@ function Assets.newImageSet(path, ...)
     imageData.width    = imageData.image:getWidth()
     imageData.height   = imageData.image:getHeight()
     local filename  = getFilename(path)
-    Assets.images[filename] = imageData
+    Assets.imageSets[filename] = imageData
     return imageData
 end
 
 
 
+-- INFO: Added newImage because that's what users would expect to use
+-- based on the LÖVE function name
 function Assets.newImage(path, ...)
-    local image     = newImage(path, ...)
-    local filename  = getFilename(path)
-    Assets.images[filename] = image
-    return image
+    Assets.newImageSet(path, ...)
 end
 
 
@@ -276,16 +274,15 @@ end
 
 
 
-function Assets.getImage(name)
+function Assets.getImageSet(name)
     local asset = getAsset(Assets.imageSets, name)
-    return asset.image
+    return asset
 end
 
 
 
-function Assets.getImageSet(name)
-    local asset = getAsset(Assets.imageSets, name)
-    return asset
+function Assets.getImage(name)
+    return Assets.getImageSet(name).image
 end
 
 
