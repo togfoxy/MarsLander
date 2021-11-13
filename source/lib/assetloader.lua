@@ -190,13 +190,13 @@ end
 
 
 function Assets.newImageSet(path, ...)
-    local imageData = {}
-    imageData.image    = newImage(path, ...)
-    imageData.width    = imageData.image:getWidth()
-    imageData.height   = imageData.image:getHeight()
+    local imageSet = {}
+    imageSet.image    = newImage(path, ...)
+    imageSet.width    = imageSet.image:getWidth()
+    imageSet.height   = imageSet.image:getHeight()
     local filename  = getFilename(path)
-    Assets.imageSets[filename] = imageData
-    return imageData
+    Assets.imageSets[filename] = imageSet
+    return imageSet
 end
 
 
@@ -204,7 +204,8 @@ end
 -- INFO: Added newImage because that's what users would expect to use
 -- based on the LÖVE function name
 function Assets.newImage(path, ...)
-    Assets.newImageSet(path, ...)
+    local imageSet = Assets.newImageSet(path, ...)
+    return imageSet.image
 end
 
 
