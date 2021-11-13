@@ -15,6 +15,7 @@ function EnetHandler.createHost()
 -- called by menu
 
 	server = Sock.newServer(HOST_IP_ADDRESS, 22122)
+	ENET_IS_CONNECTED = true
 	
     -- Called when receiving a message of type "connect"
     server:on("connect", function(data, client)
