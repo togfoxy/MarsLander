@@ -167,13 +167,14 @@ function functions.CalculateScore()
 end
 
 
+
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 -- returns two values: the distance to the closest base, and the object/table item for that base
 -- if there are no bases (impossible) then the distance value returned will be -1
 -- note: if distance is a negative value then the Lander has not yet passed the base
 
-	local closestdistance = 0
-	local closestbase
+	local closestdistance = -1
+	local closestbase = {}
 	local absdist
 	local dist
 	local realdist
@@ -182,9 +183,9 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 		if v.objecttype == intBaseType then
 			-- the + bit is an offset to calculate the landing pad and not the image
 			absdist = math.abs(xvalue - (v.x + 85))
-			-- same but without the math.abs
+			-- same but without the math.abs)
 			dist = (xvalue - (v.x + 85))
-			if closestdistance == 0 or absdist <= closestdistance then
+			if closestdistance == -1 or absdist <= closestdistance then
 				closestdistance = absdist
 				closestbase = v
 			end
@@ -202,73 +203,25 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 end
 
 
-function functions.HandleSockets(dt)
-
-	-- add lander info to the outgoing queue
-	local msg = {}
-	msg.x = LANDERS[1].x
-	msg.y = LANDERS[1].y
-	msg.angle = LANDERS[1].angle
-	msg.name = LANDERS[1].name
-	-- ** msg is set here and sent across UDP below
-
-	if IS_A_HOST then
-
-		ss.hostListenPort()
-
-		repeat
-			if incoming ~= nil then
-				if incoming.name == "ConnectionRequest" then
-					gbolIsConnected = true
-					msg = {}
-					msg.name = "ConnectionAccepted"
-				else
-					LANDERS[2] = {}			--! super big flaw: this hardcodes LANDERS[2]
-					LANDERS[2].x = incoming.x
-					LANDERS[2].y = incoming.y
-					LANDERS[2].angle = incoming.angle
-					LANDERS[2].name = incoming.name
-				end
-			end
-		until incoming == nil
-
-		msg = {}
-	end
-
-	if IS_A_CLIENT then
-		repeat
-			if incoming ~= nil then
-				if incoming.name == "ConnectionAccepted" then
-					gbolIsConnected = true
-					if CURRENT_SCREEN[#CURRENT_SCREEN] == "MainMenu" then
-						Fun.SaveGameSettings()
-						Fun.AddScreen("World")
-					end
-				else
-					LANDERS[2] = {}
-					LANDERS[2].x = incoming.x
-					LANDERS[2].y = incoming.y
-					LANDERS[2].angle = incoming.angle
-					LANDERS[2].name = incoming.name
-				end
-			end
-		until incoming == nil
-	end
-end
-
 
 function functions.ResetGame()
+-- this resets the game for all landers - including multiplayer landers
 
 	GROUND = {}
-	OBJECTS = {}
+	OBJECTS = {}	-- TODO: don't reset whole table but instead reset status, fuel amounts etc.
 	Smoke.destroy()
 
 	-- ensure Terrain.init appears before Lander.create
 	Terrain.init()
+	
+	-- TODO: mplayer needs to reset without wiping LANDERS
+	--       or to wipe LANDERS and recreate each client
 
-	LANDERS = {}
-	table.insert(LANDERS, Lander.create())
-
+	if not ENET_IS_CONNECTED then
+		LANDERS = {}
+		table.insert(LANDERS, Lander.create())
+	end
+	
 end
 
 return functions

@@ -5,16 +5,17 @@ local EnetHandler = {}
 local server
 local client
 
-local TIMER_HOST_SEND_INTERVAL = 0.05
+local TIMER_HOST_SEND_INTERVAL = 0.04
 local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 
-local timerClientSendInterval = 0.05
+local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
 function EnetHandler.createHost()
 -- called by menu
 
 	server = Sock.newServer(HOST_IP_ADDRESS, 22122)
+	ENET_IS_CONNECTED = true
 	
     -- Called when receiving a message of type "connect"
     server:on("connect", function(data, client)
@@ -24,15 +25,23 @@ function EnetHandler.createHost()
 		local newLander = Lander.create()
 		newLander.connectionID = client:getConnectId()
 		table.insert(LANDERS, newLander)
+		
+		LovelyToasts.show("Client connected",3, "top")
 	end)
 	
 	server:on("clientdata", function(lander, clientInfo)
+
 		-- match the incoming lander object
 		for k,v in pairs(LANDERS) do
 			if v.connectionID == lander.connectionID then
-				v.x = lander.x
+				v.x = lander.x 
 				v.y = lander.y
+				v.connectionID = lander.connectionID	-- used by enet
 				v.angle = lander.angle
+				v.engineOn = lander.engineOn
+				v.leftEngineOn = lander.leftEngineOn
+				v.rightEngineOn = lander.rightEngineOn
+				v.score = lander.score
 				v.name = lander.name
 				break
 			end
@@ -42,6 +51,8 @@ end
 
 function EnetHandler.createClient()
 -- called by menu
+
+	LovelyToasts.show("Trying to connect on " .. GAME_SETTINGS.hostIP,3, "middle")
 
 	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
 	
@@ -64,14 +75,15 @@ function EnetHandler.createClient()
 	end)
 	
 	client:on("peerupdate", function(peerLander)
-		if LANDERS[1].connectionID == peerLander.connectionID then
-			-- nothing to do
-		else
+		-- have received information about other peers
+		-- cycle through list of known peers
+		-- if peer is new (unknown) then update list of known peers
+		if LANDERS[1].connectionID ~= peerLander.connectionID then
 			local isLanderFound = false
 			local myindex
-			for k,v in pairs(LANDERS) do
+			for k,lander in pairs(LANDERS) do
 				myindex = k
-				if v.connectionID == peerLander.connectionID then
+				if lander.connectionID == peerLander.connectionID then
 					isLanderFound = true
 					break
 				end
@@ -94,7 +106,22 @@ function EnetHandler.update(dt)
 		if timerHostSendTimer <= 0 then
 			timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 			for _, lander in pairs(LANDERS) do
-				server:sendToAll("peerupdate",lander)
+				-- could send the whole LANDERS element
+				-- but better to send a skinny version
+				local skinnyLander = {}
+				skinnyLander.x = lander.x 
+				skinnyLander.y = lander.y
+				skinnyLander.connectionID = lander.connectionID	-- used by enet
+				skinnyLander.angle = lander.angle
+				skinnyLander.engineOn = lander.engineOn
+				skinnyLander.leftEngineOn = lander.leftEngineOn
+				skinnyLander.rightEngineOn = lander.rightEngineOn
+				skinnyLander.score = lander.score
+				skinnyLander.name = lander.name
+				-- skinnyLander = lander.health		-- to be incorporated later
+				-- skinnyLander = lander.modules	-- to be incorporated later			
+		
+				server:sendToAll("peerupdate",skinnyLander)
 			end
 		end
 		
