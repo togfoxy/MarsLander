@@ -58,10 +58,7 @@ Assets = require 'lib.assetloader'
 -- ~~~~~~~~~
 
 -- Load assets
--- FIXME: assetloader doesn't check if the file to load is actually an image/sound file
-Assets.loadDirectory("assets/images", "image")
-Assets.loadDirectory("assets/sounds", "sound")
-Assets.loadDirectory("assets/music", "music")
+Assets.loadDirectory("assets")
 
 -- Load fonts
 Assets.newFont(14)

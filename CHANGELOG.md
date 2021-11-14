@@ -38,6 +38,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - fixed the '$' sign in the shop
 - fix smoke particles not being removed after starting a new game
 - fix background drawn wrong on full screen
+- Fixed assets not being checked for supported file types
 
 
 
