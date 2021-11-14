@@ -144,6 +144,7 @@ local function thrustLeft(lander, dt)
 		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
 			-- parachutes allow left/right drifting even if no fuel and thrusters available
 			deployParachute(lander)
+print("deployed")
 			local forceX = 0.5 * dt
 			lander.vx = lander.vx - forceX	
 		end
@@ -271,6 +272,33 @@ local function checkForContact(lander, dt)
 	if lander.y > roundedGroundY - 8 then	-- 8 = the image offset for visual effect
 		-- a heavy landing will cause damage
 		checkForDamage(lander)
+		
+		if not lander.onGround then
+
+			-- destroy the single use parachute
+			if parachuteIsDeployed(lander) then
+	print(#lander.modules)
+				-- need to destroy this single-use module
+				local moduleIndexToDestroy = 0
+				for moduleIndex, moduleItem in pairs(lander.modules) do
+					if moduleItem.id == 5 and moduleItem.deployed then	-- 5 = parachute
+						moduleIndexToDestroy = moduleIndex
+						moduleItem.deployed = false
+						break
+					end
+				end
+				assert(moduleIndexToDestroy > 0)
+				table.remove(lander.modules, moduleIndexToDestroy)
+				-- adjust new mass
+				DEFAULT_MASS = recalcDefaultMass(lander)
+				
+	print(#lander.modules)
+	print("~~~")
+				
+			end	
+		end
+		
+		
 		-- Lander is on ground
 		lander.onGround = true
 		-- Stop x, y movement
@@ -293,22 +321,6 @@ local function checkForContact(lander, dt)
 				lander.gameOver = true
 			end
 		end
-		
-		-- destroy the single use parachute
-		if parachuteIsDeployed(lander) then
-			-- need to destroy this single-use module
-			local moduleToDestroy = 0
-			for moduleIndex, moduleItem in pairs(lander.modules) do
-				if moduleItem.id == 5 and moduleItem.deployed then	-- 5 = parachute
-					moduleToDestroy = moduleIndex
-					break
-				end
-			end
-			assert(moduleToDestroy > 0)
-			table.remove(lander.modules, moduleToDestroy)
-			-- adjust new mass
-			DEFAULT_MASS = recalcDefaultMass(lander)
-		end		
 		
 		-- check for game-over conditions
 		if not onBase and lander.fuel <= 1 then
