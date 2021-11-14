@@ -18,7 +18,6 @@ HUD.fuel.text.width, HUD.fuel.text.height = HUD.fuel.text.image:getDimensions()
 HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.fuel.text.height / 2)
 
 
-local tower = Assets.getImageSet("tower")
 local ship = Assets.getImageSet("ship")
 local flame = Assets.getImageSet("flame")
 
@@ -143,7 +142,7 @@ local function drawShopMenu()
 
 		-- Create List of available modules
 		for _, module in pairs(Modules) do
-			local string = "%s. Buy '%s' - $%s \n"
+			local string = "%s. Buy %s - $%s \n"
 			itemListString = string.format(string, module.id, module.name, module.cost)
 			-- Draw list of modules
 			local color = {1, 1, 1, 1}

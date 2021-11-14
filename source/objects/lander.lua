@@ -33,6 +33,17 @@ local engineSound = Assets.getSound("engine")
 
 
 
+local function recalcDefaultMass(lander)
+	local result = 0
+	-- all the masses are stored in this table so add them up
+	for i = 1, #lander.mass do
+		result = result + lander.mass[i]
+	end
+	-- return mass of all the components + mass of fuel
+	return (result + lander.fuelCapacity)
+end
+
+
 
 local function landerHasFuelToThrust(lander, dt)
 -- returns true if the lander has enough fuel for thrust
@@ -75,8 +86,6 @@ local function deployParachute(lander)
 		end
 	end
 end
-
-
 
 
 
@@ -328,18 +337,6 @@ end
 
 
 
-local function recalcDefaultMass(lander)
-	local result = 0
-	-- all the masses are stored in this table so add them up
-	for i = 1, #lander.mass do
-		result = result + lander.mass[i]
-	end
-	-- return mass of all the components + mass of fuel
-	return (result + lander.fuelCapacity)
-end
-
-
-
 local function buyModule(module, lander)
 	-- Enough money to purchase the module ?
 	if lander.money >= module.cost then
@@ -394,7 +391,7 @@ function Lander.create(name)
 	lander.onGround = false
 	-- Health in percent
 	lander.health = 100
-	lander.money = 0
+	lander.money = 200
 	lander.gameOver = false
 	lander.score = lander.x - ORIGIN_X
 	lander.name = name or CURRENT_PLAYER_NAME
@@ -570,6 +567,13 @@ function Lander.draw()
 		else
 			love.graphics.setColor(1,1,1,0.5)
 		end
+		
+		-- draw parachute before drawing the lander
+		if parachuteIsDeployed(lander) then
+			local parachuteYOffset = y - parachute.image:getHeight()
+			local parachuteXOffset = x - parachute.image:getWidth() / 2
+			love.graphics.draw(parachute.image, parachuteXOffset, parachuteYOffset)
+		end		
 
 		-- TODO: work out why ship.width doesn't work in mplayer mode
 		love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
@@ -593,12 +597,6 @@ function Lander.draw()
 			lander.rightEngineOn = false
 		end
 		
-		-- draw parachute
-		if parachuteIsDeployed(lander) then
-			local parachuteYOffset = y -10
-			love.graphics.draw(parachute.image, x, parachuteYOffset)
-		end		
-
 		-- draw label
 		love.graphics.setNewFont(10)
 		love.graphics.print(lander.name, x + 14, y - 10)
