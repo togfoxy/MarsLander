@@ -144,7 +144,6 @@ local function thrustLeft(lander, dt)
 		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
 			-- parachutes allow left/right drifting even if no fuel and thrusters available
 			deployParachute(lander)
-print("deployed")
 			local forceX = 0.5 * dt
 			lander.vx = lander.vx - forceX	
 		end
@@ -277,7 +276,6 @@ local function checkForContact(lander, dt)
 
 			-- destroy the single use parachute
 			if parachuteIsDeployed(lander) then
-	print(#lander.modules)
 				-- need to destroy this single-use module
 				local moduleIndexToDestroy = 0
 				for moduleIndex, moduleItem in pairs(lander.modules) do
@@ -291,10 +289,6 @@ local function checkForContact(lander, dt)
 				table.remove(lander.modules, moduleIndexToDestroy)
 				-- adjust new mass
 				DEFAULT_MASS = recalcDefaultMass(lander)
-				
-	print(#lander.modules)
-	print("~~~")
-				
 			end	
 		end
 		
