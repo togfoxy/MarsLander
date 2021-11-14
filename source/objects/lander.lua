@@ -292,6 +292,8 @@ local function checkForContact(lander, dt)
 			end	
 		end
 		
+		-- NOTE: if you need to check things on first contact with terrain (like receiving damage) then place
+		-- that code above lander.onGround = true
 		
 		-- Lander is on ground
 		lander.onGround = true
@@ -397,7 +399,7 @@ function Lander.create(name)
 	lander.onGround = false
 	-- Health in percent
 	lander.health = 100
-	lander.money = 200
+	lander.money = 0
 	lander.gameOver = false
 	lander.score = lander.x - ORIGIN_X
 	lander.name = name or CURRENT_PLAYER_NAME
