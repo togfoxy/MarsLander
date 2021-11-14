@@ -31,6 +31,13 @@ local Modules =  {
         cost = 185,
         mass = 20,
     },
+	parachute = {
+		id = 5,
+		name = "Parachute (single use)",
+		cost = 100,
+		mass = 10,
+		deployed = false,
+	},
 }
 
 
