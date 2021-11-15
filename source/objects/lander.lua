@@ -560,55 +560,55 @@ end
 function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(LANDERS) do
-		local sx, sy = 1.5, 1.5
+		-- guard against connecting mplayer clients not having complete data
+		if landerId == 1 or lander.x ~= nil then
+			local sx, sy = 1.5, 1.5
+			local x = lander.x - WORLD_OFFSET
+			local y = lander.y
+			local ox = ship.width / 2
+			local oy = ship.height / 2
 
-		assert(lander.x ~= nil)
+			-- fade other landers in multiplayer mode
+			if landerId == 1 then
+				love.graphics.setColor(1,1,1,1)
+			else
+				love.graphics.setColor(1,1,1,0.5)
+			end
+			
+			-- draw parachute before drawing the lander
+			if parachuteIsDeployed(lander) then
+				local parachuteYOffset = y - parachute.image:getHeight()
+				local parachuteXOffset = x - parachute.image:getWidth() / 2
+				love.graphics.draw(parachute.image, parachuteXOffset, parachuteYOffset)
+			end		
 
-		local x = lander.x - WORLD_OFFSET
-		local y = lander.y
-		local ox = ship.width / 2
-		local oy = ship.height / 2
+			-- TODO: work out why ship.width doesn't work in mplayer mode
+			love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
 
-		-- fade other landers in multiplayer mode
-		if landerId == 1 then
+			-- draw flames
+			local ox = flame.width / 2
+			local oy = flame.height / 2
+			if lander.engineOn then
+				local angle = math.rad(lander.angle)
+				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
+				lander.engineOn = false
+			end
+			if lander.leftEngineOn then
+				local angle = math.rad(lander.angle + 90)
+				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
+				lander.leftEngineOn = false
+			end
+			if lander.rightEngineOn then
+				local angle = math.rad(lander.angle - 90)
+				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
+				lander.rightEngineOn = false
+			end
+			
+			-- draw label
+			love.graphics.setNewFont(10)
+			love.graphics.print(lander.name, x + 14, y - 10)
 			love.graphics.setColor(1,1,1,1)
-		else
-			love.graphics.setColor(1,1,1,0.5)
 		end
-		
-		-- draw parachute before drawing the lander
-		if parachuteIsDeployed(lander) then
-			local parachuteYOffset = y - parachute.image:getHeight()
-			local parachuteXOffset = x - parachute.image:getWidth() / 2
-			love.graphics.draw(parachute.image, parachuteXOffset, parachuteYOffset)
-		end		
-
-		-- TODO: work out why ship.width doesn't work in mplayer mode
-		love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
-
-		-- draw flames
-		local ox = flame.width / 2
-		local oy = flame.height / 2
-		if lander.engineOn then
-			local angle = math.rad(lander.angle)
-			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
-			lander.engineOn = false
-		end
-		if lander.leftEngineOn then
-			local angle = math.rad(lander.angle + 90)
-			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
-			lander.leftEngineOn = false
-		end
-		if lander.rightEngineOn then
-			local angle = math.rad(lander.angle - 90)
-			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
-			lander.rightEngineOn = false
-		end
-		
-		-- draw label
-		love.graphics.setNewFont(10)
-		love.graphics.print(lander.name, x + 14, y - 10)
-		love.graphics.setColor(1,1,1,1)
 	end
 end
 

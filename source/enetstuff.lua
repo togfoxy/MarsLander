@@ -119,7 +119,7 @@ function EnetHandler.update(dt)
 				skinnyLander.score = lander.score
 				skinnyLander.name = lander.name
 				-- skinnyLander = lander.health		-- to be incorporated later
-				-- skinnyLander = lander.modules	-- to be incorporated later			
+				skinnyLander = lander.modules	-- to be incorporated later			
 		
 				server:sendToAll("peerupdate",skinnyLander)
 			end
