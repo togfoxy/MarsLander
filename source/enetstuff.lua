@@ -11,6 +11,13 @@ local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
+function EnetHandler.ClientDisconnecting(clientConnectionID)
+-- client is disconnecting. Send msg to host
+	client:send("clientdisconnect", clientConnectionID)
+end
+
+
+
 function EnetHandler.createHost()
 -- called by menu
 
@@ -32,7 +39,7 @@ function EnetHandler.createHost()
 	server:on("clientdata", function(lander, clientInfo)
 
 		-- match the incoming lander object
-		for k,v in pairs(LANDERS) do
+		for _,v in pairs(LANDERS) do
 			if v.connectionID == lander.connectionID then
 				v.x = lander.x 
 				v.y = lander.y
@@ -45,6 +52,22 @@ function EnetHandler.createHost()
 				v.name = lander.name
 				break
 			end
+		end
+	end)
+	
+	server:on("clientdisconnect", function(clientConnectionID, clientInfo)
+		local isLanderFound = false
+		local myLanderIndex
+		for k,lander in pairs(LANDERS) do
+			myLanderIndex = k
+			if lander.connectionID == clientConnectionID then
+				isLanderFound = true
+				break
+			end
+		end
+		if isLanderFound then
+			table.remove(LANDERS, myLanderIndex)
+print("client " .. myLanderIndex .. " is removed.")
 		end
 	end)
 end

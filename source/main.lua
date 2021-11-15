@@ -295,6 +295,18 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	-- Back to previous screen
 	if key == "escape" then
+		if ENET_IS_CONNECTED then
+			-- test if pressing ESC on main screen (i.e. quiting)
+			if #CURRENT_SCREEN == 1 then
+				if IS_A_CLIENT then
+					EnetHandler.ClientDisconnecting(LANDERS[1].connectionID)
+				elseif IS_A_HOST then
+				
+				else
+					error("Error 10 occured while player disconnected.")
+				end
+			end
+		end
 		Fun.RemoveScreen()
 	elseif strCurrentScreen == "World" then
 		-- Restart the game. Different to reset a single lander
