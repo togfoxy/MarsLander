@@ -18,7 +18,6 @@ HUD.fuel.text.width, HUD.fuel.text.height = HUD.fuel.text.image:getDimensions()
 HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.fuel.text.height / 2)
 
 
-local tower = Assets.getImageSet("tower")
 local ship = Assets.getImageSet("ship")
 local flame = Assets.getImageSet("flame")
 
@@ -143,7 +142,7 @@ local function drawShopMenu()
 
 		-- Create List of available modules
 		for _, module in pairs(Modules) do
-			local string = "%s. Buy '%s' - $%s \n"
+			local string = "%s. Buy %s - $%s \n"
 			itemListString = string.format(string, module.id, module.name, module.cost)
 			-- Draw list of modules
 			local color = {1, 1, 1, 1}
@@ -181,11 +180,14 @@ local function drawScore()
 	
 	Assets.setFont("font14")
 	for _,lander in pairs(LANDERS) do
-		local roundedScore = Cf.round(lander.score)
-		local formattedScore = Cf.strFormatThousand(roundedScore)		
-		local tempString = lander.name .. ": " .. formattedScore
-		love.graphics.printf(tempString,x,y, lineLength, alignment)
-		y = y + 20	-- prep the y value for the next score (will be ignored for single player)
+		-- guard against connecting mplayer clients not having complete data
+		if lander.score ~= nil then
+			local roundedScore = Cf.round(lander.score)
+			local formattedScore = Cf.strFormatThousand(roundedScore)		
+			local tempString = lander.name .. ": " .. formattedScore
+			love.graphics.printf(tempString,x,y, lineLength, alignment)
+			y = y + 20	-- prep the y value for the next score (will be ignored for single player)
+		end
 	end
 end
 

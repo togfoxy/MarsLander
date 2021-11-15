@@ -18,6 +18,7 @@ local keyDown = love.keyboard.isDown
 -- TODO: Create the spriteData with width and height automatically (except for animations)
 local ship = Assets.getImageSet("ship")
 local flame = Assets.getImageSet("flame")
+local parachute = Assets.getImageSet("parachute")
 
 local landingSound = Assets.getSound("landingSuccess")
 local failSound = Assets.getSound("wrong")
@@ -30,9 +31,67 @@ local engineSound = Assets.getSound("engine")
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
+
+
+local function recalcDefaultMass(lander)
+	local result = 0
+	-- all the masses are stored in this table so add them up
+	for i = 1, #lander.mass do
+		result = result + lander.mass[i]
+	end
+	-- return mass of all the components + mass of fuel
+	return (result + lander.fuelCapacity)
+end
+
+
+
+local function landerHasFuelToThrust(lander, dt)
+-- returns true if the lander has enough fuel for thrust
+-- returns false if not enough fuel to thrust
+-- Note: fuel can be > 0 but still not enough to thrust
+
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Modules.thrusters)
+	if (lander.fuel - dt) >= 0 or (hasThrusterUpgrade and (lander.fuel - (dt * 0.80)) >= 0) then
+		return true
+	else
+		return false
+	end
+end
+
+
+
+local function parachuteIsDeployed(lander)
+-- return true if lander has a parachute and it is deployed
+
+	for _, moduleItem in pairs(lander.modules) do
+		if moduleItem.id == 5 then	-- 5 = parachute	
+			if moduleItem.deployed then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+
+
+local function deployParachute(lander)
+-- sets the 'deployed' status of parachute
+-- assumes the lander has a parachute
+
+	for _, moduleItem in pairs(lander.modules) do
+		if moduleItem.id == 5 then	-- 5 = parachute
+			moduleItem.deployed = true
+			break
+		end
+	end
+end
+
+
+
 local function doThrust(lander, dt)
 	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Modules.thrusters)
-	if lander.fuel - dt >= 0 or (hasThrusterUpgrade and lander.fuel - (dt * 0.80) >= 0) then
+	if landerHasFuelToThrust(lander, dt) then
 		local angleRadian = math.rad(lander.angle)
 		local forceX = math.cos(angleRadian) * dt
 		local forceY = math.sin(angleRadian) * dt
@@ -71,25 +130,45 @@ end
 
 
 local function thrustLeft(lander, dt)
-	if Lander.hasUpgrade(lander, Modules.sideThrusters) then
-		local forceX = 0.5 * dt		--!
+-- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
+	if Lander.hasUpgrade(lander, Modules.sideThrusters) and landerHasFuelToThrust(lander, dt) then
+		local forceX = 0.5 * dt
 		lander.vx = lander.vx - forceX
 		-- opposite engine is on
 		lander.rightEngineOn = true
 		lander.fuel = lander.fuel - forceX
 	end
+	
+	-- if trying to side thrust and has parachute and descending and on the screen then ...
+	if Lander.hasUpgrade(lander, Modules.parachute) and not landerHasFuelToThrust(lander, dt) then
+		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
+			-- parachutes allow left/right drifting even if no fuel and thrusters available
+			deployParachute(lander)
+			local forceX = 0.5 * dt
+			lander.vx = lander.vx - forceX	
+		end
+	end	
 end
 
 
 
 local function thrustRight(lander, dt)
-	if Lander.hasUpgrade(lander, Modules.sideThrusters) then
-		local forceX = 0.5 * dt		--!
+	if Lander.hasUpgrade(lander, Modules.sideThrusters) and landerHasFuelToThrust(lander, dt) then
+		local forceX = 0.5 * dt
 		lander.vx	= lander.vx + forceX
 		lander.fuel = lander.fuel - forceX
 		-- opposite engine is on
 		lander.leftEngineOn = true
 	end
+	
+	-- if trying to side thrust and has parachute and descending and on the screen then ...
+	if Lander.hasUpgrade(lander, Modules.parachute) and not landerHasFuelToThrust(lander, dt) then
+		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
+			deployParachute(lander)
+			local forceX = 0.5 * dt
+			lander.vx = lander.vx + forceX	
+		end
+	end		
 end
 
 
@@ -107,12 +186,16 @@ local function moveShip(lander, dt)
 	if not lander.onGround then
 		-- apply gravity
 		lander.vy = lander.vy + (Enum.constGravity * dt)
+		
+		-- parachutes slow descent
+		if parachuteIsDeployed(lander) and lander.vy > 0.5 then
+			lander.vy = 0.5
+		end	
+		
 		-- used to determine speed right before touchdown
 		LANDER_VY = lander.vy
 		LANDER_VX = lander.vx
 	end
-	
-	-- lander.x = Cf.round(lander.x,0)
 end
 
 
@@ -173,7 +256,7 @@ local function checkForContact(lander, dt)
 	-- bestDistance could be a negative number meaning not yet past the base (but maybe really close to it)
 	-- FIXME: Couldn't baseType be a string like "fuelStation" instead of numbers?
 	-- 2 = type of base = fuel
-	local bestDistance, bestBase = Fun.GetDistanceToClosestBase(lander.x, 2)
+	local bestDistance, bestBase = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
 	-- bestBase is an object/table item
 	-- add money based on alignment to centre of landing pad
 	if bestDistance >= -80 and bestDistance <= 40 then
@@ -185,9 +268,33 @@ local function checkForContact(lander, dt)
 
 	-- check if lander is at or below the terrain
 	-- the offset is the size of the lander image
-	if lander.y > roundedGroundY - 8 then
+	if lander.y > roundedGroundY - 8 then	-- 8 = the image offset for visual effect
 		-- a heavy landing will cause damage
 		checkForDamage(lander)
+		
+		if not lander.onGround then
+
+			-- destroy the single use parachute
+			if parachuteIsDeployed(lander) then
+				-- need to destroy this single-use module
+				local moduleIndexToDestroy = 0
+				for moduleIndex, moduleItem in pairs(lander.modules) do
+					if moduleItem.id == 5 and moduleItem.deployed then	-- 5 = parachute
+						moduleIndexToDestroy = moduleIndex
+						moduleItem.deployed = false
+						break
+					end
+				end
+				assert(moduleIndexToDestroy > 0)
+				table.remove(lander.modules, moduleIndexToDestroy)
+				-- adjust new mass
+				DEFAULT_MASS = recalcDefaultMass(lander)
+			end	
+		end
+		
+		-- NOTE: if you need to check things on first contact with terrain (like receiving damage) then place
+		-- that code above lander.onGround = true
+		
 		-- Lander is on ground
 		lander.onGround = true
 		-- Stop x, y movement
@@ -210,6 +317,7 @@ local function checkForContact(lander, dt)
 				lander.gameOver = true
 			end
 		end
+		
 		-- check for game-over conditions
 		if not onBase and lander.fuel <= 1 then
 			lander.gameOver = true
@@ -237,27 +345,13 @@ end
 
 
 
-local function recalcDefaultMass(lander)
-	local result = 0
-	-- all the masses are stored in this table so add them up
-	for i = 1, #lander.mass do
-		result = result + lander.mass[i]
-	end
-	-- return mass of all the components + mass of fuel
-	return (result + lander.fuelCapacity)
-end
-
-
-
 local function buyModule(module, lander)
 	-- Enough money to purchase the module ?
 	if lander.money >= module.cost then
-		for i = 1, #lander.modules do
-			if lander.modules[i] == module then
-				-- this module is already purchased
-				failSound:play()
-				return
-			end
+		if Lander.hasUpgrade(lander, module) then
+			-- this module is already purchased
+			failSound:play()
+			return
 		end
 
 		-- TODO: Switch this temporary solution to something more dynamic
@@ -466,48 +560,55 @@ end
 function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(LANDERS) do
-		local sx, sy = 1.5, 1.5
+		-- guard against connecting mplayer clients not having complete data
+		if landerId == 1 or lander.x ~= nil then
+			local sx, sy = 1.5, 1.5
+			local x = lander.x - WORLD_OFFSET
+			local y = lander.y
+			local ox = ship.width / 2
+			local oy = ship.height / 2
 
-		assert(lander.x ~= nil)
+			-- fade other landers in multiplayer mode
+			if landerId == 1 then
+				love.graphics.setColor(1,1,1,1)
+			else
+				love.graphics.setColor(1,1,1,0.5)
+			end
+			
+			-- draw parachute before drawing the lander
+			if parachuteIsDeployed(lander) then
+				local parachuteYOffset = y - parachute.image:getHeight()
+				local parachuteXOffset = x - parachute.image:getWidth() / 2
+				love.graphics.draw(parachute.image, parachuteXOffset, parachuteYOffset)
+			end		
 
-		local x = lander.x - WORLD_OFFSET
-		local y = lander.y
-		local ox = ship.width / 2
-		local oy = ship.height / 2
+			-- TODO: work out why ship.width doesn't work in mplayer mode
+			love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
 
-		-- fade other landers in multiplayer mode
-		if landerId == 1 then
+			-- draw flames
+			local ox = flame.width / 2
+			local oy = flame.height / 2
+			if lander.engineOn then
+				local angle = math.rad(lander.angle)
+				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
+				lander.engineOn = false
+			end
+			if lander.leftEngineOn then
+				local angle = math.rad(lander.angle + 90)
+				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
+				lander.leftEngineOn = false
+			end
+			if lander.rightEngineOn then
+				local angle = math.rad(lander.angle - 90)
+				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
+				lander.rightEngineOn = false
+			end
+			
+			-- draw label
+			love.graphics.setNewFont(10)
+			love.graphics.print(lander.name, x + 14, y - 10)
 			love.graphics.setColor(1,1,1,1)
-		else
-			love.graphics.setColor(1,1,1,0.5)
 		end
-
-		-- TODO: work out why ship.width doesn't work in mplayer mode
-		love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
-
-		-- draw flames
-		local ox = flame.width / 2
-		local oy = flame.height / 2
-		if lander.engineOn then
-			local angle = math.rad(lander.angle)
-			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
-			lander.engineOn = false
-		end
-		if lander.leftEngineOn then
-			local angle = math.rad(lander.angle + 90)
-			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
-			lander.leftEngineOn = false
-		end
-		if lander.rightEngineOn then
-			local angle = math.rad(lander.angle - 90)
-			love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
-			lander.rightEngineOn = false
-		end
-
-		-- draw label
-		love.graphics.setNewFont(10)
-		love.graphics.print(lander.name, x + 14, y - 10)
-		love.graphics.setColor(1,1,1,1)
 	end
 end
 
@@ -517,7 +618,7 @@ function Lander.keypressed(key, scancode, isrepeat)
 	-- Let the player buy upgrades when landed on a fuel base
 	local lander = LANDERS[1]
 	-- 2 = base type (fuel)
-	if Lander.isOnLandingPad(lander, 2) then
+	if Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
 		-- Iterate all available modules
 		for _, module in pairs(Modules) do
 			-- Press key assigned to the module by its id

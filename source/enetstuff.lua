@@ -106,22 +106,7 @@ function EnetHandler.update(dt)
 		if timerHostSendTimer <= 0 then
 			timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 			for _, lander in pairs(LANDERS) do
-				-- could send the whole LANDERS element
-				-- but better to send a skinny version
-				local skinnyLander = {}
-				skinnyLander.x = lander.x 
-				skinnyLander.y = lander.y
-				skinnyLander.connectionID = lander.connectionID	-- used by enet
-				skinnyLander.angle = lander.angle
-				skinnyLander.engineOn = lander.engineOn
-				skinnyLander.leftEngineOn = lander.leftEngineOn
-				skinnyLander.rightEngineOn = lander.rightEngineOn
-				skinnyLander.score = lander.score
-				skinnyLander.name = lander.name
-				-- skinnyLander = lander.health		-- to be incorporated later
-				-- skinnyLander = lander.modules	-- to be incorporated later			
-		
-				server:sendToAll("peerupdate",skinnyLander)
+				server:sendToAll("peerupdate",lander)
 			end
 		end
 		
