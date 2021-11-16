@@ -1,6 +1,6 @@
 local functions = {}
 
-function functions.QuitGame()
+function functions.quitGame()
 -- cleans up before quiting the game
 
 	if ENET_IS_CONNECTED then
@@ -28,7 +28,7 @@ end
 
 function functions.RemoveScreen()
 	if #CURRENT_SCREEN == 1 then
-		functions.QuitGame()
+		functions.quitGame()
 	end
 	table.remove(CURRENT_SCREEN)
 end
