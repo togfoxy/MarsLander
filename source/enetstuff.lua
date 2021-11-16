@@ -11,9 +11,14 @@ local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
-function EnetHandler.ClientDisconnecting(clientConnectionID)
+function EnetHandler.disconnectClient(clientConnectionID)
 -- client is disconnecting. Send msg to host
+	ENET_IS_CONNECTED = false
+	IS_A_CLIENT = false
+
 	client:send("clientdisconnect", clientConnectionID)
+	client:update()
+	client:disconnect()
 end
 
 
@@ -21,7 +26,7 @@ end
 function EnetHandler.createHost()
 -- called by menu
 
-	server = Sock.newServer(HOST_IP_ADDRESS, 22122)
+	server = Sock.newServer("*", 22122)
 	ENET_IS_CONNECTED = true
 	
     -- Called when receiving a message of type "connect"
@@ -67,7 +72,7 @@ function EnetHandler.createHost()
 		end
 		if isLanderFound then
 			table.remove(LANDERS, myLanderIndex)
-print("client " .. myLanderIndex .. " is removed.")
+			print("client " .. myLanderIndex .. " is removed.")
 		end
 	end)
 end
@@ -119,6 +124,11 @@ function EnetHandler.createClient()
 		end
 	end)
 	
+    -- Called when the client disconnects from the server
+    client:on("disconnect", function(data)
+        print("Client disconnected from the server.")
+    end)
+		
 	client:connect()
 end
 

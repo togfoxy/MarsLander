@@ -8,10 +8,7 @@ end
 function functions.RemoveScreen()
 	table.remove(CURRENT_SCREEN)
 	if #CURRENT_SCREEN < 1 then
-
-		--if success then
-			love.event.quit()       --! this doesn't dothe same as the EXIT button
-		--end
+		love.event.quit()
 	end
 end
 

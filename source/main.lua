@@ -299,7 +299,7 @@ function love.keypressed(key, scancode, isrepeat)
 			-- test if pressing ESC on main screen (i.e. quiting)
 			if #CURRENT_SCREEN == 1 then
 				if IS_A_CLIENT then
-					EnetHandler.ClientDisconnecting(LANDERS[1].connectionID)
+					EnetHandler.disconnectClient(LANDERS[1].connectionID)
 				elseif IS_A_HOST then
 				
 				else
