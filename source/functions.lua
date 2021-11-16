@@ -1,22 +1,45 @@
 local functions = {}
 
+local function QuitGame()
+-- cleans up before quiting the game
+
+	if ENET_IS_CONNECTED then
+		-- test if pressing ESC on main screen (i.e. quiting)
+		if #CURRENT_SCREEN == 1 then
+			if IS_A_CLIENT then
+				EnetHandler.disconnectClient(LANDERS[1].connectionID)
+			elseif IS_A_HOST then
+				EnetHandler.disconnectHost()
+			else
+				error("Error 10 occured while player disconnected.")
+			end
+		end
+	end
+	love.event.quit()
+end
+
+
+
 function functions.AddScreen(strNewScreen)
 	table.insert(CURRENT_SCREEN, strNewScreen)
 end
 
 
+
 function functions.RemoveScreen()
-	table.remove(CURRENT_SCREEN)
-	if #CURRENT_SCREEN < 1 then
-		love.event.quit()
+	if #CURRENT_SCREEN == 1 then
+		QuitGame()
 	end
+	table.remove(CURRENT_SCREEN)
 end
+
 
 
 function functions.CurrentScreenName()
 -- returns the current active screen
 	return CURRENT_SCREEN[#CURRENT_SCREEN]
 end
+
 
 
 function functions.SwapScreen(newscreen)
@@ -26,6 +49,7 @@ function functions.SwapScreen(newscreen)
     Fun.AddScreen(newscreen)
     table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
 end
+
 
 
 function functions.SaveGameSettings()
@@ -39,6 +63,7 @@ function functions.SaveGameSettings()
     serialisedString = Bitser.dumps(GAME_SETTINGS)
     success, message = Nativefs.write(savefile, serialisedString )
 end
+
 
 
 function functions.LoadGameSettings()
@@ -83,6 +108,7 @@ function functions.LoadGameSettings()
 end
 
 
+
 function functions.SaveGame()
 -- uses the globals because too hard to pass params
 
@@ -108,6 +134,7 @@ function functions.SaveGame()
 	LovelyToasts.show("Game saved",3, "middle")
 
 end
+
 
 
 function functions.LoadGame()
@@ -150,6 +177,7 @@ function functions.LoadGame()
 		LovelyToasts.show("ERROR: Unable to load game!", 3, "middle")
 	end
 end
+
 
 
 function functions.CalculateScore()

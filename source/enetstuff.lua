@@ -28,9 +28,10 @@ function EnetHandler.disconnectClient(clientConnectionID)
 	ENET_IS_CONNECTED = false
 	IS_A_CLIENT = false
 
+print("delta")
 	client:send("clientdisconnect", clientConnectionID)
 	client:update()
-	client:disconnect()
+	-- client:disconnect()
 end
 
 
@@ -73,6 +74,7 @@ function EnetHandler.createHost()
 	end)
 	
 	server:on("clientdisconnect", function(clientConnectionID, clientInfo)
+print("char")
 		local isLanderFound = false
 		local myLanderIndex
 		for k,lander in pairs(LANDERS) do
