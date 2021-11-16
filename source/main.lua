@@ -301,7 +301,7 @@ function love.keypressed(key, scancode, isrepeat)
 				if IS_A_CLIENT then
 					EnetHandler.disconnectClient(LANDERS[1].connectionID)
 				elseif IS_A_HOST then
-				
+					EnetHandler.disconnectHost()
 				else
 					error("Error 10 occured while player disconnected.")
 				end

@@ -11,6 +11,18 @@ local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
+
+
+function EnetHandler.disconnectHost()
+	ENET_IS_CONNECTED = false
+	IS_A_HOST = false
+	server:sendToAll("hostshutdown")
+	server:update()
+	server:destroy()
+end
+
+
+
 function EnetHandler.disconnectClient(clientConnectionID)
 -- client is disconnecting. Send msg to host
 	ENET_IS_CONNECTED = false
@@ -128,6 +140,17 @@ function EnetHandler.createClient()
     client:on("disconnect", function(data)
         print("Client disconnected from the server.")
     end)
+	
+	client:on("hostshutdown", function()
+		client:disconnect()
+		ENET_IS_CONNECTED = false
+		IS_A_CLIENT = false
+		for i = 1, #LANDERS do
+			if i > 1 then
+				table.remove(LANDERS, i)
+			end
+		end
+	end)
 		
 	client:connect()
 end
