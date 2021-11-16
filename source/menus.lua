@@ -138,7 +138,8 @@ function Menus.DrawMainMenu()
 		Slab.NewLine()
 
 		if Slab.Button("Exit",{W=155}) then
-			love.event.quit(0)
+			-- love.event.quit(0)
+			Fun.QuitGame()
 		end
 		Slab.NewLine()
 
