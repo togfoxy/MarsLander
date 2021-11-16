@@ -5,26 +5,32 @@ All notable changes to this project should be documented in this file.
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
 
-## UNRELEASED
+## v0.12 - UNRELEASED
 
 ### Added
-- added the 'wrong' sound in an additional place in the shop
+
 - the 'R'eset key is disabled in mplayer mode. Use the new enter/return key to reset a single lander
 - disabled load/save when in multiplayer mode
 - can now buy a parachute module. Deploys automatically. Use the side thruster keys (q/e) to steer. Single use.
-
-
+- Host/client disconnections are now actively managed
+- ability for external clients to connect over internet (not just LAN)
 
 ### Changed
-- removed the generation of buildings for now. Intend to put them back in soon
-- buildings are now being generated again
+
+### Fixed
+- fix background drawn wrong on full screen
+- Fixed assets not being checked for supported file types
+
+## v0.11
+### Added
+- added the 'wrong' sound in an additional place in the shop
+
+### Changed
+- restored the original 'wrong' sound as it is better
 - buildings and fuel bases are determined on demand and not up-front
 - removed the images/sprites out of the lander table
 - major code re-organization and optimization
 - 'p' now unpauses the game
-- restored the original 'wrong' sound as it is better
-
-
 
 ### Fixed
 - fixed saved player name not being displayed correctly in-game
@@ -38,10 +44,6 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - rangefinder fixed
 - fixed the '$' sign in the shop
 - fix smoke particles not being removed after starting a new game
-- fix background drawn wrong on full screen
-- Fixed assets not being checked for supported file types
-
-
 
 ## v0.10
 ### Added

@@ -11,10 +11,33 @@ local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
+
+
+function EnetHandler.disconnectHost()
+	ENET_IS_CONNECTED = false
+	IS_A_HOST = false
+	server:sendToAll("hostshutdown")
+	server:update()
+	server:destroy()
+end
+
+
+
+function EnetHandler.disconnectClient(clientConnectionID)
+-- client is disconnecting. Send msg to host
+	ENET_IS_CONNECTED = false
+	IS_A_CLIENT = false
+
+	client:send("clientdisconnect", clientConnectionID)
+	client:update()
+end
+
+
+
 function EnetHandler.createHost()
 -- called by menu
 
-	server = Sock.newServer(HOST_IP_ADDRESS, 22122)
+	server = Sock.newServer("*", 22122)
 	ENET_IS_CONNECTED = true
 	
     -- Called when receiving a message of type "connect"
@@ -32,7 +55,7 @@ function EnetHandler.createHost()
 	server:on("clientdata", function(lander, clientInfo)
 
 		-- match the incoming lander object
-		for k,v in pairs(LANDERS) do
+		for _,v in pairs(LANDERS) do
 			if v.connectionID == lander.connectionID then
 				v.x = lander.x 
 				v.y = lander.y
@@ -45,6 +68,22 @@ function EnetHandler.createHost()
 				v.name = lander.name
 				break
 			end
+		end
+	end)
+	
+	server:on("clientdisconnect", function(clientConnectionID, clientInfo)
+		local isLanderFound = false
+		local myLanderIndex
+		for k,lander in pairs(LANDERS) do
+			myLanderIndex = k
+			if lander.connectionID == clientConnectionID then
+				isLanderFound = true
+				break
+			end
+		end
+		if isLanderFound then
+			table.remove(LANDERS, myLanderIndex)
+			print("client " .. myLanderIndex .. " is removed.")
 		end
 	end)
 end
@@ -96,6 +135,22 @@ function EnetHandler.createClient()
 		end
 	end)
 	
+    -- Called when the client disconnects from the server
+    client:on("disconnect", function(data)
+        print("Client disconnected from the server.")
+    end)
+	
+	client:on("hostshutdown", function()
+		client:disconnect()
+		ENET_IS_CONNECTED = false
+		IS_A_CLIENT = false
+		for i = 1, #LANDERS do
+			if i > 1 then
+				table.remove(LANDERS, i)
+			end
+		end
+	end)
+		
 	client:connect()
 end
 

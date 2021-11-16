@@ -76,7 +76,7 @@ function Menus.DrawMainMenu()
 		end
 		Slab.NewLine()
 
-		if not IS_A_CLIENT and not IS_A_HOST then
+		if not ENET_IS_CONNECTED then
 			if Slab.Button("Host game",{W=155}) then
 				IS_A_CLIENT = false
 				IS_A_HOST = true
@@ -120,13 +120,16 @@ function Menus.DrawMainMenu()
 				GAME_SETTINGS.hostPort = Slab.GetInputText() or "22122"
 			end
 
-			if Slab.Button("Join game",{W=155}) then
-				IS_A_HOST = false
-				IS_A_CLIENT = true
-				Fun.SaveGameSettings()
-				EnetHandler.createClient()
+			-- don't show JOIN button if already connected
+			if not ENET_IS_CONNECTED then
+				if Slab.Button("Join game",{W=155}) then
+					IS_A_HOST = false
+					IS_A_CLIENT = true
+					Fun.SaveGameSettings()
+					EnetHandler.createClient()
+				end
+				Slab.NewLine()
 			end
-			Slab.NewLine()
 		end
 
 		if Slab.Button("Credits",{W=155}) then
@@ -135,7 +138,8 @@ function Menus.DrawMainMenu()
 		Slab.NewLine()
 
 		if Slab.Button("Exit",{W=155}) then
-			love.event.quit(0)
+			-- love.event.quit(0)
+			Fun.quitGame()
 		end
 		Slab.NewLine()
 
