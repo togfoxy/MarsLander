@@ -12,8 +12,8 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - the 'R'eset key is disabled in mplayer mode. Use the new enter/return key to reset a single lander
 - disabled load/save when in multiplayer mode
 - can now buy a parachute module. Deploys automatically. Use the side thruster keys (q/e) to steer. Single use.
-
-
+- Host/client disconnections are now actively managed
+- ability for external clients to connect over internet (not just LAN)
 
 ### Changed
 - removed the generation of buildings for now. Intend to put them back in soon
@@ -23,8 +23,6 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - major code re-organization and optimization
 - 'p' now unpauses the game
 - restored the original 'wrong' sound as it is better
-
-
 
 ### Fixed
 - fixed saved player name not being displayed correctly in-game
