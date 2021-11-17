@@ -189,6 +189,10 @@ local function drawScore()
 			y = y + 20	-- prep the y value for the next score (will be ignored for single player)
 		end
 	end
+
+	-- print high score
+	local highscore = Cf.strFormatThousand(Cf.round(GAME_SETTINGS.HighScore))
+	love.graphics.print("High Score: " .. highscore, (SCREEN_WIDTH / 2) - 75, 90)	
 end
 
 

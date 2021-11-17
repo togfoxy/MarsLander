@@ -74,8 +74,9 @@ Assets.newFont(20)
 
 -- TODO: Turn global modules / objects to local ones
 -- Scripts
+Enum		= require 'scripts.enum'		-- ensure Enum is declared first
 Modules		= require 'scripts.modules'		-- Lander modules
-Enum		= require 'scripts.enum'
+
 -- Objects
 Smoke 		= require 'objects.smoke'		-- Smoke particles for objects
 Lander 		= require 'objects.lander'
