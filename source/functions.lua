@@ -30,6 +30,14 @@ function functions.RemoveScreen()
 	if #CURRENT_SCREEN == 1 then
 		functions.quitGame()
 	end
+	
+	-- save settings if leaving the settings screen
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
+	if strCurrentScreen == "Settings" then
+		Fun.SaveGameSettings()
+		Fun.SaveGameConfig()
+	end
+	
 	table.remove(CURRENT_SCREEN)
 end
 
@@ -48,6 +56,37 @@ function functions.SwapScreen(newscreen)
 
     Fun.AddScreen(newscreen)
     table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
+end
+
+
+
+function functions.SaveGameConfig()
+-- save game settings so they can be autoloaded next session
+	local savefile
+	local serialisedString
+	local success, message
+	local savedir = love.filesystem.getSource()
+
+    savefile = savedir .. "/" .. "gameconfig.dat"
+    serialisedString = Bitser.dumps(GAME_CONFIG)
+    success, message = Nativefs.write(savefile, serialisedString )
+end
+
+
+function functions.LoadGameConfig()
+    local savedir = love.filesystem.getSource()
+    love.filesystem.setIdentity( savedir )
+
+    local savefile, contents
+
+    savefile = savedir .. "/" .. "gameconfig.dat"
+    contents, _ = Nativefs.read(savefile)
+	local success
+    success, GAME_CONFIG = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
+
+	if success == false then
+		GAME_CONFIG = {}
+	end
 end
 
 
