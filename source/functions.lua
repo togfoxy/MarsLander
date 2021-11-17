@@ -1,5 +1,31 @@
 local functions = {}
 
+
+
+local function setDefaultGameConfigs()
+-- sets all game configs to default settings
+
+	GAME_CONFIG = {}
+	GAME_CONFIG.allowParachutes = true
+	GAME_CONFIG.useAdvancedPhysics = false
+
+end
+
+
+
+local function configureModules()
+-- modules need to be activated once GAME_SETTINGS is loaded
+-- cycle through all modules and set ACTIVE on those that are configurable
+
+	for _,module in pairs(Modules) do
+		if module.id == Enum.moduleParachute then
+			module.allowed = GAME_CONFIG.allowParachutes
+		end
+	end
+end
+
+
+
 function functions.quitGame()
 -- cleans up before quiting the game
 
@@ -60,17 +86,6 @@ end
 
 
 
-local function setDefaultGameConfigs()
--- sets all game configs to default settings
-
-	GAME_CONFIG = {}
-	GAME_CONFIG.allowParachutes = true
-	GAME_CONFIG.useAdvancedPhysics = false
-
-end
-
-
-
 function functions.SaveGameConfig()
 -- save game settings so they can be autoloaded next session
 	local savefile
@@ -82,6 +97,7 @@ function functions.SaveGameConfig()
     serialisedString = Bitser.dumps(GAME_CONFIG)
     success, message = Nativefs.write(savefile, serialisedString )
 end
+
 
 
 function functions.LoadGameConfig()
@@ -98,6 +114,10 @@ function functions.LoadGameConfig()
 	if success == false then
 		setDefaultGameConfigs()
 	end
+	
+	-- turn on and off modules
+	configureModules()
+	
 end
 
 

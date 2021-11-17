@@ -64,7 +64,7 @@ local function parachuteIsDeployed(lander)
 -- return true if lander has a parachute and it is deployed
 
 	for _, moduleItem in pairs(lander.modules) do
-		if moduleItem.id == 5 then	-- 5 = parachute	
+		if moduleItem.id == Enum.moduleParachute then	
 			if moduleItem.deployed then
 				return true
 			end
@@ -80,7 +80,7 @@ local function deployParachute(lander)
 -- assumes the lander has a parachute
 
 	for _, moduleItem in pairs(lander.modules) do
-		if moduleItem.id == 5 then	-- 5 = parachute
+		if moduleItem.id == Enum.moduleParachute then
 			moduleItem.deployed = true
 			break
 		end
@@ -347,33 +347,35 @@ end
 
 local function buyModule(module, lander)
 	-- Enough money to purchase the module ?
-	if lander.money >= module.cost then
-		if Lander.hasUpgrade(lander, module) then
-			-- this module is already purchased
-			failSound:play()
-			return
-		end
-
-		-- TODO: Switch this temporary solution to something more dynamic
-		if module.fuelCapacity then
-			if module.fuelCapacity > lander.fuelCapacity then
-				lander.fuelCapacity = module.fuelCapacity
-			else
-				-- Downgrading wouldn't be that fun
+	if module.allowed == nil or module.allowed == true then
+		if lander.money >= module.cost then
+			if Lander.hasUpgrade(lander, module) then
+				-- this module is already purchased
+				failSound:play()
 				return
 			end
-		end
+		
+			-- TODO: Switch this temporary solution to something more dynamic
+			if module.fuelCapacity then
+				if module.fuelCapacity > lander.fuelCapacity then
+					lander.fuelCapacity = module.fuelCapacity
+				else
+					-- Downgrading wouldn't be that fun
+					return
+				end
+			end
 
-		-- can purchase this module
-		table.insert(lander.modules, module)
-		-- pay for it
-		lander.money = lander.money - module.cost
-		-- add and calculate new mass
-		lander.mass[#lander.mass+1] = module.mass
-		DEFAULT_MASS = recalcDefaultMass(lander)
-	else
-		-- play 'failed' sound
-		failSound:play()
+			-- can purchase this module
+			table.insert(lander.modules, module)
+			-- pay for it
+			lander.money = lander.money - module.cost
+			-- add and calculate new mass
+			lander.mass[#lander.mass+1] = module.mass
+			DEFAULT_MASS = recalcDefaultMass(lander)
+		else
+			-- play 'failed' sound
+			failSound:play()
+		end
 	end
 end
 
@@ -617,10 +619,10 @@ end
 function Lander.keypressed(key, scancode, isrepeat)
 	-- Let the player buy upgrades when landed on a fuel base
 	local lander = LANDERS[1]
-	-- 2 = base type (fuel)
+	
 	if Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
 		-- Iterate all available modules
-		for _, module in pairs(Modules) do
+		for k, module in pairs(Modules) do
 			-- Press key assigned to the module by its id
 			if key == tostring(module.id) then
 				buyModule(module, lander)

@@ -276,9 +276,6 @@ function Menus.DrawSettingsMenu()
 		
 		Slab.SetLayoutColumn(1)
 
-		Slab.NewLine()
-		Slab.Textf("Player Settings:")
-		Slab.NewLine()
 		Slab.Textf("Name:")
 		local PlayerName = GAME_SETTINGS.PlayerName
 		if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
@@ -293,8 +290,6 @@ function Menus.DrawSettingsMenu()
 				GAME_SETTINGS.PlayerName = PlayerName
 			end
 		end
-		Slab.NewLine()
-		Slab.Separator()
 
 		Slab.NewLine()
 		Slab.Text("Game Settings:")
@@ -304,16 +299,14 @@ function Menus.DrawSettingsMenu()
 		end
 
 		Slab.NewLine()
-		Slab.Separator()
 
-		Slab.NewLine()
-		if Slab.Button("OK") then
-			-- return to the previous game state
-			Fun.RemoveScreen()
-		end
-		
 		-- all the configurable options go here
 		Slab.SetLayoutColumn(2)
+		
+		Slab.Textf("Options:")
+		if Slab.CheckBox(GAME_CONFIG.showDEBUG, "Show debug info") then
+			GAME_CONFIG.showDEBUG = not GAME_CONFIG.showDEBUG
+		end		
 		
 		if Slab.CheckBox(GAME_CONFIG.allowParachutes, "Allow parachutes") then
 			GAME_CONFIG.allowParachutes = not GAME_CONFIG.allowParachutes
@@ -324,6 +317,27 @@ function Menus.DrawSettingsMenu()
 		end
 		
 		Slab.EndLayout() -- layout-settings
+		
+		-- this displays the OK button at the bottom
+		Slab.BeginLayout('layout-settings2',{AlignX = "center"})
+			
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			
+			Slab.Separator()	
+			Slab.NewLine()
+			if Slab.Button("OK") then
+				-- return to the previous game state
+				Fun.RemoveScreen()
+			end		
+		Slab.EndLayout() -- layout-settings
+		
 	Slab.EndWindow()
 end
 

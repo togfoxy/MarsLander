@@ -18,6 +18,7 @@ local Modules =  {
         cost = 200,
         mass = 10,
         fuelCapacity = 32,
+		allowed = false
     },
     rangefinder = {
         id = Enum.moduleRangefinder,
@@ -37,8 +38,8 @@ local Modules =  {
 		cost = 100,
 		mass = 10,
 		deployed = false,
+		allowed = true,
 	},
 }
-
 
 return Modules
