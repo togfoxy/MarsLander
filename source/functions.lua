@@ -60,6 +60,17 @@ end
 
 
 
+local function setDefaultGameConfigs()
+-- sets all game configs to default settings
+
+	GAME_CONFIG = {}
+	GAME_CONFIG.allowParachutes = true
+	GAME_CONFIG.useAdvancedPhysics = false
+
+end
+
+
+
 function functions.SaveGameConfig()
 -- save game settings so they can be autoloaded next session
 	local savefile
@@ -85,7 +96,7 @@ function functions.LoadGameConfig()
     success, GAME_CONFIG = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
 
 	if success == false then
-		GAME_CONFIG = {}
+		setDefaultGameConfigs()
 	end
 end
 

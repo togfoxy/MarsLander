@@ -253,8 +253,8 @@ function Menus.DrawCredits()
 end
 
 function Menus.DrawSettingsMenu()
-	local intSlabWidth = 400	-- the width of the settings window slab.
-	local intSlabHeight = 250 	-- the height of the windowslab
+	local intSlabWidth = 500	-- the width of the settings window slab.
+	local intSlabHeight = 300 	-- the height of the windowslab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -264,7 +264,7 @@ function Menus.DrawSettingsMenu()
 		Y = fltSlabWindowY,
 		W = intSlabWidth,
 		H = intSlabHeight,
-		Border = 0,
+		Border = 15,
 		AutoSizeWindow = false,
 		AllowMove = false,
 		AllowResize = false,
@@ -272,7 +272,9 @@ function Menus.DrawSettingsMenu()
 		}
 
 	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
-		Slab.BeginLayout('layout-settings',{AlignX = "center"})
+		Slab.BeginLayout('layout-settings',{AlignX = "left", Columns = 2})
+		
+		Slab.SetLayoutColumn(1)
 
 		Slab.NewLine()
 		Slab.Textf("Player Settings:")
@@ -299,7 +301,6 @@ function Menus.DrawSettingsMenu()
 		if Slab.CheckBox(GAME_SETTINGS.FullScreen, "Full Screen") then
 			GAME_SETTINGS.FullScreen = not GAME_SETTINGS.FullScreen
 			love.window.setFullscreen(GAME_SETTINGS.FullScreen)
-			Fun.SaveGameSettings()
 		end
 
 		Slab.NewLine()
@@ -310,7 +311,18 @@ function Menus.DrawSettingsMenu()
 			-- return to the previous game state
 			Fun.RemoveScreen()
 		end
-
+		
+		-- all the configurable options go here
+		Slab.SetLayoutColumn(2)
+		
+		if Slab.CheckBox(GAME_CONFIG.allowParachutes, "Allow parachutes") then
+			GAME_CONFIG.allowParachutes = not GAME_CONFIG.allowParachutes
+		end
+		
+		if Slab.CheckBox(GAME_CONFIG.useAdvancedPhysics, "Use advanced physics") then
+			GAME_CONFIG.useAdvancedPhysics = not GAME_CONFIG.useAdvancedPhysics
+		end
+		
 		Slab.EndLayout() -- layout-settings
 	Slab.EndWindow()
 end
