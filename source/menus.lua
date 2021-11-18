@@ -307,6 +307,10 @@ function Menus.DrawSettingsMenu()
 		if Slab.CheckBox(GAME_CONFIG.showDEBUG, "Show debug info") then
 			GAME_CONFIG.showDEBUG = not GAME_CONFIG.showDEBUG
 		end		
+
+		if Slab.CheckBox(GAME_CONFIG.easyMode, "Easy mode") then
+			GAME_CONFIG.easyMode = not GAME_CONFIG.easyMode
+		end
 		
 		if Slab.CheckBox(GAME_CONFIG.allowParachutes, "Allow parachutes") then
 			GAME_CONFIG.allowParachutes = not GAME_CONFIG.allowParachutes

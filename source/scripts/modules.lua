@@ -8,7 +8,7 @@
 local Modules =  {
     thrusters = {
         id = Enum.moduleEfficientThrusters,
-        name = "Efficent Thrusters",
+        name = "Efficient Thrusters",
         cost = 225,
         mass = 20,
     },

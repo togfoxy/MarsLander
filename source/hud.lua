@@ -142,8 +142,8 @@ local function drawShopMenu()
 
 		-- Create List of available modules
 		local y = SCREEN_HEIGHT * 0.33
-		
-		for _, module in pairs(Modules) do
+
+		for k, module in pairs(Modules) do
 			if module.allowed == nil or module.allowed == true then
 				local string = "%s. Buy %s - $%s \n"
 				itemListString = string.format(string, module.id, module.name, module.cost)

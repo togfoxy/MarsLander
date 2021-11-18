@@ -230,6 +230,10 @@ local function payLanderForControl(lander, base)
 		lander.money = Cf.round(lander.money + ((1 - LANDER_VY) * 100),0)
 		-- pay for a good horizontal speed
 		lander.money = Cf.round(lander.money + (0.60 - LANDER_VX * 100),0)
+		
+		if GAME_CONFIG.easyMode and lander.money < 0 then
+			lander.money = 0
+		end
 	end
 end
 
