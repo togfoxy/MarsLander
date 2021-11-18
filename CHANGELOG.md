@@ -23,6 +23,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - Fixed assets not being checked for supported file types
 - restored the high score that somehow got removed
 - removed unused audio files
+- miscellaneous multi-player fixes
 
 ## v0.11
 ### Added
