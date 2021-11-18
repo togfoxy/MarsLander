@@ -7,38 +7,39 @@
 
 local Modules =  {
     thrusters = {
-        id = 1,
-        name = "Efficent Thrusters",
+        id = Enum.moduleEfficientThrusters,
+        name = "Efficient Thrusters",
         cost = 225,
         mass = 20,
     },
     largeTank = {
-        id = 2,
+        id = Enum.moduleLargeTank,
         name = "Large Fuel Tank",
         cost = 200,
         mass = 10,
         fuelCapacity = 32,
+		allowed = false
     },
     rangefinder = {
-        id = 3,
+        id = Enum.moduleRangefinder,
         name = "Rangefinder",
         cost = 175,
         mass = 5,
     },
     sideThrusters = {
-        id = 4,
+        id = Enum.moduleSideThrusters,
         name = "Side Thrusters",
         cost = 185,
         mass = 20,
     },
 	parachute = {
-		id = 5,
+		id = Enum.moduleParachute,
 		name = "Parachute (single use)",
 		cost = 100,
 		mass = 10,
 		deployed = false,
+		allowed = true,
 	},
 }
-
 
 return Modules

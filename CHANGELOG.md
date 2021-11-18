@@ -14,12 +14,16 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - can now buy a parachute module. Deploys automatically. Use the side thruster keys (q/e) to steer. Single use.
 - Host/client disconnections are now actively managed
 - ability for external clients to connect over internet (not just LAN)
+- expanded the settings slab window to accommodate game options
 
 ### Changed
 
 ### Fixed
 - fix background drawn wrong on full screen
 - Fixed assets not being checked for supported file types
+- restored the high score that somehow got removed
+- removed unused audio files
+- miscellaneous multi-player fixes
 
 ## v0.11
 ### Added

@@ -74,8 +74,9 @@ Assets.newFont(20)
 
 -- TODO: Turn global modules / objects to local ones
 -- Scripts
+Enum		= require 'scripts.enum'		-- ensure Enum is declared first
 Modules		= require 'scripts.modules'		-- Lander modules
-Enum		= require 'scripts.enum'
+
 -- Objects
 Smoke 		= require 'objects.smoke'		-- Smoke particles for objects
 Lander 		= require 'objects.lander'
@@ -102,6 +103,7 @@ GROUND = {}			-- stores the y value for the ground
 OBJECTS = {}		-- stores objects that need to be drawn
 MASS_RATIO = 0		-- for debugging only. Records current mass/default mass ratio
 GAME_SETTINGS = {}	-- track game settings
+GAME_CONFIG = {}	-- tracks the user defined settings for modules turned on and off
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
 ORIGIN_X = Cf.round(SCREEN_WIDTH / 2, 0)
@@ -203,6 +205,7 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
+	Fun.LoadGameConfig()
 
 	-- Restore full screen setting
 	love.window.setFullscreen(GAME_SETTINGS.FullScreen)

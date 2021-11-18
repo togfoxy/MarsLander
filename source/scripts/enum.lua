@@ -17,4 +17,11 @@ return {
 
 	-- miscellaneous
 	rangefinderMaximumDistance = 4000,
+	
+	-- module ID's
+	moduleEfficientThrusters = 1,
+	moduleLargeTank = 2,
+	moduleRangefinder = 3,
+	moduleSideThrusters = 4,
+	moduleParachute = 5
 }
