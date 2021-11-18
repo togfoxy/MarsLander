@@ -254,7 +254,7 @@ end
 
 function Menus.DrawSettingsMenu()
 	local intSlabWidth = 500	-- the width of the settings window slab.
-	local intSlabHeight = 300 	-- the height of the windowslab
+	local intSlabHeight = 325 	-- the height of the windowslab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 

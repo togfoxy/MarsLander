@@ -8,6 +8,7 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG = {}
 	GAME_CONFIG.allowParachutes = true
 	GAME_CONFIG.useAdvancedPhysics = false
+	GAME_CONFIG.easyMode = false
 
 end
 

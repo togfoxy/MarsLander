@@ -626,7 +626,7 @@ function Lander.keypressed(key, scancode, isrepeat)
 	
 	if Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
 		-- Iterate all available modules
-		for k, module in pairs(Modules) do
+		for _, module in pairs(Modules) do
 			-- Press key assigned to the module by its id
 			if key == tostring(module.id) then
 				buyModule(module, lander)
