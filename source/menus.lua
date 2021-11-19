@@ -253,8 +253,8 @@ function Menus.DrawCredits()
 end
 
 function Menus.DrawSettingsMenu()
-	local intSlabWidth = 400	-- the width of the settings window slab.
-	local intSlabHeight = 250 	-- the height of the windowslab
+	local intSlabWidth = 500	-- the width of the settings window slab.
+	local intSlabHeight = 325 	-- the height of the windowslab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -264,7 +264,7 @@ function Menus.DrawSettingsMenu()
 		Y = fltSlabWindowY,
 		W = intSlabWidth,
 		H = intSlabHeight,
-		Border = 0,
+		Border = 15,
 		AutoSizeWindow = false,
 		AllowMove = false,
 		AllowResize = false,
@@ -272,11 +272,10 @@ function Menus.DrawSettingsMenu()
 		}
 
 	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
-		Slab.BeginLayout('layout-settings',{AlignX = "center"})
+		Slab.BeginLayout('layout-settings',{AlignX = "left", Columns = 2})
+		
+		Slab.SetLayoutColumn(1)
 
-		Slab.NewLine()
-		Slab.Textf("Player Settings:")
-		Slab.NewLine()
 		Slab.Textf("Name:")
 		local PlayerName = GAME_SETTINGS.PlayerName
 		if Slab.Input('Name',{Text=PlayerName,Tooltip="Enter your player name here"}) then
@@ -291,27 +290,58 @@ function Menus.DrawSettingsMenu()
 				GAME_SETTINGS.PlayerName = PlayerName
 			end
 		end
-		Slab.NewLine()
-		Slab.Separator()
 
 		Slab.NewLine()
 		Slab.Text("Game Settings:")
 		if Slab.CheckBox(GAME_SETTINGS.FullScreen, "Full Screen") then
 			GAME_SETTINGS.FullScreen = not GAME_SETTINGS.FullScreen
 			love.window.setFullscreen(GAME_SETTINGS.FullScreen)
-			Fun.SaveGameSettings()
 		end
 
 		Slab.NewLine()
-		Slab.Separator()
 
-		Slab.NewLine()
-		if Slab.Button("OK") then
-			-- return to the previous game state
-			Fun.RemoveScreen()
+		-- all the configurable options go here
+		Slab.SetLayoutColumn(2)
+		
+		Slab.Textf("Options:")
+		if Slab.CheckBox(GAME_CONFIG.showDEBUG, "Show debug info") then
+			GAME_CONFIG.showDEBUG = not GAME_CONFIG.showDEBUG
+		end		
+
+		if Slab.CheckBox(GAME_CONFIG.easyMode, "Easy mode") then
+			GAME_CONFIG.easyMode = not GAME_CONFIG.easyMode
 		end
-
+		
+		if Slab.CheckBox(GAME_CONFIG.allowParachutes, "Allow parachutes") then
+			GAME_CONFIG.allowParachutes = not GAME_CONFIG.allowParachutes
+		end
+		
+		if Slab.CheckBox(GAME_CONFIG.useAdvancedPhysics, "Use advanced physics") then
+			GAME_CONFIG.useAdvancedPhysics = not GAME_CONFIG.useAdvancedPhysics
+		end
+		
 		Slab.EndLayout() -- layout-settings
+		
+		-- this displays the OK button at the bottom
+		Slab.BeginLayout('layout-settings2',{AlignX = "center"})
+			
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			Slab.NewLine()
+			
+			Slab.Separator()	
+			Slab.NewLine()
+			if Slab.Button("OK") then
+				-- return to the previous game state
+				Fun.RemoveScreen()
+			end		
+		Slab.EndLayout() -- layout-settings
+		
 	Slab.EndWindow()
 end
 

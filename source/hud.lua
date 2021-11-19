@@ -141,18 +141,22 @@ local function drawShopMenu()
 		Assets.setFont("font20")
 
 		-- Create List of available modules
-		for _, module in pairs(Modules) do
-			local string = "%s. Buy %s - $%s \n"
-			itemListString = string.format(string, module.id, module.name, module.cost)
-			-- Draw list of modules
-			local color = {1, 1, 1, 1}
-			local y = SCREEN_HEIGHT * 0.33
-			if Lander.hasUpgrade(LANDERS[1], module) then
-				color = {.8, .1, .1, .5}
+		local y = SCREEN_HEIGHT * 0.33
+
+		for k, module in pairs(Modules) do
+			if module.allowed == nil or module.allowed == true then
+				local string = "%s. Buy %s - $%s \n"
+				itemListString = string.format(string, module.id, module.name, module.cost)
+				-- Draw list of modules
+				local color = {1, 1, 1, 1}
+				if Lander.hasUpgrade(LANDERS[1], module) then
+					color = {.8, .1, .1, .5}
+				end
+				love.graphics.setColor(color)
+				love.graphics.printf(itemListString, 0, y, SCREEN_WIDTH, "center")
+				y = y + 20
+				love.graphics.setColor(1, 1, 1, 1)
 			end
-			love.graphics.setColor(color)
-			love.graphics.printf(itemListString, 0, y + (20*module.id), SCREEN_WIDTH, "center")
-			love.graphics.setColor(1, 1, 1, 1)
 		end
 	end
 end
@@ -189,21 +193,28 @@ local function drawScore()
 			y = y + 20	-- prep the y value for the next score (will be ignored for single player)
 		end
 	end
+
+	-- print high score
+	local highscore = Cf.strFormatThousand(Cf.round(GAME_SETTINGS.HighScore))
+	love.graphics.print("High Score: " .. highscore, (SCREEN_WIDTH / 2) - 75, 90)	
 end
 
 
 
 local function drawDebug()
-	Assets.setFont("font14")
-	local lander = LANDERS[1]
 
-	love.graphics.print("Mass = " .. Cf.round(Lander.getMass(lander), 2), 5, 75)
-	love.graphics.print("Fuel = " .. Cf.round(lander.fuel, 2), 5, 90)
-	love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 120)
-	love.graphics.print("MEM: " .. Cf.round(collectgarbage("count")), 10, 140)
-	love.graphics.print("Ground: " .. #GROUND, 10, 160)
-	love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
-	love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
+	if GAME_CONFIG.showDEBUG then
+		Assets.setFont("font14")
+		local lander = LANDERS[1]
+
+		love.graphics.print("Mass = " .. Cf.round(Lander.getMass(lander), 2), 5, 75)
+		love.graphics.print("Fuel = " .. Cf.round(lander.fuel, 2), 5, 90)
+		love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 120)
+		love.graphics.print("MEM: " .. Cf.round(collectgarbage("count")), 10, 140)
+		love.graphics.print("Ground: " .. #GROUND, 10, 160)
+		love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
+		love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
+	end
 end
 
 

@@ -1,5 +1,32 @@
 local functions = {}
 
+
+
+local function setDefaultGameConfigs()
+-- sets all game configs to default settings
+
+	GAME_CONFIG = {}
+	GAME_CONFIG.allowParachutes = true
+	GAME_CONFIG.useAdvancedPhysics = false
+	GAME_CONFIG.easyMode = false
+
+end
+
+
+
+local function configureModules()
+-- modules need to be activated once GAME_SETTINGS is loaded
+-- cycle through all modules and set ACTIVE on those that are configurable
+
+	for _,module in pairs(Modules) do
+		if module.id == Enum.moduleParachute then
+			module.allowed = GAME_CONFIG.allowParachutes
+		end
+	end
+end
+
+
+
 function functions.quitGame()
 -- cleans up before quiting the game
 
@@ -30,6 +57,14 @@ function functions.RemoveScreen()
 	if #CURRENT_SCREEN == 1 then
 		functions.quitGame()
 	end
+	
+	-- save settings if leaving the settings screen
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
+	if strCurrentScreen == "Settings" then
+		Fun.SaveGameSettings()
+		Fun.SaveGameConfig()
+	end
+	
 	table.remove(CURRENT_SCREEN)
 end
 
@@ -48,6 +83,42 @@ function functions.SwapScreen(newscreen)
 
     Fun.AddScreen(newscreen)
     table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
+end
+
+
+
+function functions.SaveGameConfig()
+-- save game settings so they can be autoloaded next session
+	local savefile
+	local serialisedString
+	local success, message
+	local savedir = love.filesystem.getSource()
+
+    savefile = savedir .. "/" .. "gameconfig.dat"
+    serialisedString = Bitser.dumps(GAME_CONFIG)
+    success, message = Nativefs.write(savefile, serialisedString )
+end
+
+
+
+function functions.LoadGameConfig()
+    local savedir = love.filesystem.getSource()
+    love.filesystem.setIdentity( savedir )
+
+    local savefile, contents
+
+    savefile = savedir .. "/" .. "gameconfig.dat"
+    contents, _ = Nativefs.read(savefile)
+	local success
+    success, GAME_CONFIG = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
+
+	if success == false then
+		setDefaultGameConfigs()
+	end
+	
+	-- turn on and off modules
+	configureModules()
+	
 end
 
 
