@@ -7,6 +7,7 @@
 
 local Lander = {}
 
+local DEFAULT_PAYMENT = 50
 
 
 -- ~~~~~~~~~~~~~~~~
@@ -15,7 +16,6 @@ local Lander = {}
 
 local keyDown = love.keyboard.isDown
 
--- TODO: Create the spriteData with width and height automatically (except for animations)
 local ship = Assets.getImageSet("ship")
 local flame = Assets.getImageSet("flame")
 local parachute = Assets.getImageSet("parachute")
@@ -64,7 +64,7 @@ local function parachuteIsDeployed(lander)
 -- return true if lander has a parachute and it is deployed
 
 	for _, moduleItem in pairs(lander.modules) do
-		if moduleItem.id == 5 then	-- 5 = parachute	
+		if moduleItem.id == 5 then	-- 5 = parachute
 			if moduleItem.deployed then
 				return true
 			end
@@ -138,14 +138,14 @@ local function thrustLeft(lander, dt)
 		lander.rightEngineOn = true
 		lander.fuel = lander.fuel - forceX
 	end
-	
+
 	-- if trying to side thrust and has parachute and descending and on the screen then ...
 	if Lander.hasUpgrade(lander, Modules.parachute) and not landerHasFuelToThrust(lander, dt) then
 		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
 			-- parachutes allow left/right drifting even if no fuel and thrusters available
 			deployParachute(lander)
 			local forceX = 0.5 * dt
-			lander.vx = lander.vx - forceX	
+			lander.vx = lander.vx - forceX
 		end
 	end	
 end
@@ -160,15 +160,15 @@ local function thrustRight(lander, dt)
 		-- opposite engine is on
 		lander.leftEngineOn = true
 	end
-	
+
 	-- if trying to side thrust and has parachute and descending and on the screen then ...
 	if Lander.hasUpgrade(lander, Modules.parachute) and not landerHasFuelToThrust(lander, dt) then
 		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
 			deployParachute(lander)
 			local forceX = 0.5 * dt
-			lander.vx = lander.vx + forceX	
+			lander.vx = lander.vx + forceX
 		end
-	end		
+	end
 end
 
 
@@ -186,15 +186,11 @@ local function moveShip(lander, dt)
 	if not lander.onGround then
 		-- apply gravity
 		lander.vy = lander.vy + (Enum.constGravity * dt)
-		
+
 		-- parachutes slow descent
 		if parachuteIsDeployed(lander) and lander.vy > 0.5 then
 			lander.vy = 0.5
-		end	
-		
-		-- used to determine speed right before touchdown
-		LANDER_VY = lander.vy
-		LANDER_VX = lander.vx
+		end
 	end
 end
 
@@ -212,25 +208,31 @@ end
 
 
 
-local function payLanderFromBase(lander, base, baseDistance)
-	-- pay some money based on distance to the base
-	-- base is an object/table item from OBJECTS
-	local distance = math.abs(baseDistance)
-	if not base.paid then
-		lander.money = Cf.round(lander.money + (100 - distance),0)
-		landingSound:play()
+local function payLander(lander, amount)
+	local amount = Cf.round(amount, 0)
+	lander.money = math.max(0, lander.money + amount)
+	if DEBUG then
+		print("Paid "..amount.."$")
 	end
 end
 
 
 
-local function payLanderForControl(lander, base)
-	if base.paid == false then
-		-- pay for a good vertical speed
-		lander.money = Cf.round(lander.money + ((1 - LANDER_VY) * 100),0)
-		-- pay for a good horizontal speed
-		lander.money = Cf.round(lander.money + (0.60 - LANDER_VX * 100),0)
-	end
+local function payLanderFromBase(lander, distance)
+	-- pay some money based on distance to the base
+	-- base is an object/table item from OBJECTS
+	local distance = math.abs(distance)
+	payLander(lander, (DEFAULT_PAYMENT - distance))
+	landingSound:play()
+end
+
+
+
+local function payLanderForControl(lander)
+	-- pay for a good vertical speed
+	payLander(lander, DEFAULT_PAYMENT - (math.abs(lander.vx) * DEFAULT_PAYMENT))
+	-- pay for a good horizontal speed
+	payLander(lander, DEFAULT_PAYMENT - (math.abs(lander.vy) * DEFAULT_PAYMENT))
 end
 
 
@@ -271,7 +273,7 @@ local function checkForContact(lander, dt)
 	if lander.y > roundedGroundY - 8 then	-- 8 = the image offset for visual effect
 		-- a heavy landing will cause damage
 		checkForDamage(lander)
-		
+
 		if not lander.onGround then
 
 			-- destroy the single use parachute
@@ -289,12 +291,27 @@ local function checkForContact(lander, dt)
 				table.remove(lander.modules, moduleIndexToDestroy)
 				-- adjust new mass
 				DEFAULT_MASS = recalcDefaultMass(lander)
-			end	
+			end
 		end
-		
+
+		-- TODO: Move some of the fuel base logic to objects/base.lua
+		if onBase and not lander.gameOver then
+			refuelLander(lander, bestBase,dt)
+			if not bestBase.paid then
+				-- pay the lander on first visit on the base
+				payLanderFromBase(lander, bestDistance)
+				-- this is the first landing on this base so pay money based on vertical and horizontal speed
+				payLanderForControl(lander)
+				bestBase.paid = true
+			-- check for game-over conditions
+			elseif not bestBase.active and lander.fuel <= 1 then
+				lander.gameOver = true
+			end
+		end
+
 		-- NOTE: if you need to check things on first contact with terrain (like receiving damage) then place
 		-- that code above lander.onGround = true
-		
+
 		-- Lander is on ground
 		lander.onGround = true
 		-- Stop x, y movement
@@ -303,21 +320,6 @@ local function checkForContact(lander, dt)
 			lander.vy = 0
 		end
 
-		-- TODO: Move some of the fuel base logic to objects/base.lua
-		if onBase and not lander.gameOver then
-			refuelLander(lander, bestBase,dt)
-			payLanderFromBase(lander, bestBase, bestDistance)
-			-- pay the lander on first visit on the base
-			-- this is the first landing on this base so pay money based on vertical and horizontal speed
-			if not bestBase.paid then
-				payLanderForControl(lander, bestBase)
-				bestBase.paid = true
-			-- check for game-over conditions
-			elseif not bestBase.active and lander.fuel <= 1 then
-				lander.gameOver = true
-			end
-		end
-		
 		-- check for game-over conditions
 		if not onBase and lander.fuel <= 1 then
 			lander.gameOver = true
@@ -513,7 +515,7 @@ local function updateScore(lander)
 -- updates the lander score that is saved in the lander table
 -- this is the same as functions.CalculateScore(). Intention is to deprecate and remove that function and use this.
 -- this procedure does not return the score. It updates the lander table
-	
+
 	lander.score = lander.x - ORIGIN_X
 
 	if lander.score > GAME_SETTINGS.HighScore then
@@ -546,8 +548,10 @@ function Lander.update(lander, dt)
 	-- TODO: Calculate the offset so that it doesn't need to be global
 	-- Calculate worldOffset for everyone based on lander x position
 	WORLD_OFFSET = Cf.round(lander.x) - ORIGIN_X
+	
 	-- Reset angle if > 360 degree
 	if math.max(lander.angle) > 360 then lander.angle = 0 end
+
 	-- Update ship
     moveShip(lander, dt)
     playSoundEffects(lander)
@@ -574,16 +578,16 @@ function Lander.draw()
 			else
 				love.graphics.setColor(1,1,1,0.5)
 			end
-			
+
 			-- draw parachute before drawing the lander
 			if parachuteIsDeployed(lander) then
-				local parachuteYOffset = y - parachute.image:getHeight()
-				local parachuteXOffset = x - parachute.image:getWidth() / 2
+				local parachuteXOffset = x - parachute.width / 2
+				local parachuteYOffset = y - parachute.height
 				love.graphics.draw(parachute.image, parachuteXOffset, parachuteYOffset)
-			end		
+			end
 
 			-- TODO: work out why ship.width doesn't work in mplayer mode
-			love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
+			love.graphics.draw(ship.image, x, y, math.rad(lander.angle), sx, sy, ox, oy)
 
 			-- draw flames
 			local ox = flame.width / 2
@@ -603,7 +607,7 @@ function Lander.draw()
 				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 				lander.rightEngineOn = false
 			end
-			
+
 			-- draw label
 			love.graphics.setNewFont(10)
 			love.graphics.print(lander.name, x + 14, y - 10)

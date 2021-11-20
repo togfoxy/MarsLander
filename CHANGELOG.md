@@ -16,10 +16,12 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - ability for external clients to connect over internet (not just LAN)
 
 ### Changed
+- Changed payment to be based on a default value of 50$
 
 ### Fixed
 - fix background drawn wrong on full screen
 - Fixed assets not being checked for supported file types
+- Fixed out-of-bounds payment when landing with negative velocity
 
 ## v0.11
 ### Added
