@@ -218,19 +218,17 @@ end
 
 
 
-local function payLanderFromBase(lander, base, baseDistance)
+local function payLanderFromBase(lander, distance)
 	-- pay some money based on distance to the base
 	-- base is an object/table item from OBJECTS
-	local distance = math.abs(baseDistance)
-	if not base.paid then
-		payLander(lander, (DEFAULT_PAYMENT - distance))
-		landingSound:play()
-	end
+	local distance = math.abs(distance)
+	payLander(lander, (DEFAULT_PAYMENT - distance))
+	landingSound:play()
 end
 
 
 
-local function payLanderForControl(lander, base)
+local function payLanderForControl(lander)
 	-- pay for a good vertical speed
 	payLander(lander, DEFAULT_PAYMENT - (math.abs(lander.vx) * DEFAULT_PAYMENT))
 	-- pay for a good horizontal speed
@@ -299,11 +297,11 @@ local function checkForContact(lander, dt)
 		-- TODO: Move some of the fuel base logic to objects/base.lua
 		if onBase and not lander.gameOver then
 			refuelLander(lander, bestBase,dt)
-			payLanderFromBase(lander, bestBase, bestDistance)
-			-- pay the lander on first visit on the base
-			-- this is the first landing on this base so pay money based on vertical and horizontal speed
 			if not bestBase.paid then
-				payLanderForControl(lander, bestBase)
+				-- pay the lander on first visit on the base
+				payLanderFromBase(lander, bestDistance)
+				-- this is the first landing on this base so pay money based on vertical and horizontal speed
+				payLanderForControl(lander)
 				bestBase.paid = true
 			-- check for game-over conditions
 			elseif not bestBase.active and lander.fuel <= 1 then
