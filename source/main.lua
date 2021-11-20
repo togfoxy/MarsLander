@@ -110,10 +110,6 @@ WORLD_OFFSET = ORIGIN_X
 -- this is the mass the lander starts with hence the mass the noob engines are tuned to
 DEFAULT_MASS = 220
 
--- track speed of the lander to detect crashes etc
-LANDER_VX = 0
-LANDER_VY = 0
-
 -- Default Player values
 DEFAULT_PLAYER_NAME = 'Player Name'
 CURRENT_PLAYER_NAME = DEFAULT_PLAYER_NAME
